@@ -1,0 +1,542 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  output          = "../generated/client"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [pgvector(map: "vector", schema: "extensions"), pg_trgm]
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTH
+// ─────────────────────────────────────────────
+
+model User {
+  id    String @id @default(uuid()) @db.Uuid
+  // Mirrors Supabase auth.users.id — set via trigger
+  email String @unique
+
+  fullName  String? @map("full_name")
+  avatarUrl String? @map("avatar_url")
+  role      UserRole @default(STUDENT)
+
+  // Onboarding context (medicine student focus)
+  examDate      DateTime? @map("exam_date")
+  hoursPerDay   Float?    @map("hours_per_day")
+  gradeGoal     String?   @map("grade_goal") // e.g., "16", "85%"
+  currentLevel  String?   @map("current_level") // e.g., "beginner", "intermediate"
+  studyNiche    String?   @map("study_niche") // e.g., "medicine", "engineering"
+
+  // Stripe
+  stripeCustomerId String? @unique @map("stripe_customer_id")
+
+  // Preferences
+  preferredExplanationStyle ExplanationStyle @default(CONCISE) @map("preferred_explanation_style")
+  preferredLocale           String           @default("pt") @map("preferred_locale")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subscription     Subscription?
+  documents        Document[]
+  flashcards       Flashcard[]
+  quizAttempts     QuizAttempt[]
+  studySessions    StudySession[]
+  studyPlans       StudyPlan[]
+  progressRecords  ProgressRecord[]
+  conversations    ChatConversation[]
+  apiUsageLogs     ApiUsageLog[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+  INSTITUTION_ADMIN
+}
+
+enum ExplanationStyle {
+  CONCISE
+  DETAILED
+  VISUAL
+  ANALOGICAL
+}
+
+// ─────────────────────────────────────────────
+// SUBSCRIPTIONS (Stripe)
+// ─────────────────────────────────────────────
+
+model Subscription {
+  id                   String             @id @default(uuid()) @db.Uuid
+  userId               String             @unique @map("user_id") @db.Uuid
+  stripeSubscriptionId String             @unique @map("stripe_subscription_id")
+  stripePriceId        String             @map("stripe_price_id")
+  stripeProductId      String             @map("stripe_product_id")
+  status               SubscriptionStatus
+  plan                 PlanTier
+  currentPeriodStart   DateTime           @map("current_period_start")
+  currentPeriodEnd     DateTime           @map("current_period_end")
+  cancelAtPeriodEnd    Boolean            @default(false) @map("cancel_at_period_end")
+  canceledAt           DateTime?          @map("canceled_at")
+  trialStart           DateTime?          @map("trial_start")
+  trialEnd             DateTime?          @map("trial_end")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  TRIALING
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAUSED
+}
+
+enum PlanTier {
+  FREE
+  PRO
+  PREMIUM
+  INSTITUTIONAL
+}
+
+// ─────────────────────────────────────────────
+// DOCUMENTS
+// ─────────────────────────────────────────────
+
+model Document {
+  id           String         @id @default(uuid()) @db.Uuid
+  userId       String         @map("user_id") @db.Uuid
+  title        String
+  sourceType   SourceType     @map("source_type")
+  originalName String?        @map("original_name")
+  mimeType     String?        @map("mime_type")
+  sizeBytes    Int?           @map("size_bytes")
+  pageCount    Int?           @map("page_count")
+
+  // YouTube-specific
+  youtubeUrl      String? @map("youtube_url")
+  youtubeDuration Int?    @map("youtube_duration") // seconds
+
+  // Status
+  status       DocumentStatus @default(PENDING)
+  errorMessage String?        @map("error_message")
+
+  // Extracted content (file deleted after this is populated)
+  extractedText String? @map("extracted_text") @db.Text
+  wordCount     Int?    @map("word_count")
+
+  // Subject/topic metadata
+  subject String?
+  topics  String[] // extracted topic list
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks     DocumentChunk[]
+  flashcards Flashcard[]
+  quizzes    Quiz[]
+  studyPlans StudyPlan[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("documents")
+}
+
+enum SourceType {
+  PDF
+  POWERPOINT
+  TEXT
+  YOUTUBE
+  SCREENSHOT
+  IMAGE
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+// ─────────────────────────────────────────────
+// DOCUMENT CHUNKS (for RAG / vector search)
+// ─────────────────────────────────────────────
+
+model DocumentChunk {
+  id         String @id @default(uuid()) @db.Uuid
+  documentId String @map("document_id") @db.Uuid
+  chunkIndex Int    @map("chunk_index")
+  content    String @db.Text
+  tokenCount Int?   @map("token_count")
+
+  // Page reference (for PDFs/PPTs)
+  pageNumber Int? @map("page_number")
+
+  // pgvector embedding — 1536 dims for text-embedding-3-small
+  embedding Unsupported("vector(1536)")?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, chunkIndex])
+  @@map("document_chunks")
+}
+
+// ─────────────────────────────────────────────
+// FLASHCARDS
+// ─────────────────────────────────────────────
+
+model Flashcard {
+  id         String  @id @default(uuid()) @db.Uuid
+  userId     String  @map("user_id") @db.Uuid
+  documentId String? @map("document_id") @db.Uuid
+
+  front      String          @db.Text // question/term
+  back       String          @db.Text // answer/definition
+  hint       String?         @db.Text
+  topic      String?
+  difficulty DifficultyLevel @default(MEDIUM)
+  tags       String[]
+
+  // SM-2 spaced repetition state
+  smInterval   Int      @default(0) @map("sm_interval") // days until next review
+  smRepetition Int      @default(0) @map("sm_repetition") // number of correct reviews
+  smEfactor    Float    @default(2.5) @map("sm_efactor") // ease factor
+  smDueDate    DateTime @default(now()) @map("sm_due_date") // next review date
+
+  isGenerated Boolean  @default(true) @map("is_generated") // AI vs manual
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document?        @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reviews  ProgressRecord[]
+
+  @@index([userId, smDueDate]) // critical for SM-2 daily queue
+  @@index([documentId])
+  @@map("flashcards")
+}
+
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// ─────────────────────────────────────────────
+// QUIZZES
+// ─────────────────────────────────────────────
+
+model Quiz {
+  id           String   @id @default(uuid()) @db.Uuid
+  documentId   String?  @map("document_id") @db.Uuid
+  title        String
+  description  String?  @db.Text
+  quizType     QuizType @map("quiz_type")
+  timeLimit    Int?     @map("time_limit") // seconds; null = untimed
+  passingScore Int      @default(70) @map("passing_score") // percentage
+  isExamMode   Boolean  @default(false) @map("is_exam_mode")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  document  Document?      @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@index([documentId])
+  @@map("quizzes")
+}
+
+enum QuizType {
+  MULTIPLE_CHOICE
+  OPEN_ANSWER
+  MIXED
+  EXAM_SIMULATION
+}
+
+model QuizQuestion {
+  id            String          @id @default(uuid()) @db.Uuid
+  quizId        String          @map("quiz_id") @db.Uuid
+  questionIndex Int             @map("question_index")
+  questionText  String          @db.Text @map("question_text")
+  questionType  QuestionType    @map("question_type")
+  explanation   String?         @db.Text // shown after answering
+  difficulty    DifficultyLevel @default(MEDIUM)
+  topic         String?
+  points        Int             @default(1)
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options QuizOption[]
+  answers QuizAnswer[]
+
+  @@index([quizId, questionIndex])
+  @@map("quiz_questions")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  OPEN_ANSWER
+}
+
+model QuizOption {
+  id          String @id @default(uuid()) @db.Uuid
+  questionId  String @map("question_id") @db.Uuid
+  optionIndex Int    @map("option_index")
+  text        String @db.Text
+  isCorrect   Boolean @map("is_correct")
+
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_options")
+}
+
+// ─────────────────────────────────────────────
+// QUIZ ATTEMPTS & ANSWERS
+// ─────────────────────────────────────────────
+
+model QuizAttempt {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  quizId      String    @map("quiz_id") @db.Uuid
+  score       Float? // percentage 0-100
+  passed      Boolean?
+  timeTaken   Int?      @map("time_taken") // seconds
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@index([userId, createdAt])
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id              String   @id @default(uuid()) @db.Uuid
+  attemptId       String   @map("attempt_id") @db.Uuid
+  questionId      String   @map("question_id") @db.Uuid
+  selectedOptions String[] @map("selected_options") // option IDs for MC
+  openResponse    String?  @db.Text @map("open_response")
+  isCorrect       Boolean? @map("is_correct")
+  score           Float? // partial credit for open answers
+  aiFeedback      String?  @db.Text @map("ai_feedback") // Claude explanation
+  timeSpent       Int?     @map("time_spent") // seconds on this question
+
+  attempt  QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_answers")
+}
+
+// ─────────────────────────────────────────────
+// STUDY SESSIONS
+// ─────────────────────────────────────────────
+
+model StudySession {
+  id                String      @id @default(uuid()) @db.Uuid
+  userId            String      @map("user_id") @db.Uuid
+  sessionType       SessionType @map("session_type")
+  documentId        String?     @map("document_id") @db.Uuid
+  durationSeconds   Int?        @map("duration_seconds")
+  cardsReviewed     Int         @default(0) @map("cards_reviewed")
+  questionsAnswered Int         @default(0) @map("questions_answered")
+  correctAnswers    Int         @default(0) @map("correct_answers")
+  startedAt         DateTime    @default(now()) @map("started_at")
+  endedAt           DateTime?   @map("ended_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@map("study_sessions")
+}
+
+enum SessionType {
+  FLASHCARD_REVIEW
+  QUIZ
+  EXAM_SIMULATION
+  READING
+  CHAT
+}
+
+// ─────────────────────────────────────────────
+// STUDY PLANS
+// ─────────────────────────────────────────────
+
+model StudyPlan {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  documentId  String?  @map("document_id") @db.Uuid
+  title       String
+  examDate    DateTime @map("exam_date")
+  hoursPerDay Float    @map("hours_per_day")
+  gradeGoal   String   @map("grade_goal")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document?      @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  days     StudyPlanDay[]
+
+  @@index([userId, isActive])
+  @@map("study_plans")
+}
+
+model StudyPlanDay {
+  id           String   @id @default(uuid()) @db.Uuid
+  planId       String   @map("plan_id") @db.Uuid
+  dayNumber    Int      @map("day_number")
+  date         DateTime @db.Date
+  totalMinutes Int      @map("total_minutes")
+  isCompleted  Boolean  @default(false) @map("is_completed")
+
+  plan  StudyPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
+  tasks StudyPlanTask[]
+
+  @@unique([planId, dayNumber])
+  @@map("study_plan_days")
+}
+
+model StudyPlanTask {
+  id          String      @id @default(uuid()) @db.Uuid
+  dayId       String      @map("day_id") @db.Uuid
+  taskType    SessionType @map("task_type")
+  title       String
+  description String?     @db.Text
+  durationMin Int         @map("duration_min")
+  topic       String?
+  isCompleted Boolean     @default(false) @map("is_completed")
+  taskOrder   Int         @map("task_order")
+
+  day StudyPlanDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId, taskOrder])
+  @@map("study_plan_tasks")
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS RECORDS (SM-2 review history)
+// ─────────────────────────────────────────────
+
+model ProgressRecord {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  flashcardId  String   @map("flashcard_id") @db.Uuid
+  grade        Int // SM-2 grade 0-5
+  prevInterval Int      @map("prev_interval")
+  newInterval  Int      @map("new_interval")
+  prevEfactor  Float    @map("prev_efactor")
+  newEfactor   Float    @map("new_efactor")
+  responseTime Int?     @map("response_time") // ms
+  reviewedAt   DateTime @default(now()) @map("reviewed_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flashcard Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+  @@index([flashcardId])
+  @@map("progress_records")
+}
+
+// ─────────────────────────────────────────────
+// CHAT COMPANION
+// ─────────────────────────────────────────────
+
+model ChatConversation {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  title       String?
+  documentIds String[] @map("document_ids") // context documents
+
+  // Memory: difficulties the user expressed
+  knownWeaknesses String[] @map("known_weaknesses")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String      @id @default(uuid()) @db.Uuid
+  conversationId String      @map("conversation_id") @db.Uuid
+  role           MessageRole
+  content        String      @db.Text
+
+  // For assistant messages
+  tokensUsed Int?    @map("tokens_used")
+  modelUsed  String? @map("model_used")
+
+  // RAG context chunks used
+  sourceChunkIds String[] @map("source_chunk_ids")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("chat_messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// ─────────────────────────────────────────────
+// ADMIN: API USAGE LOGGING
+// ─────────────────────────────────────────────
+
+model ApiUsageLog {
+  id           String     @id @default(uuid()) @db.Uuid
+  userId       String?    @map("user_id") @db.Uuid
+  feature      ApiFeature
+  model        String // e.g., "claude-haiku-4-5"
+  inputTokens  Int        @map("input_tokens")
+  outputTokens Int        @map("output_tokens")
+  costUsd      Float      @map("cost_usd")
+  durationMs   Int?       @map("duration_ms")
+  success      Boolean    @default(true)
+  errorMessage String?    @map("error_message")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([feature])
+  @@map("api_usage_logs")
+}
+
+enum ApiFeature {
+  FLASHCARD_GENERATION
+  QUIZ_GENERATION
+  SUMMARY_GENERATION
+  CHAT_RESPONSE
+  STUDY_PLAN_GENERATION
+  OPEN_ANSWER_GRADING
+  EMBEDDING_GENERATION
+}

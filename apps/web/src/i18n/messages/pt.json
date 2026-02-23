@@ -1,0 +1,174 @@
+{
+  "common": {
+    "loading": "A carregar...",
+    "error": "Erro",
+    "retry": "Tentar novamente",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Criar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "finish": "Terminar",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "documents": "Documentos",
+    "flashcards": "Flashcards",
+    "quizzes": "Quizzes",
+    "studyPlan": "Plano de Estudo",
+    "progress": "Progresso",
+    "chat": "Chat IA",
+    "examSimulator": "Simulador de Exame",
+    "settings": "Definições",
+    "admin": "Administração",
+    "upload": "Carregar",
+    "signOut": "Terminar sessão"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signUp": "Criar conta",
+    "email": "Email",
+    "password": "Palavra-passe",
+    "forgotPassword": "Esqueci a palavra-passe",
+    "noAccount": "Não tens conta?",
+    "hasAccount": "Já tens conta?",
+    "googleSignIn": "Entrar com Google",
+    "magicLink": "Link mágico"
+  },
+  "landing": {
+    "hero": {
+      "title": "Estuda mais inteligente, não mais horas",
+      "subtitle": "Transforma os teus PDFs em flashcards, quizzes e planos de estudo personalizados com IA. Feito para estudantes de medicina.",
+      "cta": "Começar grátis",
+      "ctaSecondary": "Ver como funciona"
+    },
+    "features": {
+      "title": "Tudo o que precisas para passar",
+      "flashcards": {
+        "title": "Flashcards Inteligentes",
+        "description": "Gerados automaticamente com repetição espaçada (algoritmo SM-2)"
+      },
+      "quizzes": {
+        "title": "Quizzes Adaptativos",
+        "description": "O sistema deteta as tuas fraquezas e cria exercícios corretivos"
+      },
+      "chat": {
+        "title": "Tutor IA Pessoal",
+        "description": "Chat treinado no teu conteúdo, com memória das tuas dificuldades"
+      },
+      "plan": {
+        "title": "Plano de Estudo Diário",
+        "description": "Diz-nos a data do exame e a nota que queres. Nós criamos o plano."
+      }
+    },
+    "pricing": {
+      "title": "Preços simples e transparentes",
+      "free": {
+        "name": "Grátis",
+        "price": "€0",
+        "period": "/mês",
+        "features": ["1 documento/mês", "20 flashcards", "10 quizzes", "Chat básico"]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "€15",
+        "period": "/mês",
+        "features": ["Documentos ilimitados", "Flashcards ilimitados", "Simulador de exame", "Plano adaptativo", "Exportação"]
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "€29",
+        "period": "/mês",
+        "features": ["Tudo do Pro", "Analytics avançados", "Estilos de explicação", "Deteção cognitiva", "Offline"]
+      }
+    }
+  },
+  "upload": {
+    "title": "Carregar Documento",
+    "description": "PDF, PowerPoint, texto, link YouTube ou foto dos teus apontamentos",
+    "dropzone": "Arrasta e larga aqui ou clica para selecionar",
+    "supportedFormats": "PDF, PPT, TXT, JPG, PNG (máx. 50MB)",
+    "youtubeUrl": "URL do YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "processing": "A processar o documento...",
+    "processingDescription": "A extrair texto e a gerar embeddings. O ficheiro é eliminado após extração.",
+    "success": "Documento processado com sucesso!",
+    "error": "Erro ao processar o documento"
+  },
+  "flashcards": {
+    "title": "Flashcards",
+    "due": "Para rever hoje",
+    "all": "Todos",
+    "create": "Criar flashcard",
+    "generate": "Gerar com IA",
+    "front": "Frente",
+    "back": "Verso",
+    "hint": "Dica",
+    "topic": "Tópico",
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Médio",
+      "hard": "Difícil"
+    },
+    "review": {
+      "title": "Sessão de Revisão",
+      "showAnswer": "Mostrar resposta",
+      "again": "Outra vez",
+      "hard": "Difícil",
+      "good": "Bom",
+      "easy": "Fácil",
+      "complete": "Sessão completa!",
+      "reviewed": "Revistos",
+      "remaining": "Restantes"
+    }
+  },
+  "quizzes": {
+    "title": "Quizzes",
+    "create": "Criar quiz",
+    "generate": "Gerar com IA",
+    "start": "Iniciar",
+    "submit": "Submeter",
+    "score": "Pontuação",
+    "passed": "Aprovado",
+    "failed": "Reprovado",
+    "correct": "Correto",
+    "incorrect": "Incorreto",
+    "timeLeft": "Tempo restante",
+    "question": "Pergunta"
+  },
+  "chat": {
+    "title": "Tutor IA",
+    "placeholder": "Pergunta algo sobre os teus documentos...",
+    "send": "Enviar",
+    "newConversation": "Nova conversa",
+    "noDocuments": "Seleciona documentos como contexto"
+  },
+  "progress": {
+    "title": "O teu Progresso",
+    "streak": "Sequência",
+    "days": "dias",
+    "cardsReviewed": "Flashcards revistos",
+    "accuracy": "Precisão",
+    "gradeEstimate": "Estimativa de nota",
+    "weakTopics": "Tópicos a melhorar",
+    "strongTopics": "Tópicos dominados"
+  },
+  "settings": {
+    "title": "Definições",
+    "profile": "Perfil",
+    "billing": "Faturação",
+    "preferences": "Preferências",
+    "explanationStyle": "Estilo de explicação",
+    "language": "Idioma",
+    "examDate": "Data do exame",
+    "gradeGoal": "Nota objetivo",
+    "hoursPerDay": "Horas de estudo por dia"
+  }
+}

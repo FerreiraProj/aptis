@@ -1,0 +1,174 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "documents": "Documents",
+    "flashcards": "Flashcards",
+    "quizzes": "Quizzes",
+    "studyPlan": "Study Plan",
+    "progress": "Progress",
+    "chat": "AI Chat",
+    "examSimulator": "Exam Simulator",
+    "settings": "Settings",
+    "admin": "Admin",
+    "upload": "Upload",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "googleSignIn": "Sign in with Google",
+    "magicLink": "Magic link"
+  },
+  "landing": {
+    "hero": {
+      "title": "Study smarter, not longer",
+      "subtitle": "Transform your PDFs into flashcards, quizzes and personalized study plans with AI. Built for medicine students.",
+      "cta": "Start for free",
+      "ctaSecondary": "See how it works"
+    },
+    "features": {
+      "title": "Everything you need to pass",
+      "flashcards": {
+        "title": "Smart Flashcards",
+        "description": "Auto-generated with spaced repetition (SM-2 algorithm)"
+      },
+      "quizzes": {
+        "title": "Adaptive Quizzes",
+        "description": "The system detects your weaknesses and creates corrective exercises"
+      },
+      "chat": {
+        "title": "Personal AI Tutor",
+        "description": "Chat trained on your content, with memory of your difficulties"
+      },
+      "plan": {
+        "title": "Daily Study Plan",
+        "description": "Tell us your exam date and target grade. We create the plan."
+      }
+    },
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "free": {
+        "name": "Free",
+        "price": "€0",
+        "period": "/month",
+        "features": ["1 document/month", "20 flashcards", "10 quizzes", "Basic chat"]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "€15",
+        "period": "/month",
+        "features": ["Unlimited documents", "Unlimited flashcards", "Exam simulator", "Adaptive plan", "Export"]
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "€29",
+        "period": "/month",
+        "features": ["Everything in Pro", "Advanced analytics", "Explanation styles", "Cognitive detection", "Offline"]
+      }
+    }
+  },
+  "upload": {
+    "title": "Upload Document",
+    "description": "PDF, PowerPoint, text, YouTube link or photo of your notes",
+    "dropzone": "Drag and drop here or click to select",
+    "supportedFormats": "PDF, PPT, TXT, JPG, PNG (max 50MB)",
+    "youtubeUrl": "YouTube URL",
+    "youtubeUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "processing": "Processing document...",
+    "processingDescription": "Extracting text and generating embeddings. File is deleted after extraction.",
+    "success": "Document processed successfully!",
+    "error": "Error processing document"
+  },
+  "flashcards": {
+    "title": "Flashcards",
+    "due": "Due today",
+    "all": "All",
+    "create": "Create flashcard",
+    "generate": "Generate with AI",
+    "front": "Front",
+    "back": "Back",
+    "hint": "Hint",
+    "topic": "Topic",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "review": {
+      "title": "Review Session",
+      "showAnswer": "Show answer",
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy",
+      "complete": "Session complete!",
+      "reviewed": "Reviewed",
+      "remaining": "Remaining"
+    }
+  },
+  "quizzes": {
+    "title": "Quizzes",
+    "create": "Create quiz",
+    "generate": "Generate with AI",
+    "start": "Start",
+    "submit": "Submit",
+    "score": "Score",
+    "passed": "Passed",
+    "failed": "Failed",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "timeLeft": "Time left",
+    "question": "Question"
+  },
+  "chat": {
+    "title": "AI Tutor",
+    "placeholder": "Ask something about your documents...",
+    "send": "Send",
+    "newConversation": "New conversation",
+    "noDocuments": "Select documents as context"
+  },
+  "progress": {
+    "title": "Your Progress",
+    "streak": "Streak",
+    "days": "days",
+    "cardsReviewed": "Flashcards reviewed",
+    "accuracy": "Accuracy",
+    "gradeEstimate": "Grade estimate",
+    "weakTopics": "Topics to improve",
+    "strongTopics": "Topics mastered"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "billing": "Billing",
+    "preferences": "Preferences",
+    "explanationStyle": "Explanation style",
+    "language": "Language",
+    "examDate": "Exam date",
+    "gradeGoal": "Target grade",
+    "hoursPerDay": "Study hours per day"
+  }
+}
