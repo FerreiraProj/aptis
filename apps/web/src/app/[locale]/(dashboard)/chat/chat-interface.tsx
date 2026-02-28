@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
+import type { Locale } from "date-fns";
 import { pt, enUS, es, fr, de, it } from "date-fns/locale";
 import { MessageCircle, X, Menu } from "lucide-react";
 
