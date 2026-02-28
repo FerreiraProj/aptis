@@ -48,18 +48,15 @@ export default async function ExamSessionPage({ params }: Params) {
   //   Multiple choice / True-False : 1.5 min (90 s) per question
   //   Open answer                  : 5 min (300 s) per question
   // Minimum 5 minutes, rounded to the nearest minute.
-  function calcTimeLimit(): number {
-    const mcCount = quiz.questions.filter(
-      (q) => q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE"
-    ).length;
-    const openCount = quiz.questions.filter(
-      (q) => q.questionType === "OPEN_ANSWER"
-    ).length;
-    const seconds = mcCount * 90 + openCount * 300;
-    return Math.max(5 * 60, Math.ceil(seconds / 60) * 60);
-  }
-
-  const timeLimitSeconds = quiz.timeLimit ?? calcTimeLimit();
+  const mcCount = quiz.questions.filter(
+    (q) => q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE"
+  ).length;
+  const openCount = quiz.questions.filter(
+    (q) => q.questionType === "OPEN_ANSWER"
+  ).length;
+  const calcSeconds = mcCount * 90 + openCount * 300;
+  const timeLimitSeconds =
+    quiz.timeLimit ?? Math.max(5 * 60, Math.ceil(calcSeconds / 60) * 60);
 
   return <ExamPlayer quiz={quiz} timeLimitSeconds={timeLimitSeconds} />;
 }
