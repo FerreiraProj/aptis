@@ -1,6 +1,6 @@
 import { generateObject } from "ai";
 import { z } from "zod";
-import { anthropic, MODELS } from "./client";
+import { openai, MODELS } from "./client";
 import { logApiUsage } from "./usage-logger";
 
 const QuizSchema = z.object({
@@ -20,9 +20,9 @@ const QuizSchema = z.object({
               isCorrect: z.boolean(),
             })
           )
-          .optional()
-          .describe("Required for MULTIPLE_CHOICE and TRUE_FALSE"),
-        points: z.number().default(1),
+          .nullable()
+          .describe("Options for MULTIPLE_CHOICE/TRUE_FALSE, or null for OPEN_ANSWER"),
+        points: z.number(),
       })
     )
     .min(5)
@@ -51,8 +51,8 @@ export async function generateQuiz(
   } = options;
 
   const start = Date.now();
-  const useHaiku = quizType === "MULTIPLE_CHOICE";
-  const model = useHaiku ? MODELS.HAIKU : MODELS.SONNET;
+  const useSimpleModel = quizType === "MULTIPLE_CHOICE";
+  const model = useSimpleModel ? MODELS.MINI : MODELS.STANDARD;
 
   const typeInstructions =
     quizType === "MULTIPLE_CHOICE"
@@ -62,7 +62,7 @@ export async function generateQuiz(
         : "Mix multiple choice (60%) and open-answer (40%) questions.";
 
   const { object, usage } = await generateObject({
-    model: anthropic(model),
+    model: openai(model),
     schema: QuizSchema,
     system: `You are creating a ${subject} exam for medical students.
 
@@ -81,8 +81,8 @@ Quality rules:
     userId,
     feature: "QUIZ_GENERATION",
     model,
-    inputTokens: usage.promptTokens,
-    outputTokens: usage.completionTokens,
+    inputTokens: usage.inputTokens ?? 0,
+    outputTokens: usage.outputTokens ?? 0,
     durationMs: Date.now() - start,
   });
 

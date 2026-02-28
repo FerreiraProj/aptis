@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
@@ -68,19 +69,18 @@ export default function RegisterPage() {
 
   if (verifyEmail) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
+      <div className="page-bg aurora-bg flex min-h-screen items-center justify-center p-4">
+        <Card variant="glass" className="w-full max-w-md text-center shadow-2xl rounded-3xl">
           <CardHeader>
-            <CardTitle>Verifica o teu email</CardTitle>
+            <CardTitle>{t("verifyEmail")}</CardTitle>
             <CardDescription>
-              Enviamos um email de confirmação para <strong>{email}</strong>.
-              Clica no link para ativar a tua conta.
+              {t("verifyEmailRegisterDescription", { email })}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/login">
               <Button variant="outline" className="w-full">
-                Já confirmei — Entrar
+                {t("alreadyConfirmed")}
               </Button>
             </Link>
           </CardContent>
@@ -90,11 +90,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="page-bg aurora-bg flex min-h-screen items-center justify-center p-4">
+      <Card variant="glass" className="w-full max-w-md shadow-2xl rounded-3xl">
         <CardHeader className="text-center">
-          <div className="mb-4 text-3xl font-bold text-primary">Aptis</div>
-          <CardTitle>Criar conta</CardTitle>
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <Image src="/logo.png" alt="Aptis" width={40} height={40} className="h-10 w-10 object-contain" />
+            <span className="gradient-text text-3xl font-bold">Aptis</span>
+          </div>
+          <CardTitle>{t("signUp")}</CardTitle>
           <CardDescription>
             {t("hasAccount")}{" "}
             <Link href="/login" className="text-primary hover:underline">
@@ -121,20 +124,20 @@ export default function RegisterPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-border/50" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">ou</span>
+              <span className="glass-sm rounded px-2 text-muted-foreground">{t("or")}</span>
             </div>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">Nome completo</Label>
+              <Label htmlFor="fullName">{t("fullName")}</Label>
               <Input
                 id="fullName"
                 type="text"
-                placeholder="Ana Silva"
+                placeholder={t("fullNamePlaceholder")}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -160,7 +163,7 @@ export default function RegisterPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t("passwordMinChars")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -170,18 +173,18 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "A criar conta..." : t("signUp")}
+              {loading ? t("creatingAccount") : t("signUp")}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            Ao criar conta, aceitas os nossos{" "}
+            {t("termsText")}{" "}
             <Link href="/terms" className="hover:underline">
-              Termos de Serviço
+              {t("termsOfService")}
             </Link>{" "}
-            e{" "}
+            {t("and")}{" "}
             <Link href="/privacy" className="hover:underline">
-              Política de Privacidade
+              {t("privacyPolicy")}
             </Link>
             .
           </p>

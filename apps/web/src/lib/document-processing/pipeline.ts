@@ -12,6 +12,7 @@
 import { prisma } from "@aptis/database";
 import type { SourceType } from "@aptis/database";
 import { parsePdf, needsOcr } from "./pdf-parser";
+import { parsePptx } from "./pptx-parser";
 import { runOcrOnBuffer, runOcrOnPdf } from "./ocr-processor";
 import { transcribeYouTube } from "./youtube-transcriber";
 import { chunkText } from "./text-chunker";
@@ -87,6 +88,11 @@ export async function processDocument(
 
         case "TEXT": {
           extractedText = buffer.toString("utf-8");
+          break;
+        }
+
+        case "POWERPOINT": {
+          extractedText = await parsePptx(buffer);
           break;
         }
 

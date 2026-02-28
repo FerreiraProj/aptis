@@ -35,58 +35,79 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ── Light theme — Sky/Teal medical palette ──────────────────────── */
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  --radius: 0.75rem;
+
+  --primary: oklch(0.60 0.18 215);
+  --primary-foreground: oklch(1 0 0);
+
+  --background: oklch(0.985 0.006 220);
+  --foreground: oklch(0.15 0.02 240);
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
+  --card-foreground: oklch(0.15 0.02 240);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.034 264.665);
-  --primary-foreground: oklch(0.985 0.001 106.423);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.034 264.665);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.034 264.665);
+  --popover-foreground: oklch(0.15 0.02 240);
+
+  --secondary: oklch(0.95 0.02 215);
+  --secondary-foreground: oklch(0.30 0.08 215);
+
+  --muted: oklch(0.94 0.01 220);
+  --muted-foreground: oklch(0.52 0.02 220);
+
+  --accent: oklch(0.93 0.04 200);
+  --accent-foreground: oklch(0.20 0.08 210);
+
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0.001 106.423);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.21 0.034 264.665);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.714);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+
+  --border: oklch(0.88 0.015 215);
+  --input: oklch(0.88 0.015 215);
+  --ring: oklch(0.60 0.18 215);
+
+  --chart-1: oklch(0.60 0.18 215);
+  --chart-2: oklch(0.62 0.17 195);
+  --chart-3: oklch(0.65 0.15 260);
+  --chart-4: oklch(0.70 0.14 280);
+  --chart-5: oklch(0.646 0.222 41.116);
 }
 
+/* ── Dark theme — Deep navy ──────────────────────────────────────── */
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.141 0.005 285.823);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.141 0.005 285.823);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.985 0.001 106.423);
-  --primary-foreground: oklch(0.21 0.034 264.665);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0.001 106.423);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0.001 106.423);
+  --background: oklch(0.10 0.03 240);
+  --foreground: oklch(0.95 0.005 215);
+
+  --card: oklch(0.13 0.035 240);
+  --card-foreground: oklch(0.95 0.005 215);
+
+  --popover: oklch(0.13 0.035 240);
+  --popover-foreground: oklch(0.95 0.005 215);
+
+  --primary: oklch(0.65 0.17 215);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.18 0.04 230);
+  --secondary-foreground: oklch(0.85 0.02 215);
+
+  --muted: oklch(0.18 0.03 235);
+  --muted-foreground: oklch(0.60 0.02 225);
+
+  --accent: oklch(0.18 0.05 215);
+  --accent-foreground: oklch(0.85 0.04 210);
+
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.442 0.017 285.786);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
+
+  --border: oklch(0.22 0.04 230);
+  --input: oklch(0.20 0.04 230);
+  --ring: oklch(0.65 0.17 215);
+
+  --chart-1: oklch(0.65 0.17 215);
+  --chart-2: oklch(0.62 0.17 195);
+  --chart-3: oklch(0.55 0.14 260);
+  --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.645 0.246 16.439);
 }
 
@@ -95,6 +116,163 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   GLASSMORPHISM + DESIGN UTILITIES
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Page background — radial mesh gradient ──────────────────────── */
+.page-bg {
+  background:
+    radial-gradient(ellipse at top right, #bae6fd 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, #a5f3fc 0%, transparent 50%),
+    #f0f9ff;
+}
+:is(.dark *) .page-bg {
+  background:
+    radial-gradient(ellipse at top right, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+    #050d1a;
+}
+
+/* ── Glass panels ─────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.50);
+  box-shadow: 0 4px 24px rgba(14, 165, 233, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+:is(.dark *) .glass {
+  background: rgba(5, 13, 26, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Lighter nested glass */
+.glass-sm {
+  background: rgba(255, 255, 255, 0.50);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}
+:is(.dark *) .glass-sm {
+  background: rgba(14, 26, 48, 0.60);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Sidebar — more opaque for readability */
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-right: 1px solid rgba(255, 255, 255, 0.50);
+}
+:is(.dark *) .glass-sidebar {
+  background: rgba(5, 13, 26, 0.85);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ── Gradient text ────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Gradient button surface ──────────────────────────────────────── */
+.btn-gradient {
+  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+  color: white;
+  box-shadow: 0 2px 16px rgba(14, 165, 233, 0.35);
+  transition: filter 200ms ease, box-shadow 200ms ease, transform 100ms ease;
+}
+.btn-gradient:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 24px rgba(14, 165, 233, 0.45);
+}
+.btn-gradient:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-gradient:disabled {
+  opacity: 0.6;
+}
+
+/* ── Aurora animated blobs (auth / hero backgrounds) ─────────────── */
+@keyframes aurora-shift {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(3%, -4%) scale(1.05); }
+  66%  { transform: translate(-2%, 3%) scale(0.97); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+.aurora-bg {
+  position: relative;
+  overflow: hidden;
+}
+.aurora-bg::before,
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  animation: aurora-shift 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.aurora-bg::before {
+  width: 65vw;
+  height: 65vw;
+  background: radial-gradient(circle, #bae6fd, transparent 70%);
+  top: -20%;
+  right: -10%;
+}
+.aurora-bg::after {
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, #a5f3fc, transparent 70%);
+  bottom: -15%;
+  left: -8%;
+  animation-delay: -6s;
+}
+:is(.dark *) .aurora-bg::before {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.3), transparent 70%);
+  opacity: 0.5;
+}
+:is(.dark *) .aurora-bg::after {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.2), transparent 70%);
+}
+
+/* Ensure children of aurora-bg appear above the blobs */
+.aurora-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Active sidebar nav item ──────────────────────────────────────── */
+.nav-active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(6, 182, 212, 0.10));
+  color: oklch(0.60 0.18 215);
+  border-left: 2px solid oklch(0.60 0.18 215);
+}
+:is(.dark *) .nav-active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.20), rgba(6, 182, 212, 0.12));
+  color: oklch(0.75 0.14 215);
+  border-left: 2px solid oklch(0.65 0.17 215);
+}
+
+/* ── Shimmer loading skeleton ─────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
 }

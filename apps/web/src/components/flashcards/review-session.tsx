@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ interface ReviewStats {
 type ReviewState = "front" | "back" | "complete";
 
 export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) {
+  const t = useTranslations("flashcards");
   const [cards, setCards] = useState(initialCards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [state, setState] = useState<ReviewState>("front");
@@ -90,12 +92,12 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
           setState("front");
         }
       } catch {
-        toast.error("Erro ao guardar revisão");
+        toast.error(t("review.gradeError"));
       } finally {
         setSubmitting(false);
       }
     },
-    [currentCard, currentIndex, cards.length, cardStartTime, sessionStartTime, stats, submitting, onComplete]
+    [currentCard, currentIndex, cards.length, cardStartTime, sessionStartTime, stats, submitting, onComplete, t]
   );
 
   // Keyboard shortcuts
@@ -126,8 +128,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
       {/* Progress bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>{currentIndex} revistos</span>
-          <span>{cards.length - currentIndex} restantes</span>
+          <span>{currentIndex} {t("review.reviewed").toLowerCase()}</span>
+          <span>{cards.length - currentIndex} {t("review.remaining").toLowerCase()}</span>
         </div>
         <Progress value={progress} />
       </div>
@@ -146,7 +148,7 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
           }}
         >
           {/* Front */}
-          <Card className="min-h-64 select-none" style={{ backfaceVisibility: "hidden" }}>
+          <Card variant="glass" className="rounded-3xl min-h-64 select-none" style={{ backfaceVisibility: "hidden" }}>
             <CardContent className="flex flex-col items-center justify-center min-h-64 p-8 text-center">
               {currentCard.topic && (
                 <Badge variant="outline" className="mb-4">
@@ -161,7 +163,7 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
               )}
               {state === "front" && (
                 <p className="mt-6 text-xs text-muted-foreground">
-                  Clica para ver a resposta ou prime <kbd className="rounded border px-1">Espaço</kbd>
+                  {t("review.clickHint")} <kbd className="glass-sm rounded px-1">Space</kbd>
                 </p>
               )}
             </CardContent>
@@ -169,7 +171,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
 
           {/* Back */}
           <Card
-            className="absolute inset-0 min-h-64 select-none"
+            variant="glass-sm"
+            className="rounded-3xl absolute inset-0 min-h-64 select-none"
             style={{
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
@@ -194,8 +197,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
         <div className="grid grid-cols-4 gap-2">
           <GradeButton
             grade="AGAIN"
-            label="Outra vez"
-            sublabel="< 1 min"
+            label={t("review.again")}
+            sublabel={t("review.againSublabel")}
             color="bg-red-100 hover:bg-red-200 text-red-800 border-red-200"
             shortcut="1"
             onClick={() => handleGrade("AGAIN")}
@@ -203,8 +206,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
           />
           <GradeButton
             grade="HARD"
-            label="Difícil"
-            sublabel="< 10 min"
+            label={t("review.hard")}
+            sublabel={t("review.hardSublabel")}
             color="bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-200"
             shortcut="2"
             onClick={() => handleGrade("HARD")}
@@ -212,8 +215,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
           />
           <GradeButton
             grade="GOOD"
-            label="Bom"
-            sublabel="4 dias"
+            label={t("review.good")}
+            sublabel={t("review.goodSublabel")}
             color="bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200"
             shortcut="3"
             onClick={() => handleGrade("GOOD")}
@@ -221,8 +224,8 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
           />
           <GradeButton
             grade="EASY"
-            label="Fácil"
-            sublabel="7+ dias"
+            label={t("review.easy")}
+            sublabel={t("review.easySublabel")}
             color="bg-green-100 hover:bg-green-200 text-green-800 border-green-200"
             shortcut="4"
             onClick={() => handleGrade("EASY")}
@@ -234,7 +237,7 @@ export function ReviewSession({ initialCards, onComplete }: ReviewSessionProps) 
       {/* Show answer button when front is visible */}
       {state === "front" && (
         <Button className="w-full" onClick={showAnswer}>
-          Mostrar resposta
+          {t("review.showAnswer")}
         </Button>
       )}
     </div>
@@ -261,7 +264,7 @@ function GradeButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-sm font-medium transition-colors disabled:opacity-50 ${color}`}
+      className={`flex flex-col items-center gap-1 glass-sm rounded-xl p-3 text-sm font-medium transition-colors disabled:opacity-50 ${color}`}
     >
       <span className="font-semibold">{label}</span>
       <span className="text-xs opacity-70">{sublabel}</span>
@@ -273,6 +276,7 @@ function GradeButton({
 }
 
 function SessionComplete({ stats }: { stats: ReviewStats }) {
+  const t = useTranslations("flashcards");
   const accuracy =
     stats.total > 0
       ? Math.round(((stats.good + stats.easy) / stats.total) * 100)
@@ -282,21 +286,21 @@ function SessionComplete({ stats }: { stats: ReviewStats }) {
     <div className="mx-auto max-w-md space-y-6 text-center">
       <div className="text-6xl">🎉</div>
       <div>
-        <h2 className="text-2xl font-bold">Sessão completa!</h2>
+        <h2 className="text-2xl font-bold">{t("review.complete")}</h2>
         <p className="text-muted-foreground">
-          Revisaste {stats.total} flashcards
+          {t("review.reviewedTotal", { total: stats.total })}
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-left">
-        <StatItem label="Outra vez" value={stats.again} color="text-red-600" />
-        <StatItem label="Difícil" value={stats.hard} color="text-orange-600" />
-        <StatItem label="Bom" value={stats.good} color="text-blue-600" />
-        <StatItem label="Fácil" value={stats.easy} color="text-green-600" />
+        <StatItem label={t("review.again")} value={stats.again} color="text-red-600" />
+        <StatItem label={t("review.hard")} value={stats.hard} color="text-orange-600" />
+        <StatItem label={t("review.good")} value={stats.good} color="text-blue-600" />
+        <StatItem label={t("review.easy")} value={stats.easy} color="text-green-600" />
       </div>
 
-      <div className="rounded-lg bg-muted p-4">
-        <p className="text-sm text-muted-foreground">Precisão</p>
+      <div className="glass rounded-2xl p-4">
+        <p className="text-sm text-muted-foreground">{t("review.accuracy")}</p>
         <p className="text-3xl font-bold">{accuracy}%</p>
       </div>
 
@@ -304,7 +308,7 @@ function SessionComplete({ stats }: { stats: ReviewStats }) {
         className="w-full"
         onClick={() => window.location.reload()}
       >
-        Rever mais
+        {t("review.reviewMore")}
       </Button>
     </div>
   );
@@ -320,7 +324,7 @@ function StatItem({
   color: string;
 }) {
   return (
-    <div className="rounded-lg border p-3">
+    <div className="glass-sm rounded-xl p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className={`text-2xl font-bold ${color}`}>{value}</p>
     </div>

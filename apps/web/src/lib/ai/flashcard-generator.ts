@@ -1,6 +1,6 @@
 import { generateObject } from "ai";
 import { z } from "zod";
-import { anthropic, MODELS } from "./client";
+import { openai, MODELS } from "./client";
 import { logApiUsage } from "./usage-logger";
 
 const FlashcardSchema = z.object({
@@ -9,7 +9,7 @@ const FlashcardSchema = z.object({
       z.object({
         front: z.string().describe("The question, term or concept"),
         back: z.string().describe("The answer, definition or explanation"),
-        hint: z.string().optional().describe("Optional memory hint"),
+        hint: z.string().nullable().describe("Optional memory hint, or null"),
         topic: z.string().describe("The topic or chapter this belongs to"),
         difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
         tags: z.array(z.string()).describe("Relevant tags for filtering"),
@@ -54,7 +54,7 @@ export async function generateFlashcards(
   };
 
   const { object, usage } = await generateObject({
-    model: anthropic(MODELS.HAIKU),
+    model: openai(MODELS.MINI),
     schema: FlashcardSchema,
     system: `You are an expert medical educator creating flashcards for ${subject} students using spaced repetition.
 
@@ -73,9 +73,9 @@ Rules:
   await logApiUsage({
     userId,
     feature: "FLASHCARD_GENERATION",
-    model: MODELS.HAIKU,
-    inputTokens: usage.promptTokens,
-    outputTokens: usage.completionTokens,
+    model: MODELS.MINI,
+    inputTokens: usage.inputTokens ?? 0,
+    outputTokens: usage.outputTokens ?? 0,
     durationMs: Date.now() - start,
   });
 

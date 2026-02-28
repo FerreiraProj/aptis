@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { handleChatMessage } from "@/lib/ai/chat-handler";
-import type { CoreMessage } from "ai";
+import type { ModelMessage } from "ai";
 import type { MessageRole } from "@aptis/database";
 
 type Params = { params: Promise<{ conversationId: string }> };
@@ -40,8 +40,9 @@ export async function POST(request: NextRequest, { params }: Params) {
   const auth = await requireAuth();
   if (isAuthError(auth)) return auth.error;
 
-  // Rate limit chat
-  const rateLimit = await checkRateLimit("chat", auth.user.id);
+  // Rate limit chat (plan-aware)
+  const plan = await getUserPlan(auth.user.id);
+  const rateLimit = await checkRateLimit("chat", auth.user.id, plan);
   if (!rateLimit.success) {
     return NextResponse.json(
       { error: "Rate limit exceeded. Try again later." },
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const body = await request.json();
-  const { message: userMessage } = body;
+  const { message: userMessage, subjectName } = body as { message: string; subjectName?: string };
 
   if (!userMessage || typeof userMessage !== "string") {
     return NextResponse.json({ error: "message is required" }, { status: 400 });
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   });
 
   // Build message history for the AI
-  const history: CoreMessage[] = conversation.messages
+  const history: ModelMessage[] = conversation.messages
     .filter((m) => m.role !== "SYSTEM")
     .map((m) => ({
       role: (m.role === "USER" ? "user" : "assistant") as "user" | "assistant",
@@ -96,6 +97,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     documentIds: conversation.documentIds,
     history,
     explanationStyle: user?.preferredExplanationStyle || "CONCISE",
+    subjectName: subjectName || undefined,
   });
 }
 

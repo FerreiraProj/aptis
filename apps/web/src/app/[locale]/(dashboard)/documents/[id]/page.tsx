@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Zap, Target, XCircle, Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ interface DocumentDetail {
   wordCount: number | null;
   pageCount: number | null;
   createdAt: string;
+  errorMessage: string | null;
   _count: { flashcards: number; quizzes: number; chunks: number };
 }
 
@@ -101,7 +103,7 @@ export default function DocumentDetailPage() {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="text-4xl">⏳</div>
+          <Loader2 size={32} className="animate-spin text-muted-foreground" />
           <p className="mt-2 text-muted-foreground">A carregar...</p>
         </div>
       </div>
@@ -153,10 +155,10 @@ export default function DocumentDetailPage() {
 
       {/* Processing indicator */}
       {isProcessing && (
-        <Card>
+        <Card variant="glass">
           <CardContent className="py-6">
             <div className="space-y-3 text-center">
-              <div className="text-3xl animate-spin">⚙️</div>
+              <Loader2 size={28} className="mx-auto animate-spin text-primary" />
               <p className="font-medium">A processar o documento...</p>
               <p className="text-sm text-muted-foreground">
                 A extrair texto e a gerar embeddings. O ficheiro é eliminado
@@ -181,10 +183,10 @@ export default function DocumentDetailPage() {
       {/* Generate content */}
       {isReady && (
         <div className="grid gap-4 sm:grid-cols-2">
-          <Card>
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                🃏 Flashcards
+                <Zap size={18} className="text-primary" /> Flashcards
               </CardTitle>
               <CardDescription>
                 Gera flashcards com repetição espaçada (SM-2) a partir deste
@@ -207,10 +209,10 @@ export default function DocumentDetailPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                🎯 Quiz
+                <Target size={18} className="text-primary" /> Quiz
               </CardTitle>
               <CardDescription>
                 Cria um quiz adaptativo com perguntas de escolha múltipla e
@@ -238,14 +240,14 @@ export default function DocumentDetailPage() {
 
       {/* Failed state */}
       {doc.status === "FAILED" && (
-        <Card className="border-destructive">
+        <Card variant="glass" className="border-destructive/50">
           <CardContent className="py-6 text-center">
-            <div className="text-3xl">❌</div>
+            <XCircle size={32} className="mx-auto text-destructive" />
             <p className="mt-2 font-medium text-destructive">
               Falha ao processar o documento
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Tenta de novo ou carrega um ficheiro diferente
+            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+              {doc.errorMessage ?? "Tenta de novo ou carrega um ficheiro diferente"}
             </p>
           </CardContent>
         </Card>
@@ -256,7 +258,7 @@ export default function DocumentDetailPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {label}

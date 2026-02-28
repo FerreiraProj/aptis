@@ -1,5 +1,5 @@
 /**
- * PDF text extraction using pdf-parse.
+ * PDF text extraction using pdf-parse v1.
  * Handles text-based PDFs. For scanned PDFs, falls back to OCR.
  */
 
@@ -10,18 +10,14 @@ interface ParsedPdf {
 }
 
 export async function parsePdf(buffer: Buffer): Promise<ParsedPdf> {
-  // Dynamic import to avoid issues with Next.js bundling
+  // pdf-parse v1 is a CJS module — use .default for ESM interop
   const pdfParse = (await import("pdf-parse")).default;
-
-  const data = await pdfParse(buffer, {
-    // Limit pages for very large PDFs
-    max: 200,
-  });
+  const data = await pdfParse(buffer);
 
   return {
     text: cleanText(data.text),
     numPages: data.numpages,
-    info: data.info || {},
+    info: (data.info as Record<string, unknown>) ?? {},
   };
 }
 

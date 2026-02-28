@@ -50,6 +50,7 @@ model User {
   progressRecords  ProgressRecord[]
   conversations    ChatConversation[]
   apiUsageLogs     ApiUsageLog[]
+  subjects         Subject[]
 
   @@map("users")
 }
@@ -112,6 +113,28 @@ enum PlanTier {
 }
 
 // ─────────────────────────────────────────────
+// SUBJECTS / DISCIPLINES
+// ─────────────────────────────────────────────
+
+model Subject {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  name        String
+  emoji       String    @default("📚")
+  color       String    @default("#0ea5e9")
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents Document[]
+
+  @@index([userId])
+  @@map("subjects")
+}
+
+// ─────────────────────────────────────────────
 // DOCUMENTS
 // ─────────────────────────────────────────────
 
@@ -138,13 +161,17 @@ model Document {
   wordCount     Int?    @map("word_count")
 
   // Subject/topic metadata
-  subject String?
-  topics  String[] // extracted topic list
+  subject   String? // free-form text (legacy / fallback)
+  topics    String[] // extracted topic list
+  subjectId String?  @map("subject_id") @db.Uuid
+
+  isArchived Boolean @default(false) @map("is_archived")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discipline Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   chunks     DocumentChunk[]
   flashcards Flashcard[]
   quizzes    Quiz[]
@@ -152,6 +179,7 @@ model Document {
 
   @@index([userId])
   @@index([status])
+  @@index([subjectId])
   @@map("documents")
 }
 
@@ -383,6 +411,7 @@ model StudyPlan {
   id          String   @id @default(uuid()) @db.Uuid
   userId      String   @map("user_id") @db.Uuid
   documentId  String?  @map("document_id") @db.Uuid
+  documentIds String[] @map("document_ids") // all selected document IDs
   title       String
   examDate    DateTime @map("exam_date")
   hoursPerDay Float    @map("hours_per_day")
@@ -539,4 +568,53 @@ enum ApiFeature {
   STUDY_PLAN_GENERATION
   OPEN_ANSWER_GRADING
   EMBEDDING_GENERATION
+}
+
+// ─────────────────────────────────────────────
+// ADMIN: PLAN CONFIG
+// ─────────────────────────────────────────────
+
+model PlanConfig {
+  id                   String   @id @default(uuid()) @db.Uuid
+  plan                 PlanTier @unique
+  name                 String
+  description          String?
+
+  // Pricing (EUR cents)
+  priceMonthly         Int      @default(0) @map("price_monthly")
+  priceYearly          Int      @default(0) @map("price_yearly")
+  promoPriceMonthly    Int?     @map("promo_price_monthly") // optional promotional price
+  promoPriceYearly     Int?     @map("promo_price_yearly")
+  currency             String   @default("EUR")
+
+  // Stripe
+  stripePriceIdMonthly String?  @map("stripe_price_id_monthly")
+  stripePriceIdYearly  String?  @map("stripe_price_id_yearly")
+
+  // Display
+  features             String[] // bullet points shown on pricing page
+  isPublic             Boolean  @default(true) @map("is_public")
+  trialDays            Int      @default(7) @map("trial_days")
+
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("plan_configs")
+}
+
+// ─────────────────────────────────────────────
+// ADMIN: RATE LIMIT CONFIG
+// ─────────────────────────────────────────────
+
+model RateLimitConfig {
+  id          String   @id @default(uuid()) @db.Uuid
+  plan        PlanTier
+  action      String   // "generate" | "chat" | "upload" | "studyPlan"
+  requests    Int      @default(10)
+  window      String   @default("1 h") // "@upstash/ratelimit" Duration format
+  isUnlimited Boolean  @default(false) @map("is_unlimited")
+
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([plan, action])
+  @@map("rate_limit_configs")
 }

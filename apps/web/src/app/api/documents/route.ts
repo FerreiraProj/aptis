@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { processDocument } from "@/lib/document-processing/pipeline";
 import { MAX_FILE_SIZE_BYTES, SUPPORTED_FILE_TYPES } from "@/lib/constants";
 import type { SourceType } from "@aptis/database";
@@ -13,11 +13,13 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
+  const archived = searchParams.get("archived"); // "true" = archived only; default = active only
 
   const documents = await prisma.document.findMany({
     where: {
       userId: auth.user.id,
       ...(status ? { status: status as never } : {}),
+      isArchived: archived === "true",
     },
     orderBy: { createdAt: "desc" },
     select: {
@@ -29,7 +31,9 @@ export async function GET(request: NextRequest) {
       pageCount: true,
       topics: true,
       subject: true,
+      subjectId: true,
       createdAt: true,
+      discipline: { select: { name: true, emoji: true, color: true } },
       _count: {
         select: { flashcards: true, quizzes: true },
       },
@@ -44,8 +48,9 @@ export async function POST(request: NextRequest) {
   const auth = await requireAuth();
   if (isAuthError(auth)) return auth.error;
 
-  // Rate limit: 10 uploads/hour
-  const rateLimit = await checkRateLimit("upload", auth.user.id);
+  // Rate limit: plan-aware upload limits
+  const plan = await getUserPlan(auth.user.id);
+  const rateLimit = await checkRateLimit("upload", auth.user.id, plan);
   if (!rateLimit.success) {
     return NextResponse.json(
       { error: "Rate limit exceeded. Try again later." },
@@ -102,6 +107,7 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
   const title = formData.get("title") as string | null;
+  const subjectId = (formData.get("subjectId") as string | null) || null;
 
   if (!file) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -125,7 +131,10 @@ export async function POST(request: NextRequest) {
   let sourceType: SourceType = "PDF";
   if (file.type === "text/plain") sourceType = "TEXT";
   else if (file.type.startsWith("image/")) sourceType = "IMAGE";
-  else if (file.type.includes("presentation")) sourceType = "POWERPOINT";
+  else if (
+    file.type.includes("presentation") ||
+    /\.pptx$/i.test(file.name)
+  ) sourceType = "POWERPOINT";
 
   // Upload to Supabase Storage temporarily
   const { createAdminClient } = await import("@/lib/supabase/server");
@@ -138,8 +147,9 @@ export async function POST(request: NextRequest) {
     .upload(storagePath, arrayBuffer, { contentType: file.type });
 
   if (uploadError) {
+    console.error("[documents/upload] Supabase Storage error:", uploadError);
     return NextResponse.json(
-      { error: "Failed to upload file" },
+      { error: "Failed to upload file", detail: uploadError.message },
       { status: 500 }
     );
   }
@@ -154,6 +164,7 @@ export async function POST(request: NextRequest) {
       mimeType: file.type,
       sizeBytes: file.size,
       status: "PENDING",
+      ...(subjectId ? { subjectId } : {}),
     },
   });
 

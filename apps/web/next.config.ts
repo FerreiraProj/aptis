@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  // These Node.js-only packages must NOT be bundled by Turbopack/webpack.
+  // Excluded from bundling so Node.js requires them directly at runtime.
+  serverExternalPackages: ["pdf-parse", "tesseract.js", "pdf2pic"],
   // Allow importing from packages/database
   transpilePackages: ["@aptis/database"],
   images: {

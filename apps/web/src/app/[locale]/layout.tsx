@@ -35,7 +35,7 @@ type Props = {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as "pt" | "en")) {
+  if (!routing.locales.includes(locale as "pt" | "en" | "fr" | "it" | "de" | "es")) {
     notFound();
   }
 
@@ -44,8 +44,19 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        suppressHydrationWarning
       >
+        {/* FOUC prevention: apply stored theme before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              `(function(){try{var t=localStorage.getItem('theme');` +
+              `var d=window.matchMedia('(prefers-color-scheme: dark)').matches;` +
+              `if(t==='dark'||((!t||t==='system')&&d))document.documentElement.classList.add('dark');` +
+              `}catch(e){}})();`,
+          }}
+        />
         <NextIntlClientProvider messages={messages}>
           {children}
           <Toaster position="top-right" richColors />

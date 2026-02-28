@@ -15,15 +15,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SUPPORTED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants";
+import { FileText, Youtube, Upload, CheckCircle2, Lock, BookMarked } from "lucide-react";
 
 type UploadMode = "file" | "youtube";
 
-export function UploadZone() {
+interface Subject {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+}
+
+export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
   const router = useRouter();
   const [mode, setMode] = useState<UploadMode>("file");
   const [isDragOver, setIsDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,12 +70,17 @@ export function UploadZone() {
         response = await fetch("/api/documents", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ youtubeUrl, title: youtubeUrl }),
+          body: JSON.stringify({
+            youtubeUrl,
+            title: youtubeUrl,
+            ...(selectedSubjectId ? { subjectId: selectedSubjectId } : {}),
+          }),
         });
       } else if (file) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("title", file.name);
+        if (selectedSubjectId) formData.append("subjectId", selectedSubjectId);
 
         setUploadProgress(30);
         response = await fetch("/api/documents", {
@@ -89,7 +103,6 @@ export function UploadZone() {
 
       toast.success("Documento carregado! A processar...");
 
-      // Redirect to document page
       setTimeout(() => {
         router.push(`/documents/${document.id}`);
       }, 500);
@@ -106,44 +119,48 @@ export function UploadZone() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Mode selector */}
-      <div className="flex gap-2 rounded-lg border p-1">
+      <div className="glass-sm flex gap-1 rounded-xl p-1">
         <button
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
             mode === "file"
-              ? "bg-primary text-primary-foreground"
-              : "hover:bg-accent"
+              ? "btn-gradient text-white shadow-sm"
+              : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
           }`}
           onClick={() => setMode("file")}
         >
-          📄 Documento
+          <FileText size={15} />
+          Documento
         </button>
         <button
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
             mode === "youtube"
-              ? "bg-primary text-primary-foreground"
-              : "hover:bg-accent"
+              ? "btn-gradient text-white shadow-sm"
+              : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
           }`}
           onClick={() => setMode("youtube")}
         >
-          ▶️ YouTube
+          <Youtube size={15} />
+          YouTube
         </button>
       </div>
 
       {mode === "file" ? (
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Carregar Documento</CardTitle>
             <CardDescription>
-              PDF, PowerPoint, texto ou imagem dos teus apontamentos
+              PDF, PowerPoint (.pptx), texto ou imagem dos teus apontamentos
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Drop zone */}
             <div
-              className={`flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-12 text-center transition-colors ${
+              className={`flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed p-12 text-center transition-all cursor-pointer ${
                 isDragOver
-                  ? "border-primary bg-primary/5"
-                  : "border-muted-foreground/25 hover:border-primary/50"
+                  ? "border-primary bg-primary/10"
+                  : file
+                    ? "border-primary/50 bg-primary/5"
+                    : "border-primary/30 hover:border-primary/60 hover:bg-primary/5"
               }`}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -153,23 +170,33 @@ export function UploadZone() {
               onDrop={handleFileDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <div className="text-4xl">{file ? "✅" : "📎"}</div>
               {file ? (
-                <div>
-                  <p className="font-medium">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {(file.size / 1024 / 1024).toFixed(1)} MB
-                  </p>
-                </div>
+                <>
+                  <CheckCircle2 size={40} className="text-primary" />
+                  <div>
+                    <p className="font-medium">{file.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {(file.size / 1024 / 1024).toFixed(1)} MB
+                    </p>
+                  </div>
+                </>
               ) : (
-                <div>
-                  <p className="font-medium">
-                    Arrasta e larga ou clica para selecionar
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    PDF, PPT, TXT, JPG, PNG — máximo 50MB
-                  </p>
-                </div>
+                <>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                    <Upload size={24} className="text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      Arrasta e larga ou clica para selecionar
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      PDF, PPTX, TXT, JPG, PNG — máximo 50MB
+                    </p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">
+                      Ficheiros .ppt antigos não são suportados — converte para .pptx
+                    </p>
+                  </div>
+                </>
               )}
               <input
                 ref={fileInputRef}
@@ -196,7 +223,7 @@ export function UploadZone() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Transcrever YouTube</CardTitle>
             <CardDescription>
@@ -218,6 +245,43 @@ export function UploadZone() {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Subject selector */}
+      {subjects.length > 0 && (
+        <div className="space-y-2">
+          <label className="flex items-center gap-1.5 text-sm font-medium">
+            <BookMarked size={14} />
+            Disciplina <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedSubjectId(null)}
+              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                selectedSubjectId === null
+                  ? "bg-primary text-primary-foreground"
+                  : "glass-sm text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Nenhuma
+            </button>
+            {subjects.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSelectedSubjectId(selectedSubjectId === s.id ? null : s.id)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  selectedSubjectId === s.id ? "text-white" : "glass-sm text-muted-foreground hover:text-foreground"
+                }`}
+                style={selectedSubjectId === s.id ? { backgroundColor: s.color } : {}}
+              >
+                <span>{s.emoji}</span>
+                {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Upload progress */}
@@ -248,8 +312,9 @@ export function UploadZone() {
         {uploading ? "A processar..." : "Carregar e processar"}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        🔒 O teu ficheiro é eliminado imediatamente após extração. Só guardamos
+      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+        <Lock size={11} />
+        O teu ficheiro é eliminado imediatamente após extração. Só guardamos
         o texto extraído.
       </p>
     </div>

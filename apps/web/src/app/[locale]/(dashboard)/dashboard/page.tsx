@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@aptis/database";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import {
   Card,
   CardContent,
@@ -10,10 +10,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { syncSubscriptionFromStripe } from "@/lib/stripe/sync-subscription";
+import { Upload, Zap, Target, MessageCircle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "Painel" };
+export const metadata = { title: "Dashboard" };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -21,9 +28,16 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  const params = await searchParams;
+  if (params.checkout === "success") {
+    await syncSubscriptionFromStripe(user.id);
+    redirect("/dashboard");
+  }
+
+  const t = await getTranslations("dashboard");
+
   const now = new Date();
 
-  // Parallel data fetching
   const [dbUser, dueFlashcardsCount, recentDocuments, recentSessions] =
     await Promise.all([
       prisma.user.findUnique({
@@ -77,16 +91,32 @@ export default async function DashboardPage() {
 
   const planLabel = dbUser?.subscription?.plan || "FREE";
 
+  const statusLabels: Record<string, string> = {
+    PENDING: t("statusPending"),
+    PROCESSING: t("statusProcessing"),
+    READY: t("statusReady"),
+    FAILED: t("statusFailed"),
+  };
+
+  const sourceTypeLabels: Record<string, string> = {
+    PDF: "PDF",
+    POWERPOINT: "PowerPoint",
+    TEXT: t("sourceText"),
+    YOUTUBE: "YouTube",
+    SCREENSHOT: t("sourceImage"),
+    IMAGE: t("sourceImage"),
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
-            Olá, {dbUser?.fullName?.split(" ")[0] || "Estudante"} 👋
+            {t("greeting", { name: dbUser?.fullName?.split(" ")[0] || "Estudante" })} 👋
           </h1>
           <p className="text-muted-foreground">
-            Continua assim. Cada revisão importa.
+            {t("subtitle")}
           </p>
         </div>
         <Badge variant={planLabel === "FREE" ? "outline" : "default"}>
@@ -97,52 +127,52 @@ export default async function DashboardPage() {
       {/* Stats row */}
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
-          title="Para rever hoje"
+          title={t("dueToday")}
           value={String(dueFlashcardsCount)}
-          description="flashcards com prazo"
+          description={t("dueDescription")}
           action={
             dueFlashcardsCount > 0
-              ? { href: "/flashcards/review", label: "Rever agora" }
+              ? { href: "/flashcards/review", label: t("reviewNow") }
               : undefined
           }
           highlight={dueFlashcardsCount > 0}
         />
         <StatCard
-          title="Revistos (7 dias)"
+          title={t("reviewed7Days")}
           value={String(totalCardsReviewed)}
-          description="flashcards"
+          description={t("reviewedDescription")}
         />
         <StatCard
-          title="Precisão"
+          title={t("accuracy")}
           value={accuracy > 0 ? `${accuracy}%` : "—"}
-          description="nas últimas sessões"
+          description={t("accuracyDescription")}
         />
       </div>
 
       {/* Quick actions */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <QuickAction
-          icon="📤"
-          title="Carregar PDF"
-          description="Transforma num plano de estudo"
+          Icon={Upload}
+          title={t("uploadPdf")}
+          description={t("uploadPdfDesc")}
           href="/upload"
         />
         <QuickAction
-          icon="⚡"
-          title="Rever Flashcards"
-          description={`${dueFlashcardsCount} para rever`}
+          Icon={Zap}
+          title={t("reviewFlashcards")}
+          description={t("reviewFlashcardsDesc", { count: dueFlashcardsCount })}
           href="/flashcards/review"
         />
         <QuickAction
-          icon="🎯"
-          title="Fazer Quiz"
-          description="Testa os teus conhecimentos"
+          Icon={Target}
+          title={t("makeQuiz")}
+          description={t("makeQuizDesc")}
           href="/quizzes"
         />
         <QuickAction
-          icon="💬"
-          title="Perguntar ao Tutor"
-          description="Chat com IA sobre os teus documentos"
+          Icon={MessageCircle}
+          title={t("askTutor")}
+          description={t("askTutorDesc")}
           href="/chat"
         />
       </div>
@@ -151,27 +181,27 @@ export default async function DashboardPage() {
       {recentDocuments.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Documentos Recentes</h2>
+            <h2 className="text-lg font-semibold">{t("recentDocuments")}</h2>
             <Link
               href="/documents"
               className="text-sm text-primary hover:underline"
             >
-              Ver todos →
+              {t("viewAll")}
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {recentDocuments.map((doc) => (
               <Link key={doc.id} href={`/documents/${doc.id}`}>
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card variant="glass" className="cursor-pointer hover:scale-[1.01] transition-transform h-full">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{doc.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {sourceTypeLabel(doc.sourceType)}
+                          {sourceTypeLabels[doc.sourceType] ?? doc.sourceType}
                         </p>
                       </div>
-                      <StatusBadge status={doc.status} />
+                      <StatusBadge status={doc.status} statusLabels={statusLabels} />
                     </div>
                   </CardContent>
                 </Card>
@@ -183,17 +213,19 @@ export default async function DashboardPage() {
 
       {/* Empty state */}
       {recentDocuments.length === 0 && (
-        <Card className="border-dashed">
+        <Card variant="glass" className="border-dashed border-primary/30">
           <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-            <div className="text-5xl">📚</div>
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+              <Upload size={28} className="text-primary" />
+            </div>
             <div>
-              <h3 className="font-semibold">Começa a estudar agora</h3>
+              <h3 className="font-semibold">{t("emptyTitle")}</h3>
               <p className="text-sm text-muted-foreground">
-                Carrega o teu primeiro documento e gera flashcards em segundos
+                {t("emptyDesc")}
               </p>
             </div>
             <Link href="/upload">
-              <Button>Carregar primeiro documento</Button>
+              <Button>{t("uploadFirst")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -216,7 +248,10 @@ function StatCard({
   highlight?: boolean;
 }) {
   return (
-    <Card className={highlight ? "border-primary" : ""}>
+    <Card
+      variant="glass"
+      className={highlight ? "ring-2 ring-primary/40 shadow-lg shadow-primary/10" : ""}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
@@ -238,21 +273,23 @@ function StatCard({
 }
 
 function QuickAction({
-  icon,
+  Icon,
   title,
   description,
   href,
 }: {
-  icon: string;
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
   description: string;
   href: string;
 }) {
   return (
     <Link href={href}>
-      <Card className="cursor-pointer hover:shadow-md transition-shadow h-full">
+      <Card variant="glass" className="cursor-pointer hover:scale-[1.02] transition-transform h-full">
         <CardContent className="p-4">
-          <div className="text-2xl mb-2">{icon}</div>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Icon size={18} className="text-primary" />
+          </div>
           <h3 className="font-semibold text-sm">{title}</h3>
           <p className="text-xs text-muted-foreground">{description}</p>
         </CardContent>
@@ -261,25 +298,20 @@ function QuickAction({
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const variants: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-    PENDING: { label: "Pendente", variant: "outline" },
-    PROCESSING: { label: "A processar", variant: "secondary" },
-    READY: { label: "Pronto", variant: "default" },
-    FAILED: { label: "Erro", variant: "destructive" },
+function StatusBadge({
+  status,
+  statusLabels,
+}: {
+  status: string;
+  statusLabels: Record<string, string>;
+}) {
+  const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+    PENDING: "outline",
+    PROCESSING: "secondary",
+    READY: "default",
+    FAILED: "destructive",
   };
-  const config = variants[status] || { label: status, variant: "outline" as const };
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-}
-
-function sourceTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    PDF: "PDF",
-    POWERPOINT: "PowerPoint",
-    TEXT: "Texto",
-    YOUTUBE: "YouTube",
-    SCREENSHOT: "Imagem",
-    IMAGE: "Imagem",
-  };
-  return labels[type] || type;
+  const label = statusLabels[status] ?? status;
+  const variant = variants[status] ?? "outline";
+  return <Badge variant={variant}>{label}</Badge>;
 }

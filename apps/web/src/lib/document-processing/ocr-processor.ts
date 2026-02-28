@@ -37,6 +37,11 @@ export async function runOcrOnPdf(buffer: Buffer): Promise<string> {
   // Dynamically import pdf2pic (requires native dependencies)
   const { fromBuffer } = await import("pdf2pic");
 
+  // Get page count using pdf-parse v1
+  const pdfParse = (await import("pdf-parse")).default;
+  const parsed = await pdfParse(buffer);
+  const numPages = parsed.numpages ?? 1;
+
   const convert = fromBuffer(buffer, {
     density: 150, // DPI — balance quality vs speed
     saveFilename: "page",
@@ -44,11 +49,6 @@ export async function runOcrOnPdf(buffer: Buffer): Promise<string> {
     width: 1700,
     height: 2200,
   });
-
-  // Get page count from a quick parse
-  const pdfParse = (await import("pdf-parse")).default;
-  const data = await pdfParse(buffer, { max: 1 });
-  const numPages = data.numpages;
 
   const texts: string[] = [];
 
@@ -59,7 +59,7 @@ export async function runOcrOnPdf(buffer: Buffer): Promise<string> {
     const pageBuffer = await convert(page, { responseType: "buffer" });
     if (pageBuffer.buffer) {
       const pageText = await runOcrOnBuffer(
-        Buffer.from(pageBuffer.buffer as ArrayBuffer),
+        Buffer.from(pageBuffer.buffer as unknown as ArrayBuffer),
         "image/png"
       );
       if (pageText.trim()) {

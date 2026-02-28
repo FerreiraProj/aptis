@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@aptis/database";
-import { getPlanFromPriceId } from "@/lib/stripe/plans";
+import { getPlanFromPriceIdDB } from "@/lib/stripe/plans";
 
 // CRITICAL: Must use raw body, not parsed JSON
 export async function POST(req: NextRequest) {
@@ -37,8 +37,10 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        const priceId = sub.items.data[0].price.id;
-        const plan = getPlanFromPriceId(priceId);
+        const subItem = sub.items.data[0];
+        const priceId = subItem.price.id;
+        // Use DB-backed lookup so renamed price IDs are picked up immediately
+        const plan = await getPlanFromPriceIdDB(priceId);
 
         await prisma.subscription.upsert({
           where: { stripeSubscriptionId: sub.id },
@@ -46,11 +48,11 @@ export async function POST(req: NextRequest) {
             userId,
             stripeSubscriptionId: sub.id,
             stripePriceId: priceId,
-            stripeProductId: sub.items.data[0].price.product as string,
+            stripeProductId: subItem.price.product as string,
             status: sub.status.toUpperCase() as never,
             plan,
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            currentPeriodStart: new Date(subItem.current_period_start * 1000),
+            currentPeriodEnd: new Date(subItem.current_period_end * 1000),
             cancelAtPeriodEnd: sub.cancel_at_period_end,
             trialStart: sub.trial_start
               ? new Date(sub.trial_start * 1000)
@@ -61,8 +63,8 @@ export async function POST(req: NextRequest) {
             status: sub.status.toUpperCase() as never,
             plan,
             stripePriceId: priceId,
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
+            currentPeriodStart: new Date(subItem.current_period_start * 1000),
+            currentPeriodEnd: new Date(subItem.current_period_end * 1000),
             cancelAtPeriodEnd: sub.cancel_at_period_end,
             canceledAt: sub.canceled_at
               ? new Date(sub.canceled_at * 1000)
@@ -94,7 +96,6 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        // Unhandled event type — not an error
         break;
     }
   } catch (err) {

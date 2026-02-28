@@ -41,6 +41,8 @@ const UpdateProfileSchema = z.object({
   preferredExplanationStyle: z
     .enum(["CONCISE", "DETAILED", "VISUAL", "ANALOGICAL"])
     .optional(),
+  studyNiche: z.string().min(1).max(100).nullable().optional(),
+  currentLevel: z.string().min(1).max(50).nullable().optional(),
 });
 
 export async function PUT(req: Request) {
@@ -63,7 +65,7 @@ export async function PUT(req: Request) {
     );
   }
 
-  const { fullName, examDate, hoursPerDay, gradeGoal, preferredExplanationStyle } =
+  const { fullName, examDate, hoursPerDay, gradeGoal, preferredExplanationStyle, studyNiche, currentLevel } =
     parsed.data;
 
   const updated = await prisma.user.update({
@@ -78,6 +80,8 @@ export async function PUT(req: Request) {
       ...(preferredExplanationStyle !== undefined && {
         preferredExplanationStyle,
       }),
+      ...(studyNiche !== undefined && { studyNiche }),
+      ...(currentLevel !== undefined && { currentLevel }),
     },
   });
 

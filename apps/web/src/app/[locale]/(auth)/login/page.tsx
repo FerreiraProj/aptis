@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -39,7 +40,10 @@ export default function LoginPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      router.push("/dashboard");
+      const res = await fetch("/api/user/profile");
+      const data = res.ok ? await res.json() : null;
+      const isAdmin = data?.user?.role === "ADMIN";
+      router.push(isAdmin ? "/admin" : "/dashboard");
       router.refresh();
     }
 
@@ -49,7 +53,7 @@ export default function LoginPage() {
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email) {
-      toast.error("Introduz o teu email primeiro");
+      toast.error(t("enterEmailFirst"));
       return;
     }
     setLoading(true);
@@ -89,13 +93,12 @@ export default function LoginPage() {
 
   if (magicLinkSent) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
+      <div className="page-bg aurora-bg flex min-h-screen items-center justify-center p-4">
+        <Card variant="glass" className="w-full max-w-md text-center shadow-2xl rounded-3xl">
           <CardHeader>
-            <CardTitle>Verifica o teu email</CardTitle>
+            <CardTitle>{t("verifyEmail")}</CardTitle>
             <CardDescription>
-              Enviamos um link de acesso para <strong>{email}</strong>. Clica no
-              link para entrar.
+              {t("verifyEmailDescription", { email })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -104,7 +107,7 @@ export default function LoginPage() {
               onClick={() => setMagicLinkSent(false)}
               className="w-full"
             >
-              Tentar novamente
+              {t("tryAgain")}
             </Button>
           </CardContent>
         </Card>
@@ -113,10 +116,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="page-bg aurora-bg flex min-h-screen items-center justify-center p-4">
+      <Card variant="glass" className="w-full max-w-md shadow-2xl rounded-3xl">
         <CardHeader className="text-center">
-          <div className="mb-4 text-3xl font-bold text-primary">Aptis</div>
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <Image src="/logo.png" alt="Aptis" width={40} height={40} className="h-10 w-10 object-contain" />
+            <span className="gradient-text text-3xl font-bold">Aptis</span>
+          </div>
           <CardTitle>{t("signIn")}</CardTitle>
           <CardDescription>
             {t("noAccount")}{" "}
@@ -156,10 +162,10 @@ export default function LoginPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-border/50" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">ou</span>
+              <span className="glass-sm rounded px-2 text-muted-foreground">{t("or")}</span>
             </div>
           </div>
 
@@ -198,7 +204,7 @@ export default function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "A entrar..." : t("signIn")}
+              {loading ? t("signingIn") : t("signIn")}
             </Button>
           </form>
 
