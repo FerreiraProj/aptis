@@ -105,7 +105,7 @@ export default async function AdminUsagePage() {
             <tbody>
               {recentLogs.map((log) => (
                 <tr key={log.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 font-mono text-xs">{log.user.email}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{log.user?.email ?? "—"}</td>
                   <td className="px-4 py-3 text-xs">{log.feature}</td>
                   <td className="px-4 py-3 font-mono text-xs">{log.model}</td>
                   <td className="px-4 py-3 text-right">{(log.inputTokens + log.outputTokens).toLocaleString("pt-PT")}</td>
