@@ -325,7 +325,7 @@ export function SubjectsClient({ initialSubjects, plan, limit }: SubjectsClientP
         </div>
       )}
 
-      <UpgradeDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+      <UpgradeDialog open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </div>
   );
 }
