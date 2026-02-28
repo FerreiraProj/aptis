@@ -57,7 +57,7 @@ function detectLocaleFromHeader(acceptLanguage: string | null): SupportedLocale 
   return "en";
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Skip for API routes, auth callbacks, and static files
   const { pathname } = request.nextUrl;
   if (
