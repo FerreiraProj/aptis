@@ -17,13 +17,17 @@ import { Plus, Check } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type CommissionType = "FIXED_EUR" | "PERCENTAGE";
+
 type Partner = {
   id: string;
   name: string;
   email: string;
   code: string;
-  commissionType: "FIXED_EUR" | "PERCENTAGE";
+  commissionType: CommissionType;
   commissionValue: number;
+  recurringCommissionType: CommissionType | null;
+  recurringCommissionValue: number | null;
   recurringMonths: number;
   isActive: boolean;
   notes: string | null;
@@ -62,6 +66,8 @@ function PartnersTab() {
     commissionType: "PERCENTAGE",
     commissionValue: "10",
     recurringMonths: "0",
+    recurringCommissionType: "PERCENTAGE",
+    recurringCommissionValue: "",
     notes: "",
   });
 
@@ -78,17 +84,22 @@ function PartnersTab() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
+        name: form.name,
+        email: form.email,
+        code: form.code || undefined,
+        commissionType: form.commissionType,
         commissionValue: Number(form.commissionValue),
         recurringMonths: Number(form.recurringMonths),
-        code: form.code || undefined,
+        recurringCommissionType: form.recurringCommissionValue ? form.recurringCommissionType : undefined,
+        recurringCommissionValue: form.recurringCommissionValue ? Number(form.recurringCommissionValue) : undefined,
+        notes: form.notes || undefined,
       }),
     });
     setSaving(false);
     if (res.ok) {
       toast.success("Parceiro criado");
       setShowForm(false);
-      setForm({ name: "", email: "", code: "", commissionType: "PERCENTAGE", commissionValue: "10", recurringMonths: "0", notes: "" });
+      setForm({ name: "", email: "", code: "", commissionType: "PERCENTAGE", commissionValue: "10", recurringMonths: "0", recurringCommissionType: "PERCENTAGE", recurringCommissionValue: "", notes: "" });
       load();
     } else {
       const { error } = await res.json();
@@ -105,9 +116,17 @@ function PartnersTab() {
     load();
   }
 
+  function fmtComm(type: CommissionType, value: number) {
+    return type === "FIXED_EUR" ? `${(value / 100).toFixed(2)} €` : `${value}%`;
+  }
+
   function formatCommission(p: Partner) {
-    if (p.commissionType === "FIXED_EUR") return `${(p.commissionValue / 100).toFixed(2)} €`;
-    return `${p.commissionValue}%`;
+    const initial = fmtComm(p.commissionType, p.commissionValue);
+    if (p.recurringMonths === 0) return initial;
+    const recurringType = p.recurringCommissionType ?? p.commissionType;
+    const recurringValue = p.recurringCommissionValue ?? p.commissionValue;
+    const recurring = fmtComm(recurringType, recurringValue);
+    return recurring === initial ? initial : `${initial} → ${recurring}`;
   }
 
   return (
@@ -163,7 +182,7 @@ function PartnersTab() {
                 />
               </div>
               <div className="space-y-1">
-                <Label>Meses recorrentes (0 = só 1ª vez)</Label>
+                <Label>Meses de recorrência (0 = só 1.º pagamento)</Label>
                 <Input
                   type="number"
                   min={0}
@@ -171,6 +190,42 @@ function PartnersTab() {
                   onChange={(e) => setForm({ ...form, recurringMonths: e.target.value })}
                 />
               </div>
+
+              {Number(form.recurringMonths) > 0 && (
+                <>
+                  <div className="col-span-2">
+                    <p className="text-xs text-muted-foreground mb-3 border-t pt-3">
+                      Comissão recorrente — paga nos pagamentos seguintes ao 1.º (até {form.recurringMonths} meses).
+                      Deixa o valor em branco para usar a mesma comissão do 1.º pagamento.
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Tipo de comissão recorrente</Label>
+                    <select
+                      className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                      value={form.recurringCommissionType}
+                      onChange={(e) => setForm({ ...form, recurringCommissionType: e.target.value })}
+                    >
+                      <option value="PERCENTAGE">Percentagem (%)</option>
+                      <option value="FIXED_EUR">Valor fixo (€ cêntimos)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>
+                      {form.recurringCommissionType === "PERCENTAGE" ? "Percentagem recorrente (%)" : "Valor recorrente (cêntimos)"}
+                      <span className="text-muted-foreground ml-1">(opcional)</span>
+                    </Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder={`Igual ao 1.º pagamento (${form.commissionValue})`}
+                      value={form.recurringCommissionValue}
+                      onChange={(e) => setForm({ ...form, recurringCommissionValue: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="col-span-2 space-y-1">
                 <Label>Notas internas</Label>
                 <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
@@ -192,7 +247,7 @@ function PartnersTab() {
             <tr className="border-b">
               <th className="text-left py-2">Nome / Email</th>
               <th className="text-left py-2">Código</th>
-              <th className="text-left py-2">Comissão</th>
+              <th className="text-left py-2">Comissão (1.º → recorrente)</th>
               <th className="text-left py-2">Recorrência</th>
               <th className="text-right py-2">Indicados</th>
               <th className="text-right py-2">Pendente</th>
@@ -209,7 +264,9 @@ function PartnersTab() {
                 </td>
                 <td className="py-2 font-mono text-xs">{p.code}</td>
                 <td className="py-2">{formatCommission(p)}</td>
-                <td className="py-2">{p.recurringMonths === 0 ? "Só 1ª vez" : `${p.recurringMonths} meses`}</td>
+                <td className="py-2 text-muted-foreground text-xs">
+                  {p.recurringMonths === 0 ? "Sem recorrência" : `${p.recurringMonths} meses`}
+                </td>
                 <td className="py-2 text-right">{p.totalReferrals}</td>
                 <td className="py-2 text-right text-amber-600">{(p.pendingCents / 100).toFixed(2)} €</td>
                 <td className="py-2 text-right text-green-600">{(p.paidCents / 100).toFixed(2)} €</td>

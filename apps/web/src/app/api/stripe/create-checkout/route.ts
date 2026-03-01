@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
             referredUserId: auth.user.id,
             commissionType: partner.commissionType,
             commissionValue: partner.commissionValue,
+            recurringCommissionType: partner.recurringCommissionType,
+            recurringCommissionValue: partner.recurringCommissionValue,
             recurringMonths: partner.recurringMonths,
           },
           update: {},

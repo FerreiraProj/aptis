@@ -137,16 +137,25 @@ export async function POST(req: NextRequest) {
           where: { referredUserId: userId, canceledAt: null },
         });
         if (affiliateRef) {
+          const isFirstPayment = affiliateRef.paymentsTracked === 0;
           const shouldCredit =
             affiliateRef.recurringMonths === 0
-              ? affiliateRef.paymentsTracked === 0
+              ? isFirstPayment
               : affiliateRef.paymentsTracked < affiliateRef.recurringMonths;
 
           if (shouldCredit) {
+            // Use recurring commission config for subsequent payments (if set)
+            const commType = isFirstPayment
+              ? affiliateRef.commissionType
+              : (affiliateRef.recurringCommissionType ?? affiliateRef.commissionType);
+            const commValue = isFirstPayment
+              ? affiliateRef.commissionValue
+              : (affiliateRef.recurringCommissionValue ?? affiliateRef.commissionValue);
+
             const amount = calculateAffiliateCommission(
               invoice.amount_paid,
-              affiliateRef.commissionType,
-              affiliateRef.commissionValue
+              commType,
+              commValue
             );
             await prisma.$transaction([
               prisma.affiliateCommission.create({

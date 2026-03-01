@@ -35,6 +35,8 @@ export async function GET() {
       code: p.code,
       commissionType: p.commissionType,
       commissionValue: p.commissionValue,
+      recurringCommissionType: p.recurringCommissionType,
+      recurringCommissionValue: p.recurringCommissionValue,
       recurringMonths: p.recurringMonths,
       isActive: p.isActive,
       notes: p.notes,
@@ -58,13 +60,20 @@ export async function POST(request: NextRequest) {
   if (isAuthError(auth)) return auth.error;
 
   const body = await request.json();
-  const { name, email, code, commissionType, commissionValue, recurringMonths, notes } = body;
+  const {
+    name, email, code, commissionType, commissionValue,
+    recurringCommissionType, recurringCommissionValue, recurringMonths, notes,
+  } = body;
 
   if (!name || !email || !commissionType || commissionValue == null) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const finalCode = (code ?? generateCode(name)).toUpperCase();
+  const numRecurringMonths = Number(recurringMonths ?? 0);
+
+  // recurringCommissionType/Value only stored when recurringMonths > 0
+  const hasRecurring = numRecurringMonths > 0 && recurringCommissionValue != null;
 
   const partner = await prisma.affiliatePartner.create({
     data: {
@@ -73,7 +82,9 @@ export async function POST(request: NextRequest) {
       code: finalCode,
       commissionType,
       commissionValue: Number(commissionValue),
-      recurringMonths: Number(recurringMonths ?? 0),
+      recurringCommissionType: hasRecurring ? (recurringCommissionType ?? commissionType) : null,
+      recurringCommissionValue: hasRecurring ? Number(recurringCommissionValue) : null,
+      recurringMonths: numRecurringMonths,
       notes,
       createdByAdminId: auth.user.id,
     },

@@ -12,7 +12,13 @@ export async function PUT(
 
   const { id } = await params;
   const body = await request.json();
-  const { name, email, commissionType, commissionValue, recurringMonths, isActive, notes } = body;
+  const {
+    name, email, commissionType, commissionValue,
+    recurringCommissionType, recurringCommissionValue, recurringMonths, isActive, notes,
+  } = body;
+
+  const numRecurringMonths = recurringMonths != null ? Number(recurringMonths) : undefined;
+  const hasRecurring = (numRecurringMonths ?? 0) > 0 && recurringCommissionValue != null;
 
   const partner = await prisma.affiliatePartner.update({
     where: { id },
@@ -21,7 +27,12 @@ export async function PUT(
       ...(email != null && { email }),
       ...(commissionType != null && { commissionType }),
       ...(commissionValue != null && { commissionValue: Number(commissionValue) }),
-      ...(recurringMonths != null && { recurringMonths: Number(recurringMonths) }),
+      ...(numRecurringMonths != null && { recurringMonths: numRecurringMonths }),
+      // Always update recurring fields when recurringMonths is provided
+      ...(recurringMonths != null && {
+        recurringCommissionType: hasRecurring ? (recurringCommissionType ?? commissionType) : null,
+        recurringCommissionValue: hasRecurring ? Number(recurringCommissionValue) : null,
+      }),
       ...(isActive != null && { isActive }),
       ...(notes != null && { notes }),
     },
