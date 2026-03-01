@@ -35,7 +35,8 @@
     "admin": "Administration",
     "upload": "Hochladen",
     "reviewToday": "Heute wiederholen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "referral": "Empfehlung"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -96,19 +97,36 @@
         "name": "Kostenlos",
         "price": "€0",
         "period": "/Monat",
-        "features": ["1 Dokument/Monat", "20 Lernkarten", "10 Quizze", "Basis-Chat"]
+        "features": [
+          "1 Dokument/Monat",
+          "20 Lernkarten",
+          "10 Quizze",
+          "Basis-Chat"
+        ]
       },
       "pro": {
         "name": "Pro",
         "price": "€15",
         "period": "/Monat",
-        "features": ["Unbegrenzte Dokumente", "Unbegrenzte Lernkarten", "Prüfungssimulator", "Adaptiver Plan", "Export"]
+        "features": [
+          "Unbegrenzte Dokumente",
+          "Unbegrenzte Lernkarten",
+          "Prüfungssimulator",
+          "Adaptiver Plan",
+          "Export"
+        ]
       },
       "premium": {
         "name": "Premium",
         "price": "€29",
         "period": "/Monat",
-        "features": ["Alles aus Pro", "Erweiterte Analytics", "Erklärungsstile", "Kognitive Erkennung", "Offline"]
+        "features": [
+          "Alles aus Pro",
+          "Erweiterte Analytics",
+          "Erklärungsstile",
+          "Kognitive Erkennung",
+          "Offline"
+        ]
       }
     }
   },
@@ -604,5 +622,23 @@
       "analogical": "Durch Analogien",
       "analogicalDesc": "Ich vergleiche mit Alltagssituationen"
     }
+  },
+  "referral": {
+    "title": "Mein Empfehlungslink",
+    "description": "Für jeden Freund, der abonniert, erhältst du 1 Monat Rabatt.",
+    "yourLink": "Dein Empfehlungslink",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "shareWhatsApp": "Auf WhatsApp teilen",
+    "shareEmail": "Per E-Mail teilen",
+    "applyMonths": "Rabatt anwenden ({n} Monate)",
+    "applied": "Rabatt angewendet!",
+    "statsReferrals": "Empfohlen",
+    "statsConverted": "Zahlend",
+    "statsEarned": "Gewonnene Monate",
+    "statsApplied": "Angewendete Monate",
+    "historyTitle": "Verlauf",
+    "statusSignedUp": "Registriert",
+    "statusPaid": "Zahlend"
   }
 }

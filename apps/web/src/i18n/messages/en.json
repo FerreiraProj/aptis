@@ -35,7 +35,8 @@
     "admin": "Admin",
     "upload": "Upload",
     "reviewToday": "Review Today",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "referral": "Referral"
   },
   "auth": {
     "signIn": "Sign in",
@@ -96,19 +97,36 @@
         "name": "Free",
         "price": "€0",
         "period": "/month",
-        "features": ["1 document/month", "20 flashcards", "10 quizzes", "Basic chat"]
+        "features": [
+          "1 document/month",
+          "20 flashcards",
+          "10 quizzes",
+          "Basic chat"
+        ]
       },
       "pro": {
         "name": "Pro",
         "price": "€15",
         "period": "/month",
-        "features": ["Unlimited documents", "Unlimited flashcards", "Exam simulator", "Adaptive plan", "Export"]
+        "features": [
+          "Unlimited documents",
+          "Unlimited flashcards",
+          "Exam simulator",
+          "Adaptive plan",
+          "Export"
+        ]
       },
       "premium": {
         "name": "Premium",
         "price": "€29",
         "period": "/month",
-        "features": ["Everything in Pro", "Advanced analytics", "Explanation styles", "Cognitive detection", "Offline"]
+        "features": [
+          "Everything in Pro",
+          "Advanced analytics",
+          "Explanation styles",
+          "Cognitive detection",
+          "Offline"
+        ]
       }
     }
   },
@@ -604,5 +622,23 @@
       "analogical": "By analogy",
       "analogicalDesc": "I compare with everyday situations"
     }
+  },
+  "referral": {
+    "title": "My referral link",
+    "description": "For every friend who subscribes, you earn 1 month of discount.",
+    "yourLink": "Your referral link",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "shareWhatsApp": "Share on WhatsApp",
+    "shareEmail": "Share by email",
+    "applyMonths": "Apply discount ({n} months)",
+    "applied": "Discount applied!",
+    "statsReferrals": "Referred",
+    "statsConverted": "Paying",
+    "statsEarned": "Months earned",
+    "statsApplied": "Months applied",
+    "historyTitle": "History",
+    "statusSignedUp": "Signed up",
+    "statusPaid": "Paying"
   }
 }

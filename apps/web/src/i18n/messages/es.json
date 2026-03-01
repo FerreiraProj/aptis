@@ -35,7 +35,8 @@
     "admin": "Administración",
     "upload": "Subir",
     "reviewToday": "Repasar hoy",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "referral": "Referidos"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -96,19 +97,36 @@
         "name": "Gratis",
         "price": "€0",
         "period": "/mes",
-        "features": ["1 documento/mes", "20 tarjetas", "10 quizzes", "Chat básico"]
+        "features": [
+          "1 documento/mes",
+          "20 tarjetas",
+          "10 quizzes",
+          "Chat básico"
+        ]
       },
       "pro": {
         "name": "Pro",
         "price": "€15",
         "period": "/mes",
-        "features": ["Documentos ilimitados", "Tarjetas ilimitadas", "Simulador de examen", "Plan adaptativo", "Exportación"]
+        "features": [
+          "Documentos ilimitados",
+          "Tarjetas ilimitadas",
+          "Simulador de examen",
+          "Plan adaptativo",
+          "Exportación"
+        ]
       },
       "premium": {
         "name": "Premium",
         "price": "€29",
         "period": "/mes",
-        "features": ["Todo lo de Pro", "Analytics avanzados", "Estilos de explicación", "Detección cognitiva", "Sin conexión"]
+        "features": [
+          "Todo lo de Pro",
+          "Analytics avanzados",
+          "Estilos de explicación",
+          "Detección cognitiva",
+          "Sin conexión"
+        ]
       }
     }
   },
@@ -604,5 +622,23 @@
       "analogical": "Por analogías",
       "analogicalDesc": "Comparo con situaciones cotidianas"
     }
+  },
+  "referral": {
+    "title": "Mi enlace de referido",
+    "description": "Por cada amigo que se suscriba, ganas 1 mes de descuento.",
+    "yourLink": "Tu enlace de referido",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "shareWhatsApp": "Compartir en WhatsApp",
+    "shareEmail": "Compartir por email",
+    "applyMonths": "Aplicar descuento ({n} meses)",
+    "applied": "¡Descuento aplicado!",
+    "statsReferrals": "Referidos",
+    "statsConverted": "Pagando",
+    "statsEarned": "Meses ganados",
+    "statsApplied": "Meses aplicados",
+    "historyTitle": "Historial",
+    "statusSignedUp": "Registrado",
+    "statusPaid": "Pagando"
   }
 }

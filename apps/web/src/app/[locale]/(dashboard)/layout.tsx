@@ -42,6 +42,7 @@ export default async function DashboardLayout({
     { href: "/progress", labelKey: "progress" },
     { href: "/chat", labelKey: "chat" },
     { href: "/exam-simulator", labelKey: "examSimulator" },
+    { href: "/referral", labelKey: "referral" },
   ] as const;
 
   const translatedNavItems = navItems.map((item) => ({

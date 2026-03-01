@@ -35,7 +35,8 @@
     "admin": "Administration",
     "upload": "Téléverser",
     "reviewToday": "Réviser Aujourd'hui",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "referral": "Parrainage"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -96,19 +97,36 @@
         "name": "Gratuit",
         "price": "€0",
         "period": "/mois",
-        "features": ["1 document/mois", "20 flashcards", "10 quizzes", "Chat basique"]
+        "features": [
+          "1 document/mois",
+          "20 flashcards",
+          "10 quizzes",
+          "Chat basique"
+        ]
       },
       "pro": {
         "name": "Pro",
         "price": "€15",
         "period": "/mois",
-        "features": ["Documents illimités", "Flashcards illimitées", "Simulateur d'examen", "Plan adaptatif", "Exportation"]
+        "features": [
+          "Documents illimités",
+          "Flashcards illimitées",
+          "Simulateur d'examen",
+          "Plan adaptatif",
+          "Exportation"
+        ]
       },
       "premium": {
         "name": "Premium",
         "price": "€29",
         "period": "/mois",
-        "features": ["Tout du Pro", "Analytics avancés", "Styles d'explication", "Détection cognitive", "Hors ligne"]
+        "features": [
+          "Tout du Pro",
+          "Analytics avancés",
+          "Styles d'explication",
+          "Détection cognitive",
+          "Hors ligne"
+        ]
       }
     }
   },
@@ -604,5 +622,23 @@
       "analogical": "Par analogies",
       "analogicalDesc": "Je compare avec des situations du quotidien"
     }
+  },
+  "referral": {
+    "title": "Mon lien de parrainage",
+    "description": "Pour chaque ami qui s'abonne, vous gagnez 1 mois de réduction.",
+    "yourLink": "Votre lien de parrainage",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "shareWhatsApp": "Partager sur WhatsApp",
+    "shareEmail": "Partager par email",
+    "applyMonths": "Appliquer la réduction ({n} mois)",
+    "applied": "Réduction appliquée !",
+    "statsReferrals": "Parrainés",
+    "statsConverted": "Payants",
+    "statsEarned": "Mois gagnés",
+    "statsApplied": "Mois appliqués",
+    "historyTitle": "Historique",
+    "statusSignedUp": "Inscrit",
+    "statusPaid": "Payant"
   }
 }

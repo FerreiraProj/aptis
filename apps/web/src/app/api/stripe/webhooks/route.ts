@@ -4,6 +4,9 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { prisma } from "@aptis/database";
 import { getPlanFromPriceIdDB } from "@/lib/stripe/plans";
+import { convertReferral } from "@/lib/referral";
+import { revokeManualDiscount, calculateAffiliateCommission } from "@/lib/stripe/discounts";
+import { sendLoyaltyDiscountWarning } from "@/lib/email/resend";
 
 // CRITICAL: Must use raw body, not parsed JSON
 export async function POST(req: NextRequest) {
@@ -81,6 +84,88 @@ export async function POST(req: NextRequest) {
           where: { stripeSubscriptionId: sub.id },
           data: { status: "CANCELED", canceledAt: new Date() },
         });
+
+        const userId = sub.metadata?.userId;
+        if (userId) {
+          // Revoke all active manual discounts
+          const discounts = await prisma.userDiscount.findMany({
+            where: { userId, revokedAt: null },
+          });
+          for (const d of discounts) {
+            await revokeManualDiscount(userId, d.type, "subscription_canceled");
+            if (d.type === "LOYALTY") {
+              const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { email: true, fullName: true },
+              });
+              if (user) {
+                await sendLoyaltyDiscountWarning(user.email, user.fullName ?? "", d.discountPct).catch(
+                  (err) => console.error("[webhook] sendLoyaltyDiscountWarning failed:", err)
+                );
+              }
+            }
+          }
+
+          // Cancel affiliate referrals
+          await prisma.affiliateReferral.updateMany({
+            where: { referredUserId: userId, canceledAt: null },
+            data: { canceledAt: new Date() },
+          });
+        }
+        break;
+      }
+
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        // invoice.subscription exists at runtime but may not be in the clover type
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawSub = (invoice as any).subscription;
+        const subId = typeof rawSub === "string" ? rawSub : null;
+        if (!subId) break;
+
+        const sub = await stripe.subscriptions.retrieve(subId);
+        const userId = sub.metadata?.userId;
+        if (!userId) break;
+
+        // Convert student referral on first payment
+        await convertReferral(userId, subId).catch(
+          (err) => console.error("[webhook] convertReferral failed:", err)
+        );
+
+        // Affiliate commission
+        const affiliateRef = await prisma.affiliateReferral.findFirst({
+          where: { referredUserId: userId, canceledAt: null },
+        });
+        if (affiliateRef) {
+          const shouldCredit =
+            affiliateRef.recurringMonths === 0
+              ? affiliateRef.paymentsTracked === 0
+              : affiliateRef.paymentsTracked < affiliateRef.recurringMonths;
+
+          if (shouldCredit) {
+            const amount = calculateAffiliateCommission(
+              invoice.amount_paid,
+              affiliateRef.commissionType,
+              affiliateRef.commissionValue
+            );
+            await prisma.$transaction([
+              prisma.affiliateCommission.create({
+                data: {
+                  referralId: affiliateRef.id,
+                  amountCents: amount,
+                  stripeInvoiceId: invoice.id,
+                },
+              }),
+              prisma.affiliateReferral.update({
+                where: { id: affiliateRef.id },
+                data: {
+                  paymentsTracked: { increment: 1 },
+                  convertedAt: affiliateRef.convertedAt ?? new Date(),
+                },
+              }),
+            ]);
+          }
+        }
         break;
       }
 

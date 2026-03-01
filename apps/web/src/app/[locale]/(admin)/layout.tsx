@@ -11,6 +11,8 @@ import {
   CreditCard,
   Gauge,
   ArrowLeft,
+  Percent,
+  Handshake,
 } from "lucide-react";
 
 const adminNavItems = [
@@ -20,6 +22,8 @@ const adminNavItems = [
   { href: "/admin/usage", label: "Uso da API", Icon: Zap },
   { href: "/admin/plans", label: "Planos", Icon: CreditCard },
   { href: "/admin/rate-limits", label: "Rate Limits", Icon: Gauge },
+  { href: "/admin/discounts", label: "Descontos", Icon: Percent },
+  { href: "/admin/affiliates", label: "Afiliados", Icon: Handshake },
 ];
 
 export default async function AdminLayout({

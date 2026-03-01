@@ -20,6 +20,7 @@ import {
   BarChart2,
   MessageCircle,
   Trophy,
+  Gift,
 } from "lucide-react";
 import Image from "next/image";
 import { LanguageSwitcher } from "./language-switcher";
@@ -42,6 +43,7 @@ const ICON_MAP: Record<
   "/progress": BarChart2,
   "/chat": MessageCircle,
   "/exam-simulator": Trophy,
+  "/referral": Gift,
 };
 
 // ─── Types ────────────────────────────────────────────────────────────────────

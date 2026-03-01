@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
 
@@ -49,6 +50,7 @@ export function UpgradeDialog({ open, onClose }: UpgradeDialogProps) {
   const [interval, setInterval] = useState<Interval>("monthly");
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -65,10 +67,15 @@ export function UpgradeDialog({ open, onClose }: UpgradeDialogProps) {
   async function startCheckout(planTier: string) {
     setCheckoutLoading(planTier);
     try {
+      const trimmedCode = promoCode.trim().toUpperCase();
       const res = await fetch("/api/stripe/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planTier, interval }),
+        body: JSON.stringify({
+          planTier,
+          interval,
+          ...(trimmedCode ? { referralCode: trimmedCode } : {}),
+        }),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -133,6 +140,16 @@ export function UpgradeDialog({ open, onClose }: UpgradeDialogProps) {
               )}
             </button>
           </div>
+        </div>
+
+        {/* Promo / referral code */}
+        <div className="px-6 pb-2">
+          <Input
+            placeholder="Código de referral ou parceiro (opcional)"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value)}
+            className="text-sm"
+          />
         </div>
 
         {/* Plan cards */}

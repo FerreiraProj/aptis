@@ -35,7 +35,8 @@
     "admin": "Amministrazione",
     "upload": "Carica",
     "reviewToday": "Ripasso Oggi",
-    "signOut": "Esci"
+    "signOut": "Esci",
+    "referral": "Referral"
   },
   "auth": {
     "signIn": "Accedi",
@@ -96,19 +97,36 @@
         "name": "Gratuito",
         "price": "€0",
         "period": "/mese",
-        "features": ["1 documento/mese", "20 flashcard", "10 quiz", "Chat base"]
+        "features": [
+          "1 documento/mese",
+          "20 flashcard",
+          "10 quiz",
+          "Chat base"
+        ]
       },
       "pro": {
         "name": "Pro",
         "price": "€15",
         "period": "/mese",
-        "features": ["Documenti illimitati", "Flashcard illimitate", "Simulatore d'esame", "Piano adattivo", "Esportazione"]
+        "features": [
+          "Documenti illimitati",
+          "Flashcard illimitate",
+          "Simulatore d'esame",
+          "Piano adattivo",
+          "Esportazione"
+        ]
       },
       "premium": {
         "name": "Premium",
         "price": "€29",
         "period": "/mese",
-        "features": ["Tutto di Pro", "Analytics avanzati", "Stili di spiegazione", "Rilevamento cognitivo", "Offline"]
+        "features": [
+          "Tutto di Pro",
+          "Analytics avanzati",
+          "Stili di spiegazione",
+          "Rilevamento cognitivo",
+          "Offline"
+        ]
       }
     }
   },
@@ -604,5 +622,23 @@
       "analogical": "Per analogie",
       "analogicalDesc": "Confronto con situazioni quotidiane"
     }
+  },
+  "referral": {
+    "title": "Il mio link di referral",
+    "description": "Per ogni amico che si iscrive, guadagni 1 mese di sconto.",
+    "yourLink": "Il tuo link di referral",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "shareWhatsApp": "Condividi su WhatsApp",
+    "shareEmail": "Condividi per email",
+    "applyMonths": "Applica sconto ({n} mesi)",
+    "applied": "Sconto applicato!",
+    "statsReferrals": "Segnalati",
+    "statsConverted": "Paganti",
+    "statsEarned": "Mesi guadagnati",
+    "statsApplied": "Mesi applicati",
+    "historyTitle": "Cronologia",
+    "statusSignedUp": "Registrato",
+    "statusPaid": "Pagante"
   }
 }

@@ -52,6 +52,15 @@ model User {
   apiUsageLogs     ApiUsageLog[]
   subjects         Subject[]
 
+  // Affiliate / discount relations
+  referralCode           ReferralCode?
+  referredUses           ReferralUse[]         @relation("referred_uses")
+  userDiscounts          UserDiscount[]        @relation("user_discounts")
+  adminGrantedDiscounts  UserDiscount[]        @relation("admin_granted_discounts")
+  affiliateReferrals     AffiliateReferral[]   @relation("affiliate_referrals")
+  adminCreatedAffiliates AffiliatePartner[]    @relation("admin_created_affiliates")
+  adminPaidCommissions   AffiliateCommission[] @relation("admin_paid_commissions")
+
   @@map("users")
 }
 
@@ -617,4 +626,148 @@ model RateLimitConfig {
 
   @@unique([plan, action])
   @@map("rate_limit_configs")
+}
+
+// ─────────────────────────────────────────────
+// AFFILIATE & DISCOUNT SYSTEM
+// ─────────────────────────────────────────────
+
+enum DiscountType {
+  EARLY_ADOPTER
+  LOYALTY
+}
+
+enum CommissionType {
+  FIXED_EUR   // fixed value in cents
+  PERCENTAGE  // integer percentage (e.g. 10 = 10%)
+}
+
+enum CommissionStatus {
+  PENDING
+  PAID
+  CANCELED
+}
+
+model DiscountConfig {
+  id                      String   @id @default(uuid()) @db.Uuid
+  referralDiscountPct     Int      @default(20) @map("referral_discount_pct")
+  earlyAdopterDiscountPct Int      @default(30) @map("early_adopter_discount_pct")
+  loyaltyDiscountPct      Int      @default(25) @map("loyalty_discount_pct")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("discount_config")
+}
+
+model ReferralCode {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @unique @map("user_id") @db.Uuid
+  code          String   @unique
+  pendingMonths Int      @default(0) @map("pending_months")
+  appliedMonths Int      @default(0) @map("applied_months")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals ReferralUse[]
+
+  @@map("referral_codes")
+}
+
+model ReferralUse {
+  id             String    @id @default(uuid()) @db.Uuid
+  referralCodeId String    @map("referral_code_id") @db.Uuid
+  referredUserId String    @map("referred_user_id") @db.Uuid
+  stripeSubId    String?   @map("stripe_sub_id")
+  convertedAt    DateTime? @map("converted_at")
+  creditedAt     DateTime? @map("credited_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  referredUser User         @relation("referred_uses", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@unique([referralCodeId, referredUserId])
+  @@index([referredUserId])
+  @@map("referral_uses")
+}
+
+model UserDiscount {
+  id               String       @id @default(uuid()) @db.Uuid
+  userId           String       @map("user_id") @db.Uuid
+  type             DiscountType
+  discountPct      Int          @map("discount_pct")
+  stripeCouponId   String?      @map("stripe_coupon_id")
+  grantedByAdminId String       @map("granted_by_admin_id") @db.Uuid
+  grantedAt        DateTime     @default(now()) @map("granted_at")
+  revokedAt        DateTime?    @map("revoked_at")
+  revokeReason     String?      @map("revoke_reason")
+
+  user      User @relation("user_discounts", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User @relation("admin_granted_discounts", fields: [grantedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([type])
+  @@map("user_discounts")
+}
+
+model AffiliatePartner {
+  id               String         @id @default(uuid()) @db.Uuid
+  name             String
+  email            String         @unique
+  code             String         @unique
+  commissionType   CommissionType @map("commission_type")
+  commissionValue  Int            @map("commission_value")
+  recurringMonths  Int            @default(0) @map("recurring_months")
+  isActive         Boolean        @default(true) @map("is_active")
+  notes            String?        @db.Text
+  createdByAdminId String         @map("created_by_admin_id") @db.Uuid
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  createdBy User                @relation("admin_created_affiliates", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  referrals AffiliateReferral[]
+
+  @@map("affiliate_partners")
+}
+
+model AffiliateReferral {
+  id              String         @id @default(uuid()) @db.Uuid
+  partnerId       String         @map("partner_id") @db.Uuid
+  referredUserId  String         @map("referred_user_id") @db.Uuid
+  stripeSubId     String?        @map("stripe_sub_id")
+  commissionType  CommissionType @map("commission_type")
+  commissionValue Int            @map("commission_value")
+  recurringMonths Int            @map("recurring_months")
+  paymentsTracked Int            @default(0) @map("payments_tracked")
+  convertedAt     DateTime?      @map("converted_at")
+  canceledAt      DateTime?      @map("canceled_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  partner      AffiliatePartner     @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  referredUser User                 @relation("affiliate_referrals", fields: [referredUserId], references: [id], onDelete: Cascade)
+  commissions  AffiliateCommission[]
+
+  @@unique([partnerId, referredUserId])
+  @@index([partnerId])
+  @@index([referredUserId])
+  @@map("affiliate_referrals")
+}
+
+model AffiliateCommission {
+  id              String           @id @default(uuid()) @db.Uuid
+  referralId      String           @map("referral_id") @db.Uuid
+  amountCents     Int              @map("amount_cents")
+  status          CommissionStatus @default(PENDING)
+  stripeInvoiceId String?          @map("stripe_invoice_id")
+  paidAt          DateTime?        @map("paid_at")
+  paidByAdminId   String?          @map("paid_by_admin_id") @db.Uuid
+  notes           String?          @db.Text
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  referral    AffiliateReferral @relation(fields: [referralId], references: [id], onDelete: Cascade)
+  paidByAdmin User?             @relation("admin_paid_commissions", fields: [paidByAdminId], references: [id], onDelete: SetNull)
+
+  @@index([referralId])
+  @@index([status])
+  @@map("affiliate_commissions")
 }
