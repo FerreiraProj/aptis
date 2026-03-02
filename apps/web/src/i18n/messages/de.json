@@ -430,7 +430,10 @@
       "analogicalDesc": "Verwendet Beispiele und Vergleiche",
       "visual": "Visuell",
       "visualDesc": "Strukturiert mit Listen und Diagrammen"
-    }
+    },
+    "loading": "Laden...",
+    "save": "Speichern",
+    "saving": "Speichere..."
   },
   "subjects": {
     "title": "Fächer",

@@ -430,7 +430,10 @@
       "analogicalDesc": "Usa ejemplos y comparaciones",
       "visual": "Visual",
       "visualDesc": "Estructurado con listas y diagramas"
-    }
+    },
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "saving": "Guardando..."
   },
   "subjects": {
     "title": "Materias",

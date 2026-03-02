@@ -430,7 +430,10 @@
       "analogicalDesc": "Usa exemplos e comparações",
       "visual": "Visual",
       "visualDesc": "Estruturado com listas e diagramas"
-    }
+    },
+    "loading": "A carregar...",
+    "save": "Guardar",
+    "saving": "A guardar..."
   },
   "subjects": {
     "title": "Disciplinas",

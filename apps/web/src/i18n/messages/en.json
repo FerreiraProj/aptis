@@ -430,7 +430,10 @@
       "analogicalDesc": "Uses examples and comparisons",
       "visual": "Visual",
       "visualDesc": "Structured with lists and diagrams"
-    }
+    },
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving..."
   },
   "subjects": {
     "title": "Subjects",

@@ -430,7 +430,10 @@
       "analogicalDesc": "Utilise des exemples et des comparaisons",
       "visual": "Visuel",
       "visualDesc": "Structuré avec des listes et des diagrammes"
-    }
+    },
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "saving": "Enregistrement..."
   },
   "subjects": {
     "title": "Matières",
