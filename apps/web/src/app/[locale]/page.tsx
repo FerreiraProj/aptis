@@ -3,9 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PricingSection } from "./pricing-section";
 import {
-  BookOpen,
   Target,
-  MessageCircle,
   CalendarDays,
   Upload,
   FolderOpen,
@@ -13,9 +11,6 @@ import {
   Sparkles,
   Check,
   X,
-  Brain,
-  FileText,
-  Zap,
   Shield,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
