@@ -4,6 +4,28 @@ import { createServerClient } from "@supabase/ssr";
 import createMiddleware from "next-intl/middleware";
 import { routing, ACCEPT_LANG_MAP, type SupportedLocale } from "./i18n/routing";
 
+// Country code (ISO 3166-1 alpha-2) → supported locale.
+// Countries not listed here → "en" (English fallback).
+const COUNTRY_LOCALE_MAP: Record<string, SupportedLocale> = {
+  // Portuguese
+  PT: "pt", BR: "pt", AO: "pt", MZ: "pt", CV: "pt", GW: "pt", ST: "pt", TL: "pt",
+  // Spanish
+  ES: "es", MX: "es", AR: "es", CO: "es", CL: "es", PE: "es", VE: "es",
+  UY: "es", BO: "es", EC: "es", PY: "es", CR: "es", PA: "es", CU: "es",
+  DO: "es", GT: "es", HN: "es", NI: "es", SV: "es", GQ: "es",
+  // French
+  FR: "fr", BE: "fr", MC: "fr", LU: "fr", SN: "fr", CI: "fr", CM: "fr",
+  MG: "fr", BJ: "fr", BF: "fr", ML: "fr", GN: "fr", TG: "fr", GA: "fr",
+  // German
+  DE: "de", AT: "de",
+  // Italian
+  IT: "it", SM: "it", VA: "it",
+  // English — explicitly listed so the map is self-documenting, but
+  // anything not in this map also falls back to "en"
+  US: "en", GB: "en", CA: "en", AU: "en", NZ: "en", IE: "en", ZA: "en",
+  IN: "en", SG: "en", PH: "en", NG: "en", GH: "en", KE: "en",
+};
+
 const intlMiddleware = createMiddleware(routing);
 
 // Routes that require authentication (without locale prefix)
@@ -44,17 +66,33 @@ function isAdminPath(pathname: string): boolean {
 /** Detect locale from Accept-Language header; unknown languages → "en". */
 function detectLocaleFromHeader(acceptLanguage: string | null): SupportedLocale {
   if (!acceptLanguage) return "en";
-  // Parse comma-separated language tags (e.g. "fr-FR,fr;q=0.9,en;q=0.8")
   const tags = acceptLanguage
     .split(",")
     .map((part) => part.split(";")[0].trim().toLowerCase());
   for (const tag of tags) {
-    // Try full tag first (e.g. "pt-br"), then 2-letter prefix
     if (ACCEPT_LANG_MAP[tag]) return ACCEPT_LANG_MAP[tag];
     const prefix = tag.split("-")[0];
     if (ACCEPT_LANG_MAP[prefix]) return ACCEPT_LANG_MAP[prefix];
   }
   return "en";
+}
+
+/**
+ * Detect locale with the following priority:
+ * 1. Vercel geo-IP country header (x-vercel-ip-country) — works in Vercel production.
+ * 2. Accept-Language browser header — fallback for local dev & unknown countries.
+ * 3. "en" as final fallback.
+ */
+function detectLocale(request: NextRequest): SupportedLocale {
+  const country = request.headers.get("x-vercel-ip-country")?.toUpperCase();
+  if (country) {
+    const mapped = COUNTRY_LOCALE_MAP[country];
+    if (mapped) return mapped;
+    // Country is known but not in our map → English
+    return "en";
+  }
+  // No geo header (local dev) → fall back to browser language
+  return detectLocaleFromHeader(request.headers.get("accept-language"));
 }
 
 export async function proxy(request: NextRequest) {
@@ -69,12 +107,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // On first visit (no NEXT_LOCALE cookie), detect locale from Accept-Language.
-  // next-intl defaults to "pt" when no locale is detected; we want "en" for unknown languages.
+  // On first visit (no NEXT_LOCALE cookie), detect locale from geo-IP then Accept-Language.
+  // next-intl defaults to "pt" when no locale is detected; we want "en" for unknown locations.
   const hasLocaleCookie = request.cookies.has("NEXT_LOCALE");
   if (!hasLocaleCookie) {
-    const acceptLanguage = request.headers.get("accept-language");
-    const detectedLocale = detectLocaleFromHeader(acceptLanguage);
+    const detectedLocale = detectLocale(request);
     const hasLocalePrefix = LOCALE_PREFIX_RE.test(pathname);
 
     // For non-pt locales without a URL prefix, redirect to the locale-prefixed URL.
@@ -83,13 +120,14 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = pathname === "/" ? `/${detectedLocale}` : `/${detectedLocale}${pathname}`;
       const res = NextResponse.redirect(url);
-      res.cookies.set("NEXT_LOCALE", detectedLocale, { path: "/", maxAge: 365 * 24 * 60 * 60 });
+      // Session cookie — expires when browser closes, so geo-detection runs again next session.
+      res.cookies.set("NEXT_LOCALE", detectedLocale, { path: "/" });
       return res;
     }
 
     // For "pt" or already-prefixed paths, run intl middleware normally and set cookie on the response.
     const intlResponse = intlMiddleware(request);
-    intlResponse.cookies.set("NEXT_LOCALE", detectedLocale, { path: "/", maxAge: 365 * 24 * 60 * 60 });
+    intlResponse.cookies.set("NEXT_LOCALE", detectedLocale, { path: "/" });
     if (intlResponse.status !== 200) return intlResponse;
     if (!isProtectedPath(pathname)) return intlResponse;
     return await runAuthCheck(request, intlResponse, pathname);
