@@ -18,30 +18,35 @@ import {
   Zap,
   Shield,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 // Always render dynamically so the pricing section always reads fresh DB prices
 export const dynamic = "force-dynamic";
 
-export default function LandingPage() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type T = (key: string, values?: Record<string, any>) => string;
+
+export default async function LandingPage() {
+  const t = await getTranslations("landing");
   return (
     <main className="page-bg aurora-bg flex min-h-screen flex-col">
-      <Header />
-      <HeroSection />
-      <ProblemSection />
-      <SolutionSection />
-      <AiSpecialistSection />
-      <HowItWorksSection />
-      <StudyPlansSection />
-      <ComparisonSection />
-      <TargetAudienceSection />
+      <Header t={t} />
+      <HeroSection t={t} />
+      <ProblemSection t={t} />
+      <SolutionSection t={t} />
+      <AiSpecialistSection t={t} />
+      <HowItWorksSection t={t} />
+      <StudyPlansSection t={t} />
+      <ComparisonSection t={t} />
+      <TargetAudienceSection t={t} />
       <PricingSection />
-      <PrivacySection />
-      <Footer />
+      <PrivacySection t={t} />
+      <Footer t={t} />
     </main>
   );
 }
 
-function Header() {
+function Header({ t }: { t: T }) {
   return (
     <header className="glass sticky top-0 z-50">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -55,13 +60,13 @@ function Header() {
             href="/login"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Entrar
+            {t("header.signIn")}
           </Link>
           <Link
             href="/register"
             className="btn-gradient rounded-xl px-4 py-2 text-sm font-medium"
           >
-            Começar gratuitamente
+            {t("header.signUp")}
           </Link>
         </nav>
       </div>
@@ -69,48 +74,46 @@ function Header() {
   );
 }
 
-function HeroSection() {
+function HeroSection({ t }: { t: T }) {
   return (
     <section className="container mx-auto flex flex-col items-center gap-8 px-4 py-24 text-center">
       <div className="glass-sm rounded-full px-4 py-1.5 text-sm font-medium text-primary">
-        O teu sistema de estudo inteligente, disciplina por disciplina
+        {t("hero.badge")}
       </div>
       <h1 className="max-w-4xl text-4xl font-bold tracking-tight sm:text-6xl">
-        Estuda melhor em qualquer disciplina com uma{" "}
-        <span className="gradient-text">IA que se adapta à matéria</span>
+        {t("hero.title1")}{" "}
+        <span className="gradient-text">{t("hero.titleHighlight")}</span>
       </h1>
       <p className="max-w-2xl text-lg text-muted-foreground">
-        Carrega PDFs, apontamentos ou apresentações.
-        Organiza por disciplina.
-        Gera planos, quizzes e flashcards focados exatamente no que queres estudar.
+        {t("hero.description")}
       </p>
       <div className="flex flex-col gap-4 sm:flex-row">
         <Link
           href="/register"
           className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold"
         >
-          Começar gratuitamente
+          {t("hero.ctaStart")}
         </Link>
         <Link
           href="#como-funciona"
           className="glass rounded-xl px-8 py-3 text-sm font-semibold text-foreground hover:brightness-105 transition-all"
         >
-          Como funciona
+          {t("hero.ctaHow")}
         </Link>
       </div>
       <p className="text-sm text-muted-foreground">
-        Sem guardar os teus ficheiros originais. Plano gratuito disponível.
+        {t("hero.privacy")}
       </p>
     </section>
   );
 }
 
-function ProblemSection() {
+function ProblemSection({ t }: { t: T }) {
   const problems = [
-    "PDFs espalhados por várias pastas",
-    "Flashcards numa app, resumos noutra",
-    "Quizzes genéricos sem contexto real",
-    "Sem plano de estudo estruturado",
+    t("problem.item1"),
+    t("problem.item2"),
+    t("problem.item3"),
+    t("problem.item4"),
   ];
 
   return (
@@ -118,7 +121,7 @@ function ProblemSection() {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-6 text-3xl font-bold sm:text-4xl">
-            O teu estudo está fragmentado.
+            {t("problem.title")}
           </h2>
           <div className="mb-8 grid gap-3 sm:grid-cols-2">
             {problems.map((p) => (
@@ -129,8 +132,8 @@ function ProblemSection() {
             ))}
           </div>
           <p className="text-lg font-semibold text-foreground">
-            O problema não é falta de conteúdo.{" "}
-            <span className="gradient-text">É falta de estrutura.</span>
+            {t("problem.conclusion1")}{" "}
+            <span className="gradient-text">{t("problem.conclusionHighlight")}</span>
           </p>
         </div>
       </div>
@@ -138,12 +141,12 @@ function ProblemSection() {
   );
 }
 
-function SolutionSection() {
+function SolutionSection({ t }: { t: T }) {
   const steps = [
-    { Icon: FolderOpen, text: "Cria disciplinas (ou não — é opcional)" },
-    { Icon: Upload, text: "Carrega documentos" },
-    { Icon: Layers, text: "Classifica por matéria" },
-    { Icon: Sparkles, text: "Estuda um ou vários documentos ao mesmo tempo" },
+    { Icon: FolderOpen, text: t("solution.step1") },
+    { Icon: Upload, text: t("solution.step2") },
+    { Icon: Layers, text: t("solution.step3") },
+    { Icon: Sparkles, text: t("solution.step4") },
   ];
 
   return (
@@ -151,10 +154,10 @@ function SolutionSection() {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-4 text-center text-3xl font-bold sm:text-4xl">
-            Transforma caos em disciplina.
+            {t("solution.title")}
           </h2>
           <p className="mb-10 text-center text-muted-foreground">
-            Tu escolhes o que estudar. A IA adapta-se ao contexto.
+            {t("solution.subtitle")}
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {steps.map(({ Icon, text }) => (
@@ -172,12 +175,12 @@ function SolutionSection() {
   );
 }
 
-function AiSpecialistSection() {
+function AiSpecialistSection({ t }: { t: T }) {
   const examples = [
-    { area: "Biologia", emoji: "🧬", description: "explica como professor de biologia" },
-    { area: "Direito", emoji: "⚖️", description: "usa linguagem jurídica" },
-    { area: "Medicina", emoji: "🩺", description: "raciocínio clínico" },
-    { area: "Engenharia", emoji: "⚙️", description: "abordagem técnica" },
+    { area: t("aiSpecialist.area1"), emoji: "🧬", description: t("aiSpecialist.area1desc") },
+    { area: t("aiSpecialist.area2"), emoji: "⚖️", description: t("aiSpecialist.area2desc") },
+    { area: t("aiSpecialist.area3"), emoji: "🩺", description: t("aiSpecialist.area3desc") },
+    { area: t("aiSpecialist.area4"), emoji: "⚙️", description: t("aiSpecialist.area4desc") },
   ];
 
   return (
@@ -185,10 +188,10 @@ function AiSpecialistSection() {
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
-            A IA muda conforme a disciplina.
+            {t("aiSpecialist.title")}
           </h2>
           <p className="mb-10 text-muted-foreground">
-            Se estás a estudar:
+            {t("aiSpecialist.subtitle")}
           </p>
           <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {examples.map(({ area, emoji, description }) => (
@@ -201,8 +204,8 @@ function AiSpecialistSection() {
           </div>
           <div className="glass-sm inline-block rounded-2xl px-8 py-4">
             <p className="font-semibold">
-              Não é uma IA genérica.{" "}
-              <span className="gradient-text">É uma IA contextual.</span>
+              {t("aiSpecialist.conclusion1")}{" "}
+              <span className="gradient-text">{t("aiSpecialist.conclusionHighlight")}</span>
             </p>
           </div>
         </div>
@@ -211,38 +214,38 @@ function AiSpecialistSection() {
   );
 }
 
-function HowItWorksSection() {
+function HowItWorksSection({ t }: { t: T }) {
   const steps = [
     {
       number: "1",
       Icon: Upload,
-      title: "Adiciona documentos",
-      description: "PDF, PPTX, TXT e mais.",
+      title: t("howItWorks.step1Title"),
+      description: t("howItWorks.step1Desc"),
     },
     {
       number: "2",
       Icon: FolderOpen,
-      title: "Organiza por disciplina",
-      description: "Opcional — ou estuda diretamente documentos soltos.",
+      title: t("howItWorks.step2Title"),
+      description: t("howItWorks.step2Desc"),
     },
     {
       number: "3",
       Icon: Target,
-      title: "Escolhe o que queres estudar",
-      description: "Um documento, vários ou uma disciplina inteira.",
+      title: t("howItWorks.step3Title"),
+      description: t("howItWorks.step3Desc"),
     },
     {
       number: "4",
       Icon: Sparkles,
-      title: "Recebe o teu plano de estudo",
-      description: "Flashcards inteligentes, quizzes adaptativos, explicações personalizadas e plano automático.",
+      title: t("howItWorks.step4Title"),
+      description: t("howItWorks.step4Desc"),
     },
   ];
 
   return (
     <section id="como-funciona" className="py-20">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">Como funciona</h2>
+        <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">{t("howItWorks.title")}</h2>
         <div className="mx-auto max-w-4xl grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(({ number, Icon, title, description }) => (
             <div key={number} className="glass rounded-2xl p-6 hover:scale-[1.02] transition-transform">
@@ -262,29 +265,31 @@ function HowItWorksSection() {
   );
 }
 
-function StudyPlansSection() {
+function StudyPlansSection({ t }: { t: T }) {
+  const subjects = [t("studyPlans.subject1"), t("studyPlans.subject2"), t("studyPlans.subject3")];
+
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl">
           <div className="glass rounded-3xl p-10">
             <h2 className="mb-4 text-center text-3xl font-bold sm:text-4xl">
-              Planeia cada disciplina de forma independente.
+              {t("studyPlans.title")}
             </h2>
             <p className="mb-8 text-center text-muted-foreground">
-              Tens várias disciplinas difíceis? Cria um plano para cada uma — ou mistura documentos num plano global.
+              {t("studyPlans.subtitle")}
             </p>
             <div className="mb-8 grid gap-4 sm:grid-cols-3">
-              {["Matemática", "Biologia", "Direito"].map((subject) => (
+              {subjects.map((subject) => (
                 <div key={subject} className="glass-sm rounded-xl px-4 py-3 flex items-center gap-2">
                   <CalendarDays size={16} className="text-primary" />
-                  <span className="text-sm font-medium">Plano para {subject}</span>
+                  <span className="text-sm font-medium">{t("studyPlans.planFor", { subject })}</span>
                 </div>
               ))}
             </div>
             <p className="text-center font-semibold">
-              O estudo adapta-se à{" "}
-              <span className="gradient-text">tua realidade académica.</span>
+              {t("studyPlans.conclusion1")}{" "}
+              <span className="gradient-text">{t("studyPlans.conclusionHighlight")}</span>
             </p>
           </div>
         </div>
@@ -293,27 +298,27 @@ function StudyPlansSection() {
   );
 }
 
-function ComparisonSection() {
+function ComparisonSection({ t }: { t: T }) {
   const rows = [
     {
-      feature: "Flashcards",
-      generic: "Iguais para todos",
-      aptis: "Baseados nos teus documentos",
+      feature: t("comparison.feature1"),
+      generic: t("comparison.generic1"),
+      aptis: t("comparison.aptis1"),
     },
     {
-      feature: "Contexto",
-      generic: "Sem contexto disciplinar",
-      aptis: "IA especialista por matéria",
+      feature: t("comparison.feature2"),
+      generic: t("comparison.generic2"),
+      aptis: t("comparison.aptis2"),
     },
     {
-      feature: "Organização",
-      generic: "Manual",
-      aptis: "Estrutura automática",
+      feature: t("comparison.feature3"),
+      generic: t("comparison.generic3"),
+      aptis: t("comparison.aptis3"),
     },
     {
-      feature: "Planeamento",
-      generic: "Sem plano real",
-      aptis: "Planeamento adaptativo",
+      feature: t("comparison.feature4"),
+      generic: t("comparison.generic4"),
+      aptis: t("comparison.aptis4"),
     },
   ];
 
@@ -321,15 +326,15 @@ function ComparisonSection() {
     <section className="py-20">
       <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-          Porque não é como as outras ferramentas
+          {t("comparison.title")}
         </h2>
         <div className="mx-auto max-w-3xl">
           <div className="glass rounded-2xl overflow-hidden">
             {/* Header */}
             <div className="grid grid-cols-3 glass-sm px-6 py-3 text-sm font-semibold">
-              <span className="text-muted-foreground">Funcionalidade</span>
-              <span className="text-center text-muted-foreground">Ferramentas genéricas</span>
-              <span className="text-center gradient-text">Aptis</span>
+              <span className="text-muted-foreground">{t("comparison.colFeature")}</span>
+              <span className="text-center text-muted-foreground">{t("comparison.colGeneric")}</span>
+              <span className="text-center gradient-text">{t("comparison.colAptis")}</span>
             </div>
             {/* Rows */}
             {rows.map((row, i) => (
@@ -356,21 +361,21 @@ function ComparisonSection() {
   );
 }
 
-function TargetAudienceSection() {
+function TargetAudienceSection({ t }: { t: T }) {
   const audiences = [
-    { emoji: "📚", label: "Secundário" },
-    { emoji: "🎓", label: "Universitários" },
-    { emoji: "📝", label: "Exames nacionais" },
-    { emoji: "🏆", label: "Certificações" },
-    { emoji: "⚖️", label: "Concursos" },
+    { emoji: "📚", label: t("targetAudience.audience1") },
+    { emoji: "🎓", label: t("targetAudience.audience2") },
+    { emoji: "📝", label: t("targetAudience.audience3") },
+    { emoji: "🏆", label: t("targetAudience.audience4") },
+    { emoji: "⚖️", label: t("targetAudience.audience5") },
   ];
 
   return (
     <section className="py-20">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Para quem é?</h2>
+        <h2 className="mb-4 text-3xl font-bold sm:text-4xl">{t("targetAudience.title")}</h2>
         <p className="mb-10 text-muted-foreground">
-          Se tens matéria para estudar, isto foi feito para ti.
+          {t("targetAudience.subtitle")}
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {audiences.map(({ emoji, label }) => (
@@ -385,7 +390,7 @@ function TargetAudienceSection() {
             href="/register"
             className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold inline-block"
           >
-            Começar gratuitamente
+            {t("targetAudience.cta")}
           </Link>
         </div>
       </div>
@@ -393,7 +398,7 @@ function TargetAudienceSection() {
   );
 }
 
-function PrivacySection() {
+function PrivacySection({ t }: { t: T }) {
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
@@ -405,13 +410,13 @@ function PrivacySection() {
               </div>
             </div>
             <h2 className="mb-4 text-2xl font-bold">
-              Os teus ficheiros não ficam guardados.
+              {t("privacy.title")}
             </h2>
             <p className="mb-2 text-muted-foreground">
-              O documento é eliminado após extração do conteúdo.
+              {t("privacy.text1")}
             </p>
             <p className="text-muted-foreground">
-              Guardamos apenas texto estruturado e embeddings — nunca o ficheiro original.
+              {t("privacy.text2")}
             </p>
           </div>
         </div>
@@ -420,11 +425,11 @@ function PrivacySection() {
   );
 }
 
-function Footer() {
+function Footer({ t }: { t: T }) {
   return (
     <footer className="glass-sm mt-auto py-8">
       <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Aptis. Todos os direitos reservados.
+        © {new Date().getFullYear()} Aptis. {t("footer.rights")}
       </div>
     </footer>
   );

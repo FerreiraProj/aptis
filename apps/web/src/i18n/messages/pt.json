@@ -66,68 +66,106 @@
     "privacyPolicy": "Política de Privacidade"
   },
   "landing": {
+    "header": {
+      "signIn": "Entrar",
+      "signUp": "Começar gratuitamente"
+    },
     "hero": {
-      "title": "Estuda mais inteligente, não mais horas",
-      "subtitle": "Transforma os teus PDFs em flashcards, quizzes e planos de estudo personalizados com IA. Feito para estudantes de medicina.",
-      "cta": "Começar grátis",
-      "ctaSecondary": "Ver como funciona"
+      "badge": "O teu sistema de estudo inteligente, disciplina por disciplina",
+      "title1": "Estuda melhor em qualquer disciplina com uma",
+      "titleHighlight": "ferramenta que se adapta à matéria",
+      "description": "Carrega PDFs, apontamentos ou apresentações. Organiza por disciplina. Gera planos, quizzes e flashcards focados exatamente no que queres estudar.",
+      "ctaStart": "Começar gratuitamente",
+      "ctaHow": "Como funciona",
+      "privacy": "Sem guardar os teus ficheiros originais. Plano gratuito disponível."
     },
-    "features": {
-      "title": "Tudo o que precisas para passar",
-      "flashcards": {
-        "title": "Flashcards Inteligentes",
-        "description": "Gerados automaticamente com repetição espaçada (algoritmo SM-2)"
-      },
-      "quizzes": {
-        "title": "Quizzes Adaptativos",
-        "description": "O sistema deteta as tuas fraquezas e cria exercícios corretivos"
-      },
-      "chat": {
-        "title": "Tutor IA Pessoal",
-        "description": "Chat treinado no teu conteúdo, com memória das tuas dificuldades"
-      },
-      "plan": {
-        "title": "Plano de Estudo Diário",
-        "description": "Diz-nos a data do exame e a nota que queres. Nós criamos o plano."
-      }
+    "problem": {
+      "title": "O teu estudo está fragmentado.",
+      "item1": "PDFs espalhados por várias pastas",
+      "item2": "Flashcards numa app, resumos noutra",
+      "item3": "Quizzes genéricos sem contexto real",
+      "item4": "Sem plano de estudo estruturado",
+      "conclusion1": "O problema não é falta de conteúdo.",
+      "conclusionHighlight": "É falta de estrutura."
     },
-    "pricing": {
-      "title": "Preços simples e transparentes",
-      "free": {
-        "name": "Grátis",
-        "price": "€0",
-        "period": "/mês",
-        "features": [
-          "1 documento/mês",
-          "20 flashcards",
-          "10 quizzes",
-          "Chat básico"
-        ]
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "€15",
-        "period": "/mês",
-        "features": [
-          "Documentos ilimitados",
-          "Flashcards ilimitados",
-          "Simulador de exame",
-          "Plano adaptativo",
-          "Exportação"
-        ]
-      },
-      "premium": {
-        "name": "Premium",
-        "price": "€29",
-        "period": "/mês",
-        "features": [
-          "Tudo do Pro",
-          "Analytics avançados",
-          "Estilos de explicação",
-          "Deteção cognitiva",
-          "Offline"
-        ]
-      }
+    "solution": {
+      "title": "Transforma caos em disciplina.",
+      "subtitle": "Tu escolhes o que estudar. A IA adapta-se ao contexto.",
+      "step1": "Cria disciplinas (ou não — é opcional)",
+      "step2": "Carrega documentos",
+      "step3": "Classifica por matéria",
+      "step4": "Estuda um ou vários documentos ao mesmo tempo"
+    },
+    "aiSpecialist": {
+      "title": "A IA muda conforme a disciplina.",
+      "subtitle": "Se estás a estudar:",
+      "area1": "Biologia",
+      "area1desc": "explica como professor de biologia",
+      "area2": "Direito",
+      "area2desc": "usa linguagem jurídica",
+      "area3": "Medicina",
+      "area3desc": "raciocínio clínico",
+      "area4": "Engenharia",
+      "area4desc": "abordagem técnica",
+      "conclusion1": "Não é uma IA genérica.",
+      "conclusionHighlight": "É uma IA contextual."
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "step1Title": "Adiciona documentos",
+      "step1Desc": "PDF, PPTX, TXT e mais.",
+      "step2Title": "Organiza por disciplina",
+      "step2Desc": "Opcional — ou estuda diretamente documentos soltos.",
+      "step3Title": "Escolhe o que queres estudar",
+      "step3Desc": "Um documento, vários ou uma disciplina inteira.",
+      "step4Title": "Recebe o teu plano de estudo",
+      "step4Desc": "Flashcards inteligentes, quizzes adaptativos, explicações personalizadas e plano automático."
+    },
+    "studyPlans": {
+      "title": "Planeia cada disciplina de forma independente.",
+      "subtitle": "Tens várias disciplinas difíceis? Cria um plano para cada uma — ou mistura documentos num plano global.",
+      "planFor": "Plano para {subject}",
+      "subject1": "Matemática",
+      "subject2": "Biologia",
+      "subject3": "Direito",
+      "conclusion1": "O estudo adapta-se à",
+      "conclusionHighlight": "tua realidade académica."
+    },
+    "comparison": {
+      "title": "Porque não é como as outras ferramentas",
+      "colFeature": "Funcionalidade",
+      "colGeneric": "Ferramentas genéricas",
+      "colAptis": "Aptis",
+      "feature1": "Flashcards",
+      "generic1": "Iguais para todos",
+      "aptis1": "Baseados nos teus documentos",
+      "feature2": "Contexto",
+      "generic2": "Sem contexto disciplinar",
+      "aptis2": "IA especialista por matéria",
+      "feature3": "Organização",
+      "generic3": "Manual",
+      "aptis3": "Estrutura automática",
+      "feature4": "Planeamento",
+      "generic4": "Sem plano real",
+      "aptis4": "Planeamento adaptativo"
+    },
+    "targetAudience": {
+      "title": "Para quem é?",
+      "subtitle": "Se tens matéria para estudar, isto foi feito para ti.",
+      "cta": "Começar gratuitamente",
+      "audience1": "Secundário",
+      "audience2": "Universitários",
+      "audience3": "Exames nacionais",
+      "audience4": "Certificações",
+      "audience5": "Concursos"
+    },
+    "privacy": {
+      "title": "Os teus ficheiros não ficam guardados.",
+      "text1": "O documento é eliminado após extração do conteúdo.",
+      "text2": "Guardamos apenas texto estruturado e embeddings — nunca o ficheiro original."
+    },
+    "footer": {
+      "rights": "Todos os direitos reservados."
     }
   },
   "upload": {

@@ -66,68 +66,106 @@
     "privacyPolicy": "Privacy Policy"
   },
   "landing": {
+    "header": {
+      "signIn": "Log in",
+      "signUp": "Get started for free"
+    },
     "hero": {
-      "title": "Study smarter, not longer",
-      "subtitle": "Transform your PDFs into flashcards, quizzes and personalized study plans with AI. Built for medicine students.",
-      "cta": "Start for free",
-      "ctaSecondary": "See how it works"
+      "badge": "Your intelligent study system, subject by subject",
+      "title1": "Study smarter in any subject with a",
+      "titleHighlight": "tool that adapts to the content",
+      "description": "Upload PDFs, notes or presentations. Organise by subject. Generate plans, quizzes and flashcards focused on exactly what you want to study.",
+      "ctaStart": "Get started for free",
+      "ctaHow": "How it works",
+      "privacy": "We don't store your original files. Free plan available."
     },
-    "features": {
-      "title": "Everything you need to pass",
-      "flashcards": {
-        "title": "Smart Flashcards",
-        "description": "Auto-generated with spaced repetition (SM-2 algorithm)"
-      },
-      "quizzes": {
-        "title": "Adaptive Quizzes",
-        "description": "The system detects your weaknesses and creates corrective exercises"
-      },
-      "chat": {
-        "title": "Personal AI Tutor",
-        "description": "Chat trained on your content, with memory of your difficulties"
-      },
-      "plan": {
-        "title": "Daily Study Plan",
-        "description": "Tell us your exam date and target grade. We create the plan."
-      }
+    "problem": {
+      "title": "Your study is fragmented.",
+      "item1": "PDFs scattered across multiple folders",
+      "item2": "Flashcards in one app, summaries in another",
+      "item3": "Generic quizzes with no real context",
+      "item4": "No structured study plan",
+      "conclusion1": "The problem isn't a lack of content.",
+      "conclusionHighlight": "It's a lack of structure."
     },
-    "pricing": {
-      "title": "Simple, transparent pricing",
-      "free": {
-        "name": "Free",
-        "price": "€0",
-        "period": "/month",
-        "features": [
-          "1 document/month",
-          "20 flashcards",
-          "10 quizzes",
-          "Basic chat"
-        ]
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "€15",
-        "period": "/month",
-        "features": [
-          "Unlimited documents",
-          "Unlimited flashcards",
-          "Exam simulator",
-          "Adaptive plan",
-          "Export"
-        ]
-      },
-      "premium": {
-        "name": "Premium",
-        "price": "€29",
-        "period": "/month",
-        "features": [
-          "Everything in Pro",
-          "Advanced analytics",
-          "Explanation styles",
-          "Cognitive detection",
-          "Offline"
-        ]
-      }
+    "solution": {
+      "title": "Turn chaos into discipline.",
+      "subtitle": "You choose what to study. The AI adapts to the context.",
+      "step1": "Create subjects (or don't — it's optional)",
+      "step2": "Upload documents",
+      "step3": "Classify by topic",
+      "step4": "Study one or multiple documents at once"
+    },
+    "aiSpecialist": {
+      "title": "The AI changes with each subject.",
+      "subtitle": "If you're studying:",
+      "area1": "Biology",
+      "area1desc": "explains like a biology teacher",
+      "area2": "Law",
+      "area2desc": "uses legal language",
+      "area3": "Medicine",
+      "area3desc": "clinical reasoning",
+      "area4": "Engineering",
+      "area4desc": "technical approach",
+      "conclusion1": "It's not a generic AI.",
+      "conclusionHighlight": "It's a contextual AI."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1Title": "Add documents",
+      "step1Desc": "PDF, PPTX, TXT and more.",
+      "step2Title": "Organise by subject",
+      "step2Desc": "Optional — or study loose documents directly.",
+      "step3Title": "Choose what you want to study",
+      "step3Desc": "One document, several, or an entire subject.",
+      "step4Title": "Get your study plan",
+      "step4Desc": "Smart flashcards, adaptive quizzes, personalised explanations and automatic planning."
+    },
+    "studyPlans": {
+      "title": "Plan each subject independently.",
+      "subtitle": "Got several difficult subjects? Create a plan for each — or mix documents into one global plan.",
+      "planFor": "Plan for {subject}",
+      "subject1": "Mathematics",
+      "subject2": "Biology",
+      "subject3": "Law",
+      "conclusion1": "Study adapts to your",
+      "conclusionHighlight": "academic reality."
+    },
+    "comparison": {
+      "title": "Why it's not like other tools",
+      "colFeature": "Feature",
+      "colGeneric": "Generic tools",
+      "colAptis": "Aptis",
+      "feature1": "Flashcards",
+      "generic1": "Same for everyone",
+      "aptis1": "Based on your documents",
+      "feature2": "Context",
+      "generic2": "No subject context",
+      "aptis2": "Subject-expert AI",
+      "feature3": "Organisation",
+      "generic3": "Manual",
+      "aptis3": "Automatic structure",
+      "feature4": "Planning",
+      "generic4": "No real plan",
+      "aptis4": "Adaptive planning"
+    },
+    "targetAudience": {
+      "title": "Who is it for?",
+      "subtitle": "If you have content to study, this was made for you.",
+      "cta": "Get started for free",
+      "audience1": "Secondary school",
+      "audience2": "University students",
+      "audience3": "National exams",
+      "audience4": "Certifications",
+      "audience5": "Competitive exams"
+    },
+    "privacy": {
+      "title": "Your files are not stored.",
+      "text1": "The document is deleted after content extraction.",
+      "text2": "We only store structured text and embeddings — never the original file."
+    },
+    "footer": {
+      "rights": "All rights reserved."
     }
   },
   "upload": {

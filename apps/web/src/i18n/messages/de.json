@@ -66,68 +66,106 @@
     "privacyPolicy": "Datenschutzrichtlinien"
   },
   "landing": {
+    "header": {
+      "signIn": "Anmelden",
+      "signUp": "Kostenlos starten"
+    },
     "hero": {
-      "title": "Intelligenter lernen, nicht länger",
-      "subtitle": "Verwandle deine PDFs in Lernkarten, Quizze und personalisierte Lernpläne mit KI. Entwickelt für Medizinstudenten.",
+      "badge": "Dein intelligentes Lernsystem, Fach für Fach",
+      "title1": "Lerne in jedem Fach besser mit einem",
+      "titleHighlight": "Werkzeug, das sich dem Inhalt anpasst",
+      "description": "Lade PDFs, Notizen oder Präsentationen hoch. Organisiere nach Fach. Erstelle Pläne, Quizze und Karteikarten, die genau auf das ausgerichtet sind, was du lernen möchtest.",
+      "ctaStart": "Kostenlos starten",
+      "ctaHow": "Wie es funktioniert",
+      "privacy": "Wir speichern deine Originaldateien nicht. Kostenloser Plan verfügbar."
+    },
+    "problem": {
+      "title": "Dein Lernen ist fragmentiert.",
+      "item1": "PDFs über mehrere Ordner verteilt",
+      "item2": "Karteikarten in einer App, Zusammenfassungen in einer anderen",
+      "item3": "Generische Quizze ohne echten Kontext",
+      "item4": "Kein strukturierter Lernplan",
+      "conclusion1": "Das Problem ist kein Mangel an Inhalten.",
+      "conclusionHighlight": "Es ist ein Mangel an Struktur."
+    },
+    "solution": {
+      "title": "Verwandle Chaos in Disziplin.",
+      "subtitle": "Du wählst, was du lernst. Die KI passt sich dem Kontext an.",
+      "step1": "Erstelle Fächer (oder nicht — es ist optional)",
+      "step2": "Dokumente hochladen",
+      "step3": "Nach Thema klassifizieren",
+      "step4": "Ein oder mehrere Dokumente gleichzeitig lernen"
+    },
+    "aiSpecialist": {
+      "title": "Die KI ändert sich je nach Fach.",
+      "subtitle": "Wenn du lernst:",
+      "area1": "Biologie",
+      "area1desc": "erklärt wie ein Biologielehrer",
+      "area2": "Recht",
+      "area2desc": "verwendet juristische Sprache",
+      "area3": "Medizin",
+      "area3desc": "klinisches Denken",
+      "area4": "Ingenieurwesen",
+      "area4desc": "technischer Ansatz",
+      "conclusion1": "Es ist keine generische KI.",
+      "conclusionHighlight": "Es ist eine kontextuelle KI."
+    },
+    "howItWorks": {
+      "title": "Wie es funktioniert",
+      "step1Title": "Dokumente hinzufügen",
+      "step1Desc": "PDF, PPTX, TXT und mehr.",
+      "step2Title": "Nach Fach organisieren",
+      "step2Desc": "Optional — oder lerne einzelne Dokumente direkt.",
+      "step3Title": "Wähle, was du lernen möchtest",
+      "step3Desc": "Ein Dokument, mehrere oder ein ganzes Fach.",
+      "step4Title": "Erhalte deinen Lernplan",
+      "step4Desc": "Intelligente Karteikarten, adaptive Quizze, personalisierte Erklärungen und automatische Planung."
+    },
+    "studyPlans": {
+      "title": "Plane jedes Fach unabhängig.",
+      "subtitle": "Hast du mehrere schwierige Fächer? Erstelle einen Plan für jedes — oder kombiniere Dokumente in einem globalen Plan.",
+      "planFor": "Plan für {subject}",
+      "subject1": "Mathematik",
+      "subject2": "Biologie",
+      "subject3": "Recht",
+      "conclusion1": "Das Lernen passt sich an deine",
+      "conclusionHighlight": "akademische Realität an."
+    },
+    "comparison": {
+      "title": "Warum es anders ist als andere Tools",
+      "colFeature": "Funktion",
+      "colGeneric": "Generische Tools",
+      "colAptis": "Aptis",
+      "feature1": "Karteikarten",
+      "generic1": "Gleich für alle",
+      "aptis1": "Basierend auf deinen Dokumenten",
+      "feature2": "Kontext",
+      "generic2": "Kein Fachkontext",
+      "aptis2": "Fachexperten-KI",
+      "feature3": "Organisation",
+      "generic3": "Manuell",
+      "aptis3": "Automatische Struktur",
+      "feature4": "Planung",
+      "generic4": "Kein echter Plan",
+      "aptis4": "Adaptive Planung"
+    },
+    "targetAudience": {
+      "title": "Für wen ist es?",
+      "subtitle": "Wenn du Inhalte zum Lernen hast, wurde dies für dich gemacht.",
       "cta": "Kostenlos starten",
-      "ctaSecondary": "Sehen wie es funktioniert"
+      "audience1": "Gymnasium",
+      "audience2": "Studenten",
+      "audience3": "Nationale Prüfungen",
+      "audience4": "Zertifizierungen",
+      "audience5": "Eignungsprüfungen"
     },
-    "features": {
-      "title": "Alles was du brauchst, um zu bestehen",
-      "flashcards": {
-        "title": "Intelligente Lernkarten",
-        "description": "Automatisch generiert mit Abstandswiederholung (SM-2-Algorithmus)"
-      },
-      "quizzes": {
-        "title": "Adaptive Quizze",
-        "description": "Das System erkennt deine Schwächen und erstellt Übungsaufgaben"
-      },
-      "chat": {
-        "title": "Persönlicher KI-Tutor",
-        "description": "Chat auf Basis deiner Inhalte, mit Erinnerung an deine Schwierigkeiten"
-      },
-      "plan": {
-        "title": "Täglicher Lernplan",
-        "description": "Nenn uns das Prüfungsdatum und die gewünschte Note. Wir erstellen den Plan."
-      }
+    "privacy": {
+      "title": "Deine Dateien werden nicht gespeichert.",
+      "text1": "Das Dokument wird nach der Inhaltsextraktion gelöscht.",
+      "text2": "Wir speichern nur strukturierten Text und Embeddings — niemals die Originaldatei."
     },
-    "pricing": {
-      "title": "Einfache und transparente Preise",
-      "free": {
-        "name": "Kostenlos",
-        "price": "€0",
-        "period": "/Monat",
-        "features": [
-          "1 Dokument/Monat",
-          "20 Lernkarten",
-          "10 Quizze",
-          "Basis-Chat"
-        ]
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "€15",
-        "period": "/Monat",
-        "features": [
-          "Unbegrenzte Dokumente",
-          "Unbegrenzte Lernkarten",
-          "Prüfungssimulator",
-          "Adaptiver Plan",
-          "Export"
-        ]
-      },
-      "premium": {
-        "name": "Premium",
-        "price": "€29",
-        "period": "/Monat",
-        "features": [
-          "Alles aus Pro",
-          "Erweiterte Analytics",
-          "Erklärungsstile",
-          "Kognitive Erkennung",
-          "Offline"
-        ]
-      }
+    "footer": {
+      "rights": "Alle Rechte vorbehalten."
     }
   },
   "upload": {

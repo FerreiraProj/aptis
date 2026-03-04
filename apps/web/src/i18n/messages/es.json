@@ -66,68 +66,106 @@
     "privacyPolicy": "Política de privacidad"
   },
   "landing": {
+    "header": {
+      "signIn": "Iniciar sesión",
+      "signUp": "Empezar gratis"
+    },
     "hero": {
-      "title": "Estudia de forma más inteligente, no más horas",
-      "subtitle": "Transforma tus PDFs en tarjetas, quizzes y planes de estudio personalizados con IA. Hecho para estudiantes de medicina.",
+      "badge": "Tu sistema de estudio inteligente, asignatura por asignatura",
+      "title1": "Estudia mejor en cualquier asignatura con una",
+      "titleHighlight": "herramienta que se adapta al contenido",
+      "description": "Carga PDFs, apuntes o presentaciones. Organiza por asignatura. Genera planes, quizzes y flashcards centrados en exactamente lo que quieres estudiar.",
+      "ctaStart": "Empezar gratis",
+      "ctaHow": "Cómo funciona",
+      "privacy": "No guardamos tus archivos originales. Plan gratuito disponible."
+    },
+    "problem": {
+      "title": "Tu estudio está fragmentado.",
+      "item1": "PDFs repartidos por varias carpetas",
+      "item2": "Flashcards en una app, resúmenes en otra",
+      "item3": "Quizzes genéricos sin contexto real",
+      "item4": "Sin plan de estudio estructurado",
+      "conclusion1": "El problema no es falta de contenido.",
+      "conclusionHighlight": "Es falta de estructura."
+    },
+    "solution": {
+      "title": "Transforma el caos en disciplina.",
+      "subtitle": "Tú eliges qué estudiar. La IA se adapta al contexto.",
+      "step1": "Crea asignaturas (o no — es opcional)",
+      "step2": "Carga documentos",
+      "step3": "Clasifica por materia",
+      "step4": "Estudia uno o varios documentos a la vez"
+    },
+    "aiSpecialist": {
+      "title": "La IA cambia según la asignatura.",
+      "subtitle": "Si estás estudiando:",
+      "area1": "Biología",
+      "area1desc": "explica como profesor de biología",
+      "area2": "Derecho",
+      "area2desc": "usa lenguaje jurídico",
+      "area3": "Medicina",
+      "area3desc": "razonamiento clínico",
+      "area4": "Ingeniería",
+      "area4desc": "enfoque técnico",
+      "conclusion1": "No es una IA genérica.",
+      "conclusionHighlight": "Es una IA contextual."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "step1Title": "Añade documentos",
+      "step1Desc": "PDF, PPTX, TXT y más.",
+      "step2Title": "Organiza por asignatura",
+      "step2Desc": "Opcional — o estudia documentos sueltos directamente.",
+      "step3Title": "Elige qué quieres estudiar",
+      "step3Desc": "Un documento, varios o una asignatura entera.",
+      "step4Title": "Recibe tu plan de estudio",
+      "step4Desc": "Flashcards inteligentes, quizzes adaptativos, explicaciones personalizadas y planificación automática."
+    },
+    "studyPlans": {
+      "title": "Planifica cada asignatura de forma independiente.",
+      "subtitle": "¿Tienes varias asignaturas difíciles? Crea un plan para cada una — o mezcla documentos en un plan global.",
+      "planFor": "Plan para {subject}",
+      "subject1": "Matemáticas",
+      "subject2": "Biología",
+      "subject3": "Derecho",
+      "conclusion1": "El estudio se adapta a tu",
+      "conclusionHighlight": "realidad académica."
+    },
+    "comparison": {
+      "title": "Por qué no es como otras herramientas",
+      "colFeature": "Funcionalidad",
+      "colGeneric": "Herramientas genéricas",
+      "colAptis": "Aptis",
+      "feature1": "Flashcards",
+      "generic1": "Iguales para todos",
+      "aptis1": "Basados en tus documentos",
+      "feature2": "Contexto",
+      "generic2": "Sin contexto de asignatura",
+      "aptis2": "IA experta por materia",
+      "feature3": "Organización",
+      "generic3": "Manual",
+      "aptis3": "Estructura automática",
+      "feature4": "Planificación",
+      "generic4": "Sin plan real",
+      "aptis4": "Planificación adaptativa"
+    },
+    "targetAudience": {
+      "title": "¿Para quién es?",
+      "subtitle": "Si tienes materia que estudiar, esto fue hecho para ti.",
       "cta": "Empezar gratis",
-      "ctaSecondary": "Ver cómo funciona"
+      "audience1": "Secundaria",
+      "audience2": "Universitarios",
+      "audience3": "Exámenes nacionales",
+      "audience4": "Certificaciones",
+      "audience5": "Oposiciones"
     },
-    "features": {
-      "title": "Todo lo que necesitas para aprobar",
-      "flashcards": {
-        "title": "Tarjetas inteligentes",
-        "description": "Generadas automáticamente con repetición espaciada (algoritmo SM-2)"
-      },
-      "quizzes": {
-        "title": "Quizzes adaptativos",
-        "description": "El sistema detecta tus puntos débiles y crea ejercicios correctivos"
-      },
-      "chat": {
-        "title": "Tutor IA personal",
-        "description": "Chat entrenado en tu contenido, con memoria de tus dificultades"
-      },
-      "plan": {
-        "title": "Plan de estudio diario",
-        "description": "Dinos la fecha del examen y la nota que quieres. Nosotros creamos el plan."
-      }
+    "privacy": {
+      "title": "Tus archivos no se guardan.",
+      "text1": "El documento se elimina tras la extracción del contenido.",
+      "text2": "Solo guardamos texto estructurado y embeddings — nunca el archivo original."
     },
-    "pricing": {
-      "title": "Precios simples y transparentes",
-      "free": {
-        "name": "Gratis",
-        "price": "€0",
-        "period": "/mes",
-        "features": [
-          "1 documento/mes",
-          "20 tarjetas",
-          "10 quizzes",
-          "Chat básico"
-        ]
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "€15",
-        "period": "/mes",
-        "features": [
-          "Documentos ilimitados",
-          "Tarjetas ilimitadas",
-          "Simulador de examen",
-          "Plan adaptativo",
-          "Exportación"
-        ]
-      },
-      "premium": {
-        "name": "Premium",
-        "price": "€29",
-        "period": "/mes",
-        "features": [
-          "Todo lo de Pro",
-          "Analytics avanzados",
-          "Estilos de explicación",
-          "Detección cognitiva",
-          "Sin conexión"
-        ]
-      }
+    "footer": {
+      "rights": "Todos los derechos reservados."
     }
   },
   "upload": {

@@ -66,68 +66,106 @@
     "privacyPolicy": "Politique de confidentialité"
   },
   "landing": {
+    "header": {
+      "signIn": "Se connecter",
+      "signUp": "Commencer gratuitement"
+    },
     "hero": {
-      "title": "Étudiez plus intelligemment, pas plus longtemps",
-      "subtitle": "Transformez vos PDFs en flashcards, quizzes et plans d'étude personnalisés grâce à l'IA. Conçu pour les étudiants en médecine.",
+      "badge": "Ton système d'étude intelligent, matière par matière",
+      "title1": "Étudie mieux dans toutes les matières avec un",
+      "titleHighlight": "outil qui s'adapte au contenu",
+      "description": "Charge des PDFs, notes ou présentations. Organise par matière. Génère des plans, quiz et flashcards ciblés sur exactement ce que tu veux étudier.",
+      "ctaStart": "Commencer gratuitement",
+      "ctaHow": "Comment ça marche",
+      "privacy": "Nous ne conservons pas tes fichiers originaux. Plan gratuit disponible."
+    },
+    "problem": {
+      "title": "Ton étude est fragmentée.",
+      "item1": "PDFs éparpillés dans plusieurs dossiers",
+      "item2": "Flashcards dans une app, résumés dans une autre",
+      "item3": "Quiz génériques sans contexte réel",
+      "item4": "Pas de plan d'étude structuré",
+      "conclusion1": "Le problème n'est pas un manque de contenu.",
+      "conclusionHighlight": "C'est un manque de structure."
+    },
+    "solution": {
+      "title": "Transforme le chaos en discipline.",
+      "subtitle": "Tu choisis ce que tu étudies. L'IA s'adapte au contexte.",
+      "step1": "Crée des matières (ou non — c'est optionnel)",
+      "step2": "Charge des documents",
+      "step3": "Classe par sujet",
+      "step4": "Étudie un ou plusieurs documents à la fois"
+    },
+    "aiSpecialist": {
+      "title": "L'IA change selon la matière.",
+      "subtitle": "Si tu étudies :",
+      "area1": "Biologie",
+      "area1desc": "explique comme un professeur de biologie",
+      "area2": "Droit",
+      "area2desc": "utilise le langage juridique",
+      "area3": "Médecine",
+      "area3desc": "raisonnement clinique",
+      "area4": "Ingénierie",
+      "area4desc": "approche technique",
+      "conclusion1": "Ce n'est pas une IA générique.",
+      "conclusionHighlight": "C'est une IA contextuelle."
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "step1Title": "Ajoute des documents",
+      "step1Desc": "PDF, PPTX, TXT et plus.",
+      "step2Title": "Organise par matière",
+      "step2Desc": "Optionnel — ou étudie des documents libres directement.",
+      "step3Title": "Choisis ce que tu veux étudier",
+      "step3Desc": "Un document, plusieurs ou toute une matière.",
+      "step4Title": "Reçois ton plan d'étude",
+      "step4Desc": "Flashcards intelligents, quiz adaptatifs, explications personnalisées et planification automatique."
+    },
+    "studyPlans": {
+      "title": "Planifie chaque matière de manière indépendante.",
+      "subtitle": "Tu as plusieurs matières difficiles ? Crée un plan pour chacune — ou mélange des documents dans un plan global.",
+      "planFor": "Plan pour {subject}",
+      "subject1": "Mathématiques",
+      "subject2": "Biologie",
+      "subject3": "Droit",
+      "conclusion1": "L'étude s'adapte à ta",
+      "conclusionHighlight": "réalité académique."
+    },
+    "comparison": {
+      "title": "Pourquoi ce n'est pas comme les autres outils",
+      "colFeature": "Fonctionnalité",
+      "colGeneric": "Outils génériques",
+      "colAptis": "Aptis",
+      "feature1": "Flashcards",
+      "generic1": "Identiques pour tous",
+      "aptis1": "Basés sur tes documents",
+      "feature2": "Contexte",
+      "generic2": "Sans contexte de matière",
+      "aptis2": "IA experte par matière",
+      "feature3": "Organisation",
+      "generic3": "Manuelle",
+      "aptis3": "Structure automatique",
+      "feature4": "Planification",
+      "generic4": "Pas de plan réel",
+      "aptis4": "Planification adaptative"
+    },
+    "targetAudience": {
+      "title": "Pour qui est-ce ?",
+      "subtitle": "Si tu as du contenu à étudier, ceci a été fait pour toi.",
       "cta": "Commencer gratuitement",
-      "ctaSecondary": "Voir comment ça marche"
+      "audience1": "Lycée",
+      "audience2": "Étudiants universitaires",
+      "audience3": "Examens nationaux",
+      "audience4": "Certifications",
+      "audience5": "Concours"
     },
-    "features": {
-      "title": "Tout ce dont vous avez besoin pour réussir",
-      "flashcards": {
-        "title": "Flashcards intelligentes",
-        "description": "Générées automatiquement avec répétition espacée (algorithme SM-2)"
-      },
-      "quizzes": {
-        "title": "Quizzes adaptatifs",
-        "description": "Le système détecte vos points faibles et crée des exercices correctifs"
-      },
-      "chat": {
-        "title": "Tuteur IA personnel",
-        "description": "Chat entraîné sur votre contenu, avec mémoire de vos difficultés"
-      },
-      "plan": {
-        "title": "Plan d'étude quotidien",
-        "description": "Indiquez-nous la date de l'examen et la note souhaitée. Nous créons le plan."
-      }
+    "privacy": {
+      "title": "Tes fichiers ne sont pas sauvegardés.",
+      "text1": "Le document est supprimé après l'extraction du contenu.",
+      "text2": "Nous stockons uniquement le texte structuré et les embeddings — jamais le fichier original."
     },
-    "pricing": {
-      "title": "Des tarifs simples et transparents",
-      "free": {
-        "name": "Gratuit",
-        "price": "€0",
-        "period": "/mois",
-        "features": [
-          "1 document/mois",
-          "20 flashcards",
-          "10 quizzes",
-          "Chat basique"
-        ]
-      },
-      "pro": {
-        "name": "Pro",
-        "price": "€15",
-        "period": "/mois",
-        "features": [
-          "Documents illimités",
-          "Flashcards illimitées",
-          "Simulateur d'examen",
-          "Plan adaptatif",
-          "Exportation"
-        ]
-      },
-      "premium": {
-        "name": "Premium",
-        "price": "€29",
-        "period": "/mois",
-        "features": [
-          "Tout du Pro",
-          "Analytics avancés",
-          "Styles d'explication",
-          "Détection cognitive",
-          "Hors ligne"
-        ]
-      }
+    "footer": {
+      "rights": "Tous droits réservés."
     }
   },
   "upload": {
