@@ -97,7 +97,7 @@ function HeroSection({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
       </p>
       <div className="flex flex-col gap-4 sm:flex-row">
         {isBetaMode ? (
-          <BetaApplyButton label={t("beta.applyButton")} />
+          <BetaApplyButton className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold" />
         ) : (
           <Link
             href="/register"
@@ -399,7 +399,7 @@ function TargetAudienceSection({ t, isBetaMode }: { t: T; isBetaMode: boolean })
         </div>
         <div className="mt-12">
           {isBetaMode ? (
-            <BetaApplyButton label={t("beta.applyButton")} />
+            <BetaApplyButton className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold" />
           ) : (
             <Link
               href="/register"
