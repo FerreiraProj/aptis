@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PricingSection } from "./pricing-section";
+import { BetaApplyButton } from "@/components/beta-apply-button";
 import {
   Target,
   CalendarDays,
@@ -12,8 +13,10 @@ import {
   Check,
   X,
   Shield,
+  Lock,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { prisma } from "@aptis/database";
 
 // Always render dynamically so the pricing section always reads fresh DB prices
 export const dynamic = "force-dynamic";
@@ -23,17 +26,20 @@ type T = (key: string, values?: Record<string, any>) => string;
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
+  const siteConfig = await prisma.siteConfig.findFirst().catch(() => null);
+  const isBetaMode = siteConfig?.betaModeEnabled ?? false;
+
   return (
     <main className="page-bg aurora-bg flex min-h-screen flex-col">
-      <Header t={t} />
-      <HeroSection t={t} />
+      <Header t={t} isBetaMode={isBetaMode} />
+      <HeroSection t={t} isBetaMode={isBetaMode} />
       <ProblemSection t={t} />
       <SolutionSection t={t} />
       <AiSpecialistSection t={t} />
       <HowItWorksSection t={t} />
       <StudyPlansSection t={t} />
       <ComparisonSection t={t} />
-      <TargetAudienceSection t={t} />
+      <TargetAudienceSection t={t} isBetaMode={isBetaMode} />
       <PricingSection />
       <PrivacySection t={t} />
       <Footer t={t} />
@@ -41,7 +47,7 @@ export default async function LandingPage() {
   );
 }
 
-function Header({ t }: { t: T }) {
+function Header({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
   return (
     <header className="glass sticky top-0 z-50">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -57,19 +63,26 @@ function Header({ t }: { t: T }) {
           >
             {t("header.signIn")}
           </Link>
-          <Link
-            href="/register"
-            className="btn-gradient rounded-xl px-4 py-2 text-sm font-medium"
-          >
-            {t("header.signUp")}
-          </Link>
+          {isBetaMode ? (
+            <div className="flex items-center gap-1.5 glass-sm rounded-xl px-3 py-1.5 text-sm font-medium text-muted-foreground">
+              <Lock size={13} />
+              {t("beta.betaBadge")}
+            </div>
+          ) : (
+            <Link
+              href="/register"
+              className="btn-gradient rounded-xl px-4 py-2 text-sm font-medium"
+            >
+              {t("header.signUp")}
+            </Link>
+          )}
         </nav>
       </div>
     </header>
   );
 }
 
-function HeroSection({ t }: { t: T }) {
+function HeroSection({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
   return (
     <section className="container mx-auto flex flex-col items-center gap-8 px-4 py-24 text-center">
       <div className="glass-sm rounded-full px-4 py-1.5 text-sm font-medium text-primary">
@@ -83,12 +96,16 @@ function HeroSection({ t }: { t: T }) {
         {t("hero.description")}
       </p>
       <div className="flex flex-col gap-4 sm:flex-row">
-        <Link
-          href="/register"
-          className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold"
-        >
-          {t("hero.ctaStart")}
-        </Link>
+        {isBetaMode ? (
+          <BetaApplyButton label={t("beta.applyButton")} />
+        ) : (
+          <Link
+            href="/register"
+            className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold"
+          >
+            {t("hero.ctaStart")}
+          </Link>
+        )}
         <Link
           href="#como-funciona"
           className="glass rounded-xl px-8 py-3 text-sm font-semibold text-foreground hover:brightness-105 transition-all"
@@ -356,7 +373,7 @@ function ComparisonSection({ t }: { t: T }) {
   );
 }
 
-function TargetAudienceSection({ t }: { t: T }) {
+function TargetAudienceSection({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
   const audiences = [
     { emoji: "📚", label: t("targetAudience.audience1") },
     { emoji: "🎓", label: t("targetAudience.audience2") },
@@ -381,12 +398,16 @@ function TargetAudienceSection({ t }: { t: T }) {
           ))}
         </div>
         <div className="mt-12">
-          <Link
-            href="/register"
-            className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold inline-block"
-          >
-            {t("targetAudience.cta")}
-          </Link>
+          {isBetaMode ? (
+            <BetaApplyButton label={t("beta.applyButton")} />
+          ) : (
+            <Link
+              href="/register"
+              className="btn-gradient rounded-xl px-8 py-3 text-sm font-semibold inline-block"
+            >
+              {t("targetAudience.cta")}
+            </Link>
+          )}
         </div>
       </div>
     </section>

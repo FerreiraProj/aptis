@@ -36,7 +36,8 @@
     "upload": "Carica",
     "reviewToday": "Ripasso Oggi",
     "signOut": "Esci",
-    "referral": "Referral"
+    "referral": "Referral",
+    "beta": "Beta Mode"
   },
   "auth": {
     "signIn": "Accedi",
@@ -681,5 +682,27 @@
     "historyTitle": "Cronologia",
     "statusSignedUp": "Registrato",
     "statusPaid": "Pagante"
+  },
+  "beta": {
+    "applyButton": "Richiedi accesso alla beta",
+    "modalTitle": "Candidatura alla beta chiusa",
+    "modalDesc": "Sto selezionando un piccolo gruppo di studenti per testare lo strumento e fornire feedback reale. Rispondi a queste domande rapide per ricevere l'accesso.",
+    "q1Label": "Cosa stai studiando attualmente?",
+    "q1Secondary": "Scuola superiore",
+    "q1University": "Università",
+    "q1ExamPrep": "Preparazione a esame/certificazione",
+    "q1Other": "Altro",
+    "q2Label": "Quali materie vorresti studiare con questo strumento?",
+    "q2Placeholder": "Es: Biologia, Giurisprudenza, Medicina...",
+    "q3Label": "Saresti disposto a dare un feedback onesto dopo averlo testato?",
+    "q3Yes": "Sì",
+    "q3YesDetailed": "Sì, e posso dare un feedback dettagliato",
+    "q3JustTry": "Preferisco solo provarlo",
+    "submitButton": "Candidarmi",
+    "submitting": "Invio in corso...",
+    "successTitle": "Grazie per esserti candidato alla beta.",
+    "successDesc": "Sto esaminando le candidature e selezionando gli utenti per l'accesso iniziale. Se sarai selezionato riceverai un'email con l'accesso alla piattaforma.",
+    "emailTaken": "Questa email è già nella lista d'attesa.",
+    "betaBadge": "Beta chiusa"
   }
 }

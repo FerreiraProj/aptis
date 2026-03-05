@@ -37,6 +37,17 @@ export async function sendLoyaltyDiscountWarning(
   });
 }
 
+export async function sendBetaApprovedEmail(email: string, password: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://aptis.app";
+  const { BetaApprovedEmail } = await import("./templates/beta-approved");
+  await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: "O teu acesso à Beta do Aptis foi aprovado!",
+    react: React.createElement(BetaApprovedEmail, { email, password, appUrl }),
+  });
+}
+
 export async function sendReferralRewardEmail(
   email: string,
   name: string,

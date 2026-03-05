@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Percent,
   Handshake,
+  FlaskConical,
 } from "lucide-react";
 
 const adminNavItems = [
@@ -24,6 +25,7 @@ const adminNavItems = [
   { href: "/admin/rate-limits", label: "Rate Limits", Icon: Gauge },
   { href: "/admin/discounts", label: "Descontos", Icon: Percent },
   { href: "/admin/affiliates", label: "Afiliados", Icon: Handshake },
+  { href: "/admin/beta", label: "Beta Mode", Icon: FlaskConical },
 ];
 
 export default async function AdminLayout({

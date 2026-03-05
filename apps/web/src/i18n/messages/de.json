@@ -36,7 +36,8 @@
     "upload": "Hochladen",
     "reviewToday": "Heute wiederholen",
     "signOut": "Abmelden",
-    "referral": "Empfehlung"
+    "referral": "Empfehlung",
+    "beta": "Beta Mode"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -681,5 +682,27 @@
     "historyTitle": "Verlauf",
     "statusSignedUp": "Registriert",
     "statusPaid": "Zahlend"
+  },
+  "beta": {
+    "applyButton": "Beta-Zugang anfragen",
+    "modalTitle": "Bewerbung für geschlossene Beta",
+    "modalDesc": "Ich wähle eine kleine Gruppe von Studierenden aus, um das Tool zu testen und echtes Feedback zu geben. Beantworte diese kurzen Fragen, um Zugang zu erhalten.",
+    "q1Label": "Was studierst du gerade?",
+    "q1Secondary": "Schule / Sekundarstufe",
+    "q1University": "Universität",
+    "q1ExamPrep": "Prüfungs-/Zertifizierungsvorbereitung",
+    "q1Other": "Sonstiges",
+    "q2Label": "Welche Fächer möchtest du mit diesem Tool lernen?",
+    "q2Placeholder": "z.B. Biologie, Jura, Medizin...",
+    "q3Label": "Wärst du bereit, nach dem Testen ehrliches Feedback zu geben?",
+    "q3Yes": "Ja",
+    "q3YesDetailed": "Ja, und ich kann detailliertes Feedback geben",
+    "q3JustTry": "Ich möchte es lieber einfach ausprobieren",
+    "submitButton": "Bewerben",
+    "submitting": "Wird gesendet...",
+    "successTitle": "Danke für deine Beta-Bewerbung.",
+    "successDesc": "Ich prüfe die Bewerbungen und wähle Nutzer für den ersten Zugang aus. Wenn du ausgewählt wirst, erhältst du eine E-Mail mit dem Zugang zur Plattform.",
+    "emailTaken": "Diese E-Mail-Adresse steht bereits auf der Warteliste.",
+    "betaBadge": "Geschlossene Beta"
   }
 }
