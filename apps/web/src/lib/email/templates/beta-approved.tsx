@@ -8,7 +8,6 @@ import {
   Text,
   Button,
   Hr,
-  Code,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -37,9 +36,9 @@ export function BetaApprovedEmail({ email, password, appUrl }: Props) {
             </Text>
             <Text style={{ margin: "4px 0", color: "#444", fontSize: 14 }}>
               <strong>Palavra-passe:</strong>{" "}
-              <Code style={{ backgroundColor: "#e2e8f0", padding: "2px 6px", borderRadius: 4, fontFamily: "monospace" }}>
+              <code style={{ backgroundColor: "#e2e8f0", padding: "2px 6px", borderRadius: 4, fontFamily: "monospace" }}>
                 {password}
-              </Code>
+              </code>
             </Text>
           </Container>
           <Text style={{ color: "#444", lineHeight: 1.6 }}>

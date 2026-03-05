@@ -23,8 +23,6 @@ import {
 import { toast } from "sonner";
 import { AlertTriangle, Users, Clock, CheckCircle, XCircle } from "lucide-react";
 
-export const metadata = { title: "Beta Mode" };
-
 type SiteConfig = { id: string; betaModeEnabled: boolean };
 type Stats = { total: number; pending: number; approved: number; rejected: number };
 type Application = {
