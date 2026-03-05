@@ -81,7 +81,7 @@ export function BetaApplyModal({ open, onClose }: BetaApplyModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="glass border-0 rounded-3xl shadow-2xl max-w-lg p-0 overflow-hidden max-h-[90dvh] flex flex-col">
+      <DialogContent className="glass-dialog border-0 rounded-3xl max-w-lg p-0 overflow-hidden max-h-[90dvh] flex flex-col">
         <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
           <DialogTitle className="text-xl">{t("modalTitle")}</DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">

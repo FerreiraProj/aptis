@@ -176,6 +176,20 @@
   border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
+/* Modal/dialog — more opaque so background content doesn't show through */
+.glass-dialog {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+:is(.dark *) .glass-dialog {
+  background: rgba(5, 13, 26, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.60);
+}
+
 /* ── Gradient text ────────────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #8b5cf6 100%);
