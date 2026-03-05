@@ -54,10 +54,15 @@ export function ChatInterface({
   const [showDocPicker, setShowDocPicker] = useState(false);
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [activeSubject, setActiveSubject] = useState<Subject | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Open sidebar by default on desktop only
+  useEffect(() => {
+    if (window.innerWidth >= 768) setSidebarOpen(true);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -66,6 +71,7 @@ export function ChatInterface({
   const loadConversation = useCallback(async (id: string) => {
     setIsLoadingHistory(true);
     setActiveConversationId(id);
+    if (window.innerWidth < 768) setSidebarOpen(false);
     try {
       const res = await fetch(`/api/chat/${id}`);
       if (!res.ok) return;
@@ -206,8 +212,15 @@ export function ChatInterface({
   return (
     <div className="flex" style={{ height: "calc(100vh - 7rem)" }}>
       {/* ── Sidebar ────────────────────────────────────────────── */}
+      {/* Mobile backdrop */}
       {sidebarOpen && (
-        <aside className="glass-sidebar w-64 flex-shrink-0 flex flex-col">
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      {sidebarOpen && (
+        <aside className="fixed inset-y-0 left-0 z-40 w-72 flex flex-col glass-sidebar md:relative md:inset-auto md:z-auto md:w-64 md:flex-shrink-0">
           <div className="p-3 border-b border-white/30 dark:border-white/10">
             <Button className="w-full" size="sm" onClick={() => setShowDocPicker(true)}>
               {t("newChat")}
