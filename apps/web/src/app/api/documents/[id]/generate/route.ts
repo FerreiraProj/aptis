@@ -26,7 +26,17 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const { id } = await params;
   const body = await request.json();
-  const { type = "both", count, quizType = "MULTIPLE_CHOICE" } = body;
+  const { type = "both", count, quizType = "MULTIPLE_CHOICE", locale = "pt" } = body;
+
+  const LOCALE_TO_LANGUAGE: Record<string, string> = {
+    pt: "Portuguese",
+    en: "English",
+    es: "Spanish",
+    fr: "French",
+    de: "German",
+    it: "Italian",
+  };
+  const language = LOCALE_TO_LANGUAGE[locale] ?? "Portuguese";
 
   // Fetch document
   const document = await prisma.document.findFirst({
@@ -77,6 +87,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         userId: auth.user.id,
         subject: document.subject || "medicine",
         explanationStyle: user?.preferredExplanationStyle || "CONCISE",
+        language,
       });
 
       // Save flashcards to DB
@@ -110,6 +121,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         userId: auth.user.id,
         quizType: quizType as "MULTIPLE_CHOICE" | "OPEN_ANSWER" | "MIXED",
         subject: document.subject || "medicine",
+        language,
       });
 
       // Save quiz to DB

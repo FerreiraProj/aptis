@@ -37,6 +37,7 @@ interface GenerateQuizOptions {
   userId: string;
   quizType?: "MULTIPLE_CHOICE" | "OPEN_ANSWER" | "MIXED";
   subject?: string;
+  language?: string;
 }
 
 export async function generateQuiz(
@@ -48,6 +49,7 @@ export async function generateQuiz(
     userId,
     quizType = "MULTIPLE_CHOICE",
     subject = "medicine",
+    language = "English",
   } = options;
 
   const start = Date.now();
@@ -67,6 +69,8 @@ export async function generateQuiz(
     system: `You are creating a ${subject} exam for medical students.
 
 ${typeInstructions}
+
+IMPORTANT: Write ALL content (questions, options, explanations, topics) in ${language}. Do not translate universally-used medical/scientific terms that are the same across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
 
 Quality rules:
 - Questions must be clinically relevant and exam-style

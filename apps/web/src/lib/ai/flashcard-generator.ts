@@ -29,6 +29,7 @@ interface GenerateFlashcardsOptions {
   userId: string;
   subject?: string;
   explanationStyle?: "CONCISE" | "DETAILED" | "VISUAL" | "ANALOGICAL";
+  language?: string;
 }
 
 export async function generateFlashcards(
@@ -40,6 +41,7 @@ export async function generateFlashcards(
     userId,
     subject = "medicine",
     explanationStyle = "CONCISE",
+    language = "English",
   } = options;
 
   const start = Date.now();
@@ -59,6 +61,8 @@ export async function generateFlashcards(
     system: `You are an expert medical educator creating flashcards for ${subject} students using spaced repetition.
 
 Style: ${styleInstructions[explanationStyle]}
+
+IMPORTANT: Write ALL content (front, back, hint, topic, tags) in ${language}. Do not translate universally-used medical/scientific terms that are the same across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
 
 Rules:
 - Test ONE concept per card (atomic knowledge)
