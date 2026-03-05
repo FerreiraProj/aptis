@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const t = useTranslations("auth");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -43,7 +44,10 @@ export default function LoginPage() {
       const res = await fetch("/api/user/profile");
       const data = res.ok ? await res.json() : null;
       const isAdmin = data?.user?.role === "ADMIN";
-      router.push(isAdmin ? "/admin" : "/dashboard");
+      const redirectTo = searchParams.get("redirectTo");
+      // Only allow relative redirects to prevent open redirect attacks
+      const destination = redirectTo?.startsWith("/") ? redirectTo : (isAdmin ? "/admin" : "/dashboard");
+      router.push(destination);
       router.refresh();
     }
 

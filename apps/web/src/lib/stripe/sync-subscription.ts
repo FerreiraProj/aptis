@@ -42,7 +42,7 @@ export async function syncSubscriptionFromStripe(userId: string): Promise<void> 
     console.info("[syncSubscriptionFromStripe] Syncing subscription", activeSub.id, "plan:", plan, "status:", activeSub.status);
 
     await prisma.subscription.upsert({
-      where: { stripeSubscriptionId: activeSub.id },
+      where: { userId },
       create: {
         userId,
         stripeSubscriptionId: activeSub.id,
@@ -61,12 +61,20 @@ export async function syncSubscriptionFromStripe(userId: string): Promise<void> 
           : null,
       },
       update: {
+        stripeSubscriptionId: activeSub.id,
+        stripePriceId: priceId,
+        stripeProductId: productId,
         status: activeSub.status.toUpperCase() as never,
         plan,
-        stripePriceId: priceId,
         currentPeriodStart: new Date(subItem.current_period_start * 1000),
         currentPeriodEnd: new Date(subItem.current_period_end * 1000),
         cancelAtPeriodEnd: activeSub.cancel_at_period_end,
+        trialStart: activeSub.trial_start
+          ? new Date(activeSub.trial_start * 1000)
+          : null,
+        trialEnd: activeSub.trial_end
+          ? new Date(activeSub.trial_end * 1000)
+          : null,
       },
     });
   } catch (err) {

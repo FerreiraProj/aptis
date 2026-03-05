@@ -189,7 +189,8 @@ async function runAuthCheck(
     const loginPath = locale === "pt" ? "/login" : `/${locale}/login`;
     const url = request.nextUrl.clone();
     url.pathname = loginPath;
-    url.searchParams.set("redirectTo", pathname);
+    const search = request.nextUrl.search;
+    url.searchParams.set("redirectTo", search ? pathname + search : pathname);
     return NextResponse.redirect(url);
   }
 
