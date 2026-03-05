@@ -103,14 +103,15 @@ export function UpgradeDialog({ open, onClose }: UpgradeDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="glass border-0 rounded-3xl shadow-2xl max-w-2xl p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4">
+      <DialogContent className="glass border-0 rounded-3xl shadow-2xl max-w-2xl p-0 overflow-hidden max-h-[90dvh] flex flex-col">
+        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
           <DialogTitle className="text-xl">Escolhe o teu plano</DialogTitle>
           <DialogDescription>
             Começa com um período de teste gratuito. Cancela quando quiseres.
           </DialogDescription>
         </DialogHeader>
 
+        <div className="overflow-y-auto flex-1">
         {/* Interval toggle */}
         <div className="flex justify-center px-6 pb-4">
           <div className="glass-sm inline-flex rounded-full p-1 text-sm">
@@ -252,6 +253,7 @@ export function UpgradeDialog({ open, onClose }: UpgradeDialogProps) {
               })}
             </div>
           )}
+        </div>
         </div>
       </DialogContent>
     </Dialog>
