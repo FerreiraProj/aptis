@@ -714,6 +714,41 @@
     "cta": "Loslegen",
     "ctaFree": "Kostenlos Loslegen",
     "institution": "Bildungseinrichtung?",
-    "contactUs": "Kontaktiere uns für einen individuellen Plan"
+    "contactUs": "Kontaktiere uns für einen individuellen Plan",
+    "plans": {
+      "FREE": {
+        "name": "Free",
+        "description": "Entdecke die Plattform",
+        "features": [
+          "1 Dokument pro Monat",
+          "20 Karteikarten pro Dokument",
+          "10 Fragen pro Dokument",
+          "50 Chat-Nachrichten/Monat"
+        ]
+      },
+      "PRO": {
+        "name": "Pro",
+        "description": "Für ernsthafte Lernende",
+        "features": [
+          "Unbegrenzte Dokumente",
+          "100 Karteikarten pro Dokument",
+          "50 Fragen pro Dokument",
+          "Unbegrenzter Chat mit KI-Tutor",
+          "Prüfungssimulator",
+          "KI-Lernplan"
+        ]
+      },
+      "PREMIUM": {
+        "name": "Premium",
+        "description": "Alles unbegrenzt",
+        "features": [
+          "Alles aus Pro",
+          "Unbegrenzte Karteikarten & Fragen",
+          "Erweiterte Fortschrittsanalyse",
+          "Offline-Modus",
+          "Materialien exportieren"
+        ]
+      }
+    }
   }
 }

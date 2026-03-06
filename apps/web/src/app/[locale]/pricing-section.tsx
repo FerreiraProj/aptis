@@ -76,9 +76,13 @@ export async function PricingSection() {
                   </div>
                 )}
 
-                <h3 className="mb-1 text-xl font-bold">{p.name}</h3>
-                {p.description && (
-                  <p className="mb-4 text-sm text-muted-foreground">{p.description}</p>
+                <h3 className="mb-1 text-xl font-bold">
+                  {t.has(`plans.${p.plan}.name`) ? t(`plans.${p.plan}.name`) : p.name}
+                </h3>
+                {(t.has(`plans.${p.plan}.description`) || p.description) && (
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    {t.has(`plans.${p.plan}.description`) ? t(`plans.${p.plan}.description`) : p.description}
+                  </p>
                 )}
 
                 {/* Price block */}
@@ -101,9 +105,12 @@ export async function PricingSection() {
                   )}
                 </div>
 
-                {/* Features */}
+                {/* Features — use i18n translations, fall back to DB values */}
                 <ul className="mb-8 flex-1 space-y-2">
-                  {p.features.map((feature) => (
+                  {(t.has(`plans.${p.plan}.features`)
+                    ? (t.raw(`plans.${p.plan}.features`) as string[])
+                    : p.features
+                  ).map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-sm">
                       <Check size={14} className="mt-0.5 shrink-0 text-primary" />
                       {feature}

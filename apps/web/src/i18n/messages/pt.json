@@ -714,6 +714,41 @@
     "cta": "Começar",
     "ctaFree": "Começar Grátis",
     "institution": "Instituição de ensino?",
-    "contactUs": "Contacta-nos para um plano personalizado"
+    "contactUs": "Contacta-nos para um plano personalizado",
+    "plans": {
+      "FREE": {
+        "name": "Free",
+        "description": "Para explorar a plataforma",
+        "features": [
+          "1 documento por mês",
+          "20 flashcards por documento",
+          "10 questões por documento",
+          "50 mensagens de chat/mês"
+        ]
+      },
+      "PRO": {
+        "name": "Pro",
+        "description": "Para estudantes a sério",
+        "features": [
+          "Documentos ilimitados",
+          "100 flashcards por documento",
+          "50 questões por documento",
+          "Chat ilimitado com Tutor IA",
+          "Simulador de exame",
+          "Plano de estudo com IA"
+        ]
+      },
+      "PREMIUM": {
+        "name": "Premium",
+        "description": "Tudo ilimitado",
+        "features": [
+          "Tudo do Pro",
+          "Flashcards e questões ilimitados",
+          "Análise avançada de progresso",
+          "Modo offline",
+          "Exportação de materiais"
+        ]
+      }
+    }
   }
 }
