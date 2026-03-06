@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LandingLanguageSwitcher } from "@/components/landing-language-switcher";
 import { PricingSection } from "./pricing-section";
 import { BetaApplyButton } from "@/components/beta-apply-button";
 import {
@@ -57,6 +58,7 @@ function Header({ t, isBetaMode, betaBadge }: { t: T; isBetaMode: boolean; betaB
           <span className="gradient-text text-xl font-bold">Aptis</span>
         </div>
         <nav className="flex items-center gap-3">
+          <LandingLanguageSwitcher />
           <ThemeToggle />
           <Link
             href="/login"
