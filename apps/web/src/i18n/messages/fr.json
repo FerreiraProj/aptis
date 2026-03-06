@@ -684,7 +684,7 @@
     "statusPaid": "Payant"
   },
   "beta": {
-    "applyButton": "Demander l'accès à la bêta",
+    "applyButton": "Demander l'accès",
     "modalTitle": "Candidature à la bêta fermée",
     "modalDesc": "Je sélectionne un petit groupe d'étudiants pour tester l'outil et donner de vrais retours. Répondez à ces quelques questions pour obtenir l'accès.",
     "q1Label": "Que faites-vous actuellement comme études ?",
@@ -703,6 +703,6 @@
     "successTitle": "Merci de votre candidature à la bêta.",
     "successDesc": "Je examine les candidatures et sélectionne les utilisateurs pour l'accès initial. Si vous êtes sélectionné, vous recevrez un email avec l'accès à la plateforme.",
     "emailTaken": "Cet email est déjà sur la liste d'attente.",
-    "betaBadge": "Bêta fermée"
+    "betaBadge": "Beta"
   }
 }

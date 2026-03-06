@@ -26,12 +26,13 @@ type T = (key: string, values?: Record<string, any>) => string;
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
+  const tBeta = await getTranslations("beta");
   const siteConfig = await prisma.siteConfig.findFirst().catch(() => null);
   const isBetaMode = siteConfig?.betaModeEnabled ?? false;
 
   return (
     <main className="page-bg aurora-bg flex min-h-screen flex-col">
-      <Header t={t} isBetaMode={isBetaMode} />
+      <Header t={t} isBetaMode={isBetaMode} betaBadge={tBeta("betaBadge")} />
       <HeroSection t={t} isBetaMode={isBetaMode} />
       <ProblemSection t={t} />
       <SolutionSection t={t} />
@@ -47,7 +48,7 @@ export default async function LandingPage() {
   );
 }
 
-function Header({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
+function Header({ t, isBetaMode, betaBadge }: { t: T; isBetaMode: boolean; betaBadge: string }) {
   return (
     <header className="glass sticky top-0 z-50">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -66,7 +67,7 @@ function Header({ t, isBetaMode }: { t: T; isBetaMode: boolean }) {
           {isBetaMode ? (
             <div className="flex items-center gap-1.5 glass-sm rounded-xl px-3 py-1.5 text-sm font-medium text-muted-foreground">
               <Lock size={13} />
-              {t("beta.betaBadge")}
+              {betaBadge}
             </div>
           ) : (
             <Link

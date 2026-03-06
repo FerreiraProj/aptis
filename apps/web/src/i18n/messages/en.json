@@ -684,7 +684,7 @@
     "statusPaid": "Paying"
   },
   "beta": {
-    "applyButton": "Request Beta Access",
+    "applyButton": "Request Access",
     "modalTitle": "Closed Beta Application",
     "modalDesc": "I'm selecting a small group of students to test the tool and give real feedback. Answer these quick questions to receive access.",
     "q1Label": "What are you currently studying?",
@@ -703,6 +703,6 @@
     "successTitle": "Thanks for applying to the beta.",
     "successDesc": "I'm reviewing applications and selecting users for initial access. If selected, you'll receive an email with access to the platform.",
     "emailTaken": "This email is already on the waiting list.",
-    "betaBadge": "Closed Beta"
+    "betaBadge": "Beta"
   }
 }

@@ -684,7 +684,7 @@
     "statusPaid": "A pagar"
   },
   "beta": {
-    "applyButton": "Pedir Acesso à Beta",
+    "applyButton": "Pedir Acesso",
     "modalTitle": "Candidatura à Beta Fechada",
     "modalDesc": "Estou a selecionar um grupo pequeno de estudantes para testar a ferramenta e dar feedback real. Responde a estas perguntas rápidas para receber acesso.",
     "q1Label": "O que estudas atualmente?",
@@ -703,6 +703,6 @@
     "successTitle": "Obrigado por te candidatares à beta.",
     "successDesc": "Estou a rever os pedidos e a selecionar utilizadores para acesso inicial. Se fores selecionado vais receber um email com acesso à plataforma.",
     "emailTaken": "Este email já está na lista de espera.",
-    "betaBadge": "Beta Fechada"
+    "betaBadge": "Beta"
   }
 }
