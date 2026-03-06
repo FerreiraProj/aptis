@@ -93,7 +93,7 @@ export function FlashcardsClient({
       </div>
 
       {/* Summary stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card
           variant="glass"
           className={dueCount > 0 ? "ring-2 ring-primary/40 shadow-lg shadow-primary/10" : ""}
@@ -195,7 +195,7 @@ export function FlashcardsClient({
           </div>
 
           {/* Document cards */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {filteredGroups.map((doc) => (
               <Card
                 key={doc.id}

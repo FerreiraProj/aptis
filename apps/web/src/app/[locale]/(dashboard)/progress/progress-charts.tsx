@@ -130,7 +130,7 @@ export function ProgressCharts({
       )}
 
       {/* ── Overview Stats ─────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title={t("currentStreak")}
           value={stats.streak > 0 ? `${stats.streak} ${t("days")}` : "—"}
@@ -165,7 +165,7 @@ export function ProgressCharts({
       </div>
 
       {/* ── Inventory row ──────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <MiniStat label={t("documents")} value={stats.totalDocs} icon="📄" />
         <MiniStat label="Flashcards" value={stats.totalFlashcards} icon="🃏" />
         <MiniStat label={t("generatedQuizzes")} value={stats.totalQuizzes} icon="🎯" />

@@ -184,7 +184,7 @@ export default function DocumentDetailPage() {
 
       {/* Generate content */}
       {isReady && (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

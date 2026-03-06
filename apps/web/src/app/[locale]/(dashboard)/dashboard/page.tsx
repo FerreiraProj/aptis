@@ -125,7 +125,7 @@ export default async function DashboardPage({
       </div>
 
       {/* Stats row */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           title={t("dueToday")}
           value={String(dueFlashcardsCount)}
@@ -150,7 +150,7 @@ export default async function DashboardPage({
       </div>
 
       {/* Quick actions */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <QuickAction
           Icon={Upload}
           title={t("uploadPdf")}

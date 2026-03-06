@@ -121,22 +121,20 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
       {/* Mode selector */}
       <div className="glass-sm flex gap-1 rounded-xl p-1">
         <button
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
-            mode === "file"
-              ? "btn-gradient text-white shadow-sm"
-              : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-          }`}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${mode === "file"
+            ? "btn-gradient text-white shadow-sm"
+            : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+            }`}
           onClick={() => setMode("file")}
         >
           <FileText size={15} />
           Documento
         </button>
         <button
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
-            mode === "youtube"
-              ? "btn-gradient text-white shadow-sm"
-              : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-          }`}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${mode === "youtube"
+            ? "btn-gradient text-white shadow-sm"
+            : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+            }`}
           onClick={() => setMode("youtube")}
         >
           <Youtube size={15} />
@@ -155,13 +153,12 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
           <CardContent className="space-y-4">
             {/* Drop zone */}
             <div
-              className={`flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed p-12 text-center transition-all cursor-pointer ${
-                isDragOver
-                  ? "border-primary bg-primary/10"
-                  : file
-                    ? "border-primary/50 bg-primary/5"
-                    : "border-primary/30 hover:border-primary/60 hover:bg-primary/5"
-              }`}
+              className={`flex flex-col items-center justify-center gap-1 rounded-3xl border-2 border-dashed p-6 text-center transition-all cursor-pointer ${isDragOver
+                ? "border-primary bg-primary/10"
+                : file
+                  ? "border-primary/50 bg-primary/5"
+                  : "border-primary/30 hover:border-primary/60 hover:bg-primary/5"
+                }`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setIsDragOver(true);
@@ -258,11 +255,10 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
             <button
               type="button"
               onClick={() => setSelectedSubjectId(null)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                selectedSubjectId === null
-                  ? "bg-primary text-primary-foreground"
-                  : "glass-sm text-muted-foreground hover:text-foreground"
-              }`}
+              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${selectedSubjectId === null
+                ? "bg-primary text-primary-foreground"
+                : "glass-sm text-muted-foreground hover:text-foreground"
+                }`}
             >
               Nenhuma
             </button>
@@ -271,9 +267,8 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
                 key={s.id}
                 type="button"
                 onClick={() => setSelectedSubjectId(selectedSubjectId === s.id ? null : s.id)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                  selectedSubjectId === s.id ? "text-white" : "glass-sm text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${selectedSubjectId === s.id ? "text-white" : "glass-sm text-muted-foreground hover:text-foreground"
+                  }`}
                 style={selectedSubjectId === s.id ? { backgroundColor: s.color } : {}}
               >
                 <span>{s.emoji}</span>

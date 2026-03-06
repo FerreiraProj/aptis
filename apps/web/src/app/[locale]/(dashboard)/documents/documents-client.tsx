@@ -198,7 +198,7 @@ export function DocumentsClient({
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredActive.map((doc) => (
             <DocumentCard
               key={doc.id}
@@ -224,7 +224,7 @@ export function DocumentsClient({
           </button>
 
           {showArchived && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-70">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-70">
               {archivedDocs.map((doc) => (
                 <DocumentCard
                   key={doc.id}
