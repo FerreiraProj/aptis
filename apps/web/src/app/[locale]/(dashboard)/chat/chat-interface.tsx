@@ -215,13 +215,13 @@ export function ChatInterface({
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed top-14 inset-x-0 bottom-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
       {sidebarOpen && (
-        <aside className="fixed top-14 bottom-0 left-0 z-50 w-72 flex flex-col glass-sidebar md:relative md:inset-auto md:z-auto md:w-64 md:flex-shrink-0">
-          <div className="p-3 border-b border-white/30 dark:border-white/10">
+        <aside className="fixed inset-y-0 left-0 z-[60] w-72 flex flex-col glass-sidebar md:relative md:inset-auto md:z-auto md:w-64 md:flex-shrink-0">
+          <div className="p-3 pt-14 md:pt-3 border-b border-white/30 dark:border-white/10">
             <Button className="w-full" size="sm" onClick={() => setShowDocPicker(true)}>
               {t("newChat")}
             </Button>
