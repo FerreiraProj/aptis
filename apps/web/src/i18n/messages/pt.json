@@ -704,5 +704,16 @@
     "successDesc": "Estou a rever os pedidos e a selecionar utilizadores para acesso inicial. Se fores selecionado vais receber um email com acesso à plataforma.",
     "emailTaken": "Este email já está na lista de espera.",
     "betaBadge": "Beta"
+  },
+  "pricing": {
+    "title": "Preços",
+    "mostPopular": "Mais Popular",
+    "free": "Grátis",
+    "perMonth": "/mês",
+    "trialDays": "{days} dias grátis",
+    "cta": "Começar",
+    "ctaFree": "Começar Grátis",
+    "institution": "Instituição de ensino?",
+    "contactUs": "Contacta-nos para um plano personalizado"
   }
 }

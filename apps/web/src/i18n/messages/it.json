@@ -704,5 +704,16 @@
     "successDesc": "Sto esaminando le candidature e selezionando gli utenti per l'accesso iniziale. Se sarai selezionato riceverai un'email con l'accesso alla piattaforma.",
     "emailTaken": "Questa email è già nella lista d'attesa.",
     "betaBadge": "Beta"
+  },
+  "pricing": {
+    "title": "Prezzi",
+    "mostPopular": "Più Popolare",
+    "free": "Gratuito",
+    "perMonth": "/mese",
+    "trialDays": "{days} giorni gratis",
+    "cta": "Inizia",
+    "ctaFree": "Inizia Gratuitamente",
+    "institution": "Istituzione scolastica?",
+    "contactUs": "Contattaci per un piano personalizzato"
   }
 }

@@ -704,5 +704,16 @@
     "successDesc": "Ich prüfe die Bewerbungen und wähle Nutzer für den ersten Zugang aus. Wenn du ausgewählt wirst, erhältst du eine E-Mail mit dem Zugang zur Plattform.",
     "emailTaken": "Diese E-Mail-Adresse steht bereits auf der Warteliste.",
     "betaBadge": "Beta"
+  },
+  "pricing": {
+    "title": "Preise",
+    "mostPopular": "Am Beliebtesten",
+    "free": "Kostenlos",
+    "perMonth": "/Monat",
+    "trialDays": "{days} Tage kostenlos",
+    "cta": "Loslegen",
+    "ctaFree": "Kostenlos Loslegen",
+    "institution": "Bildungseinrichtung?",
+    "contactUs": "Kontaktiere uns für einen individuellen Plan"
   }
 }
