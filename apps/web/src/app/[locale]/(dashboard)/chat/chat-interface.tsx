@@ -59,9 +59,9 @@ export function ChatInterface({
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Open sidebar by default on all screen sizes
+  // Open sidebar by default on desktop only
   useEffect(() => {
-    setSidebarOpen(true);
+    if (window.innerWidth >= 768) setSidebarOpen(true);
   }, []);
 
   useEffect(() => {
