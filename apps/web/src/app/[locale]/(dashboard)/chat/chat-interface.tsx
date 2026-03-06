@@ -210,7 +210,7 @@ export function ChatInterface({
   const activeConv = conversations.find((c) => c.id === activeConversationId);
 
   return (
-    <div className="flex" style={{ height: "calc(100vh - 7rem)" }}>
+    <div className="-my-4 lg:-my-6 flex h-[calc(100vh-3.5rem)] lg:h-screen">
       {/* ── Sidebar ────────────────────────────────────────────── */}
       {/* Mobile backdrop */}
       {sidebarOpen && (
