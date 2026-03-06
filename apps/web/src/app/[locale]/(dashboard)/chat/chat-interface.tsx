@@ -59,9 +59,9 @@ export function ChatInterface({
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Open sidebar by default on desktop only
+  // Open sidebar by default on all screen sizes
   useEffect(() => {
-    if (window.innerWidth >= 768) setSidebarOpen(true);
+    setSidebarOpen(true);
   }, []);
 
   useEffect(() => {
@@ -210,7 +210,7 @@ export function ChatInterface({
   const activeConv = conversations.find((c) => c.id === activeConversationId);
 
   return (
-    <div className="-my-4 lg:-my-6 flex h-[calc(100vh-3.5rem)] lg:h-screen">
+    <div className="-my-4 lg:-my-6 flex h-[calc(100dvh-3.5rem)] lg:h-screen">
       {/* ── Sidebar ────────────────────────────────────────────── */}
       {/* Mobile backdrop */}
       {sidebarOpen && (
