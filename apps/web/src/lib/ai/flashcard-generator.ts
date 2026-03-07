@@ -39,7 +39,7 @@ export async function generateFlashcards(
     text,
     count = 20,
     userId,
-    subject = "medicine",
+    subject = "general",
     explanationStyle = "CONCISE",
     language = "English",
   } = options;
@@ -49,7 +49,7 @@ export async function generateFlashcards(
   const styleInstructions: Record<string, string> = {
     CONCISE: "Be brief and direct. One concept per card.",
     DETAILED:
-      "Provide complete explanations with context and clinical relevance.",
+      "Provide complete explanations with context and relevant examples.",
     VISUAL: "Use analogies and mental images to make concepts memorable.",
     ANALOGICAL:
       "Explain using everyday analogies and comparisons to familiar concepts.",
@@ -58,20 +58,20 @@ export async function generateFlashcards(
   const { object, usage } = await generateObject({
     model: openai(MODELS.MINI),
     schema: FlashcardSchema,
-    system: `You are an expert medical educator creating flashcards for ${subject} students using spaced repetition.
+    system: `You are an expert educator creating flashcards for ${subject} students using spaced repetition.
 
 Style: ${styleInstructions[explanationStyle]}
 
-IMPORTANT: Write ALL content (front, back, hint, topic, tags) in ${language}. Do not translate universally-used medical/scientific terms that are the same across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
+IMPORTANT: Write ALL content (front, back, hint, topic, tags) in ${language}. Do not translate universally-used technical terms that are identical across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
 
 Rules:
 - Test ONE concept per card (atomic knowledge)
 - Front: clear question or term
-- Back: precise answer, include clinical relevance when applicable
+- Back: precise answer with real-world relevance when applicable
 - Vary difficulty (30% easy, 50% medium, 20% hard)
-- Use proper medical terminology
+- Use precise terminology appropriate to the subject area
 - Create practical, exam-relevant cards`,
-    prompt: `Create ${count} high-quality study flashcards from this medical content:\n\n${text.slice(0, 8000)}`,
+    prompt: `Create ${count} high-quality study flashcards from this content:\n\n${text.slice(0, 8000)}`,
   });
 
   await logApiUsage({

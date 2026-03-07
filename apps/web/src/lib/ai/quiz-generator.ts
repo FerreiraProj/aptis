@@ -48,7 +48,7 @@ export async function generateQuiz(
     count = 10,
     userId,
     quizType = "MULTIPLE_CHOICE",
-    subject = "medicine",
+    subject = "general",
     language = "English",
   } = options;
 
@@ -66,19 +66,19 @@ export async function generateQuiz(
   const { object, usage } = await generateObject({
     model: openai(model),
     schema: QuizSchema,
-    system: `You are creating a ${subject} exam for medical students.
+    system: `You are creating a ${subject} exam for students.
 
 ${typeInstructions}
 
-IMPORTANT: Write ALL content (questions, options, explanations, topics) in ${language}. Do not translate universally-used medical/scientific terms that are the same across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
+IMPORTANT: Write ALL content (questions, options, explanations, topics) in ${language}. Do not translate universally-used technical terms that are identical across languages (e.g. "DNA", "pH", "ATP"), but write all other text in ${language}.
 
 Quality rules:
-- Questions must be clinically relevant and exam-style
+- Questions must be relevant to the subject matter and exam-style
 - Include plausible distractors for MC (common mistakes, similar-sounding terms)
 - Explanations must explain WHY the answer is correct (not just restate it)
 - Vary difficulty appropriately
 - Test application, not just recall`,
-    prompt: `Generate ${count} exam questions based on this medical content:\n\n${text.slice(0, 10000)}`,
+    prompt: `Generate ${count} exam questions based on this content:\n\n${text.slice(0, 10000)}`,
   });
 
   await logApiUsage({

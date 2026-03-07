@@ -19,12 +19,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aptis — AI Study for Medicine Students",
+    default: "Aptis — AI-Powered Study Assistant",
     template: "%s | Aptis",
   },
   description:
-    "Transform your PDFs into smart flashcards, adaptive quizzes and personalized study plans with AI. Built for medicine students.",
-  keywords: ["study", "flashcards", "medicine", "AI", "spaced repetition"],
+    "Transform your PDFs into smart flashcards, adaptive quizzes and personalized study plans with AI. For any subject or area of study.",
+  keywords: ["study", "flashcards", "AI", "spaced repetition", "quiz"],
 };
 
 type Props = {

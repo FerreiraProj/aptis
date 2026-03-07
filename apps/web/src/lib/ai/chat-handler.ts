@@ -17,7 +17,7 @@ interface HandleChatMessageOptions {
 const STYLE_INSTRUCTIONS = {
   CONCISE: "Be concise and direct. Short, precise answers.",
   DETAILED:
-    "Provide thorough explanations with full clinical context and examples.",
+    "Provide thorough explanations with full context and examples.",
   VISUAL:
     "Use visual metaphors, analogies, and spatial descriptions to explain concepts.",
   ANALOGICAL:

@@ -85,7 +85,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         text: document.extractedText,
         count: flashcardCount,
         userId: auth.user.id,
-        subject: document.subject || "medicine",
+        subject: document.subject || "general",
         explanationStyle: user?.preferredExplanationStyle || "CONCISE",
         language,
       });
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         count: quizCount,
         userId: auth.user.id,
         quizType: quizType as "MULTIPLE_CHOICE" | "OPEN_ANSWER" | "MIXED",
-        subject: document.subject || "medicine",
+        subject: document.subject || "general",
         language,
       });
 
