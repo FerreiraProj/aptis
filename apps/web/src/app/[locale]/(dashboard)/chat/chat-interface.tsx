@@ -168,11 +168,11 @@ export function ChatInterface({
           prev.map((c) =>
             c.id === activeConversationId
               ? {
-                  ...c,
-                  title: updatedConv.title ?? c.title,
-                  updatedAt: new Date(),
-                  _count: { messages: c._count.messages + 2 },
-                }
+                ...c,
+                title: updatedConv.title ?? c.title,
+                updatedAt: new Date(),
+                _count: { messages: c._count.messages + 2 },
+              }
               : c
           )
         );
@@ -236,11 +236,10 @@ export function ChatInterface({
                 <div
                   key={conv.id}
                   onClick={() => loadConversation(conv.id)}
-                  className={`w-full text-left px-3 py-2.5 border-b border-white/10 text-sm transition-colors group relative cursor-pointer ${
-                    conv.id === activeConversationId
+                  className={`w-full text-left px-3 py-2.5 border-b border-white/10 text-sm transition-colors group relative cursor-pointer ${conv.id === activeConversationId
                       ? "bg-primary/10 text-primary"
                       : "hover:bg-accent/60"
-                  }`}
+                    }`}
                 >
                   <div className="font-medium truncate pr-6">
                     {conv.title || t("untitledConversation")}
@@ -314,7 +313,7 @@ export function ChatInterface({
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {!activeConversationId ? (
-            <div className="flex flex-col items-center justify-center h-full text-center gap-4">
+            <div className="flex flex-col items-center justify-center h-auto text-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
                 <MessageCircle size={28} className="text-primary" />
               </div>
@@ -350,11 +349,10 @@ export function ChatInterface({
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                    msg.role === "user"
+                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${msg.role === "user"
                       ? "bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-md"
                       : "glass-sm text-foreground"
-                  }`}
+                    }`}
                 >
                   {msg.content === "" && isStreaming ? (
                     <span className="animate-pulse">●●●</span>
@@ -469,11 +467,10 @@ function DocumentPickerModal({
             <button
               type="button"
               onClick={() => setSubjectFilter(null)}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                subjectFilter === null
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${subjectFilter === null
                   ? "bg-primary text-primary-foreground"
                   : "glass-sm text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {tCommon("all")}
             </button>
@@ -482,9 +479,8 @@ function DocumentPickerModal({
                 key={s.id}
                 type="button"
                 onClick={() => setSubjectFilter(subjectFilter === s.id ? null : s.id)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors flex items-center gap-1 ${
-                  subjectFilter === s.id ? "text-white" : "glass-sm text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors flex items-center gap-1 ${subjectFilter === s.id ? "text-white" : "glass-sm text-muted-foreground hover:text-foreground"
+                  }`}
                 style={subjectFilter === s.id ? { backgroundColor: s.color } : {}}
               >
                 {s.emoji} {s.name}
