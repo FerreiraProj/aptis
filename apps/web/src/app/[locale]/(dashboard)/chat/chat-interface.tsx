@@ -273,7 +273,7 @@ export function ChatInterface({
       {/* ── Main Chat Area ──────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="bg-card border-b border-border px-4 py-2.5 flex items-center gap-3 flex-shrink-0">
+        <div className="sticky top-14 z-10 bg-card border-b border-border px-4 py-2.5 flex items-center gap-3 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             className="text-muted-foreground hover:text-foreground transition-colors"
