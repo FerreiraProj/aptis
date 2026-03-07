@@ -2,18 +2,17 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { getSeoPageBySlug, SEO_PAGES } from "@/lib/seo/pages-config";
+import { getSeoPageBySlug } from "@/lib/seo/pages-config";
 import { Check } from "lucide-react";
+
+// Dynamic rendering required — parent layout uses getMessages() which reads headers()
+export const dynamic = "force-dynamic";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://aptis.study";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
-
-export async function generateStaticParams() {
-  return SEO_PAGES.map((page) => ({ slug: page.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
