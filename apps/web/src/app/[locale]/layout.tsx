@@ -17,14 +17,61 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://aptis.study";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
-    default: "Aptis — AI-Powered Study Assistant",
+    default: "Aptis — Estuda Melhor com IA | Flashcards, Quizzes e Planos",
     template: "%s | Aptis",
   },
   description:
-    "Transform your PDFs into smart flashcards, adaptive quizzes and personalized study plans with AI. For any subject or area of study.",
-  keywords: ["study", "flashcards", "AI", "spaced repetition", "quiz"],
+    "Transforma os teus PDFs e apontamentos em flashcards, quizzes e planos de estudo personalizados com IA. Para qualquer disciplina — Biologia, Direito, Medicina, Engenharia e mais.",
+  keywords: [
+    "estudar com ia",
+    "flashcards automáticos",
+    "gerar quizzes a partir de pdf",
+    "plano de estudo ia",
+    "repetição espaçada",
+    "active recall",
+    "app para estudar",
+    "transformar apontamentos em flashcards",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "pt_PT",
+    url: APP_URL,
+    siteName: "Aptis",
+    title: "Aptis — Estuda Melhor com IA",
+    description:
+      "Transforma PDFs e apontamentos em flashcards, quizzes e planos de estudo com IA. Repetição espaçada e active recall para qualquer disciplina.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Aptis — App de estudo com IA",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aptis — Estuda Melhor com IA",
+    description:
+      "Transforma PDFs em flashcards, quizzes e planos de estudo com IA. Para qualquer disciplina.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 type Props = {

@@ -18,9 +18,99 @@ import {
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@aptis/database";
+import type { Metadata } from "next";
 
 // Always render dynamically so the pricing section always reads fresh DB prices
 export const dynamic = "force-dynamic";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://aptis.study";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isPt = locale === "pt";
+  const canonical = isPt ? APP_URL : `${APP_URL}/${locale}`;
+
+  return {
+    alternates: {
+      canonical,
+      languages: {
+        "pt-PT": APP_URL,
+        "en-GB": `${APP_URL}/en`,
+        "es-ES": `${APP_URL}/es`,
+        "fr-FR": `${APP_URL}/fr`,
+        "de-DE": `${APP_URL}/de`,
+        "it-IT": `${APP_URL}/it`,
+      },
+    },
+  };
+}
+
+function LandingJsonLd() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${APP_URL}/#software`,
+        name: "Aptis",
+        url: APP_URL,
+        applicationCategory: "EducationalApplication",
+        operatingSystem: "Web",
+        description:
+          "Aplicação de estudo com IA que transforma PDFs e apontamentos em flashcards, quizzes adaptativos e planos de estudo personalizados. Usa repetição espaçada e active recall.",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "EUR",
+          description: "Plano gratuito disponível",
+        },
+        featureList: [
+          "Geração automática de flashcards a partir de PDFs",
+          "Criação de quizzes inteligentes",
+          "Plano de estudo personalizado com IA",
+          "Repetição espaçada (Spaced Repetition)",
+          "Active Recall",
+          "Tutor IA por disciplina",
+          "Suporte a 6 idiomas",
+        ],
+        screenshot: `${APP_URL}/og-image.png`,
+        inLanguage: ["pt", "en", "es", "fr", "de", "it"],
+      },
+      {
+        "@type": "Organization",
+        "@id": `${APP_URL}/#org`,
+        name: "Aptis",
+        url: APP_URL,
+        logo: {
+          "@type": "ImageObject",
+          url: `${APP_URL}/logo.png`,
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${APP_URL}/#website`,
+        url: APP_URL,
+        name: "Aptis",
+        publisher: { "@id": `${APP_URL}/#org` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${APP_URL}/register`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type T = (key: string, values?: Record<string, any>) => string;
@@ -33,6 +123,7 @@ export default async function LandingPage() {
 
   return (
     <main className="page-bg aurora-bg flex min-h-screen flex-col">
+      <LandingJsonLd />
       <Header t={t} isBetaMode={isBetaMode} betaBadge={tBeta("betaBadge")} />
       <HeroSection t={t} isBetaMode={isBetaMode} />
       <ProblemSection t={t} />
