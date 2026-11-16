@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { Check, Loader2, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { isChoiceQuestion, isMultiSelect } from "@/lib/quiz/grading";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,11 +32,25 @@ type Quiz = {
 };
 
 type ExamAnswer = {
-  selectedOptionId: string | null;
+  selectedOptionIds: string[];
   openResponse: string;
 };
 
+type ServerAnswer = { isCorrect: boolean | null; score: number | null; aiFeedback: string | null };
+
+type ExamResult = {
+  score: number | null;
+  passed: boolean | null;
+  correctCount: number;
+  gradableCount: number;
+  ungradedOpenCount: number;
+  timeTaken: number;
+  answers: Record<string, ServerAnswer>;
+};
+
 type Phase = "ready" | "running" | "confirming" | "results";
+
+const EMPTY_ANSWER: ExamAnswer = { selectedOptionIds: [], openResponse: "" };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -48,6 +64,12 @@ function formatTime(seconds: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+function isAnswered(q: Question, a: ExamAnswer | undefined): boolean {
+  return isChoiceQuestion(q.questionType)
+    ? (a?.selectedOptionIds.length ?? 0) > 0
+    : !!a?.openResponse?.trim();
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function ExamPlayer({
@@ -58,77 +80,69 @@ export function ExamPlayer({
   timeLimitSeconds: number;
 }) {
   const t = useTranslations("examSimulator");
+  const locale = useLocale();
   const [phase, setPhase] = useState<Phase>("ready");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, ExamAnswer>>({});
   const [timeLeft, setTimeLeft] = useState(timeLimitSeconds);
   const [saving, setSaving] = useState(false);
-  const [result, setResult] = useState<{
-    score: number | null;
-    passed: boolean | null;
-    correctCount: number;
-    totalMC: number;
-    timeTaken: number;
-  } | null>(null);
+  const [saveError, setSaveError] = useState(false);
+  const [result, setResult] = useState<ExamResult | null>(null);
 
   const startTimeRef = useRef<number>(0);
+  const timeTakenRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Timer ──────────────────────────────────────────────────────────────────
+  // ── Submit (graded on the server, incl. AI grading of open answers) ────────
 
-  const submitExam = useCallback(
-    async (forced = false) => {
-      if (saving) return;
-      setSaving(true);
-      setPhase("results");
+  const submitExam = useCallback(async () => {
+    if (saving) return;
+    setSaving(true);
+    setSaveError(false);
+    setPhase("results");
 
-      if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (!timeTakenRef.current) {
+      timeTakenRef.current = Math.round((Date.now() - startTimeRef.current) / 1000);
+    }
 
-      const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000);
+    const answersPayload = quiz.questions.map((q) => ({
+      questionId: q.id,
+      selectedOptionIds: answers[q.id]?.selectedOptionIds ?? [],
+      openResponse: answers[q.id]?.openResponse || null,
+    }));
 
-      // Calculate score locally before saving
-      const mcQuestions = quiz.questions.filter(
-        (q) => q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE"
-      );
-      let correctCount = 0;
-      const answersPayload = quiz.questions.map((q) => {
-        const a = answers[q.id];
-        const isMC =
-          q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE";
-        let isCorrect: boolean | null = null;
-        if (isMC && a?.selectedOptionId) {
-          const opt = q.options.find((o) => o.id === a.selectedOptionId);
-          isCorrect = opt?.isCorrect ?? false;
-          if (isCorrect) correctCount++;
-        }
-        return {
-          questionId: q.id,
-          selectedOptionIds: a?.selectedOptionId ? [a.selectedOptionId] : [],
-          openResponse: a?.openResponse || null,
-          isCorrect,
-        };
+    try {
+      const res = await fetch(`/api/quizzes/${quiz.id}/attempts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answers: answersPayload,
+          locale,
+          timeTaken: timeTakenRef.current,
+        }),
       });
-
-      const totalMC = mcQuestions.length;
-      const score = totalMC > 0 ? Math.round((correctCount / totalMC) * 100) : null;
-      const passed = score !== null ? score >= quiz.passingScore : null;
-
-      setResult({ score, passed, correctCount, totalMC, timeTaken });
-
-      // Save attempt
-      try {
-        await fetch(`/api/quizzes/${quiz.id}/attempts`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: answersPayload }),
-        });
-      } catch {
-        // non-blocking
-      }
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      setResult({
+        score: data.attempt?.score ?? null,
+        passed: data.attempt?.passed ?? null,
+        correctCount: data.correctCount ?? 0,
+        gradableCount: data.gradableCount ?? 0,
+        ungradedOpenCount: data.ungradedOpenCount ?? 0,
+        timeTaken: timeTakenRef.current,
+        answers: Object.fromEntries(
+          (data.answers ?? []).map((a: ServerAnswer & { questionId: string }) => [a.questionId, a])
+        ),
+      });
+    } catch {
+      setSaveError(true);
+    } finally {
       setSaving(false);
-    },
-    [answers, quiz, saving]
-  );
+    }
+  }, [answers, quiz, saving, locale]);
+
+  // ── Timer ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (phase !== "running") return;
@@ -137,7 +151,7 @@ export function ExamPlayer({
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
-          submitExam(true);
+          submitExam();
           return 0;
         }
         return prev - 1;
@@ -151,35 +165,28 @@ export function ExamPlayer({
 
   // ── Answer handlers ────────────────────────────────────────────────────────
 
-  function selectOption(questionId: string, optionId: string) {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        selectedOptionId: optionId,
-        openResponse: prev[questionId]?.openResponse ?? "",
-      },
-    }));
+  function toggleOption(q: Question, optionId: string) {
+    setAnswers((prev) => {
+      const current = prev[q.id] ?? EMPTY_ANSWER;
+      const selectedOptionIds = isMultiSelect(q.questionType)
+        ? current.selectedOptionIds.includes(optionId)
+          ? current.selectedOptionIds.filter((id) => id !== optionId)
+          : [...current.selectedOptionIds, optionId]
+        : [optionId];
+      return { ...prev, [q.id]: { ...current, selectedOptionIds } };
+    });
   }
 
   function setOpenResponse(questionId: string, text: string) {
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: {
-        selectedOptionId: prev[questionId]?.selectedOptionId ?? null,
-        openResponse: text,
-      },
+      [questionId]: { ...(prev[questionId] ?? EMPTY_ANSWER), openResponse: text },
     }));
   }
 
   // ── Derived state ──────────────────────────────────────────────────────────
 
-  const answeredCount = quiz.questions.filter((q) => {
-    const a = answers[q.id];
-    const isMC =
-      q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE";
-    return isMC ? !!a?.selectedOptionId : !!a?.openResponse?.trim();
-  }).length;
-
+  const answeredCount = quiz.questions.filter((q) => isAnswered(q, answers[q.id])).length;
   const unansweredCount = quiz.questions.length - answeredCount;
   const isAlmostUp = timeLeft <= 120 && timeLeft > 0;
   const question = quiz.questions[currentIdx];
@@ -189,6 +196,8 @@ export function ExamPlayer({
   function quizTypeLabel(type: string): string {
     const map: Record<string, string> = {
       MULTIPLE_CHOICE: t("player.typeMultipleChoice"),
+      MULTIPLE_SELECT: t("player.typeMultipleSelect"),
+      TRUE_FALSE: t("player.typeTrueFalse"),
       OPEN_ANSWER: t("player.typeOpenAnswer"),
       MIXED: t("player.typeMixed"),
       EXAM_SIMULATION: t("player.typeExam"),
@@ -245,6 +254,32 @@ export function ExamPlayer({
   // ── Phase: results ─────────────────────────────────────────────────────────
 
   if (phase === "results") {
+    if (saving || (!result && !saveError)) {
+      return (
+        <div className="max-w-xl mx-auto">
+          <Card variant="glass" className="rounded-3xl">
+            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+              <Loader2 size={32} className="animate-spin text-primary" />
+              <p className="font-medium">{t("player.grading")}</p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (saveError || !result) {
+      return (
+        <div className="max-w-xl mx-auto">
+          <Card variant="glass" className="rounded-3xl border-l-2 border-l-red-400">
+            <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+              <p className="text-sm">{t("player.saveFailed")}</p>
+              <Button onClick={() => submitExam()}>{t("player.retry")}</Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Score card */}
@@ -254,21 +289,21 @@ export function ExamPlayer({
             <p className="text-muted-foreground">{quiz.title}</p>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            {result?.score !== null && result?.score !== undefined ? (
+            {result.score !== null ? (
               <>
                 <div
                   className={`text-7xl font-bold ${
                     result.passed ? "text-green-600" : "text-red-500"
                   }`}
                 >
-                  {result.score}%
+                  {Math.round(result.score)}%
                 </div>
                 <div className={`text-lg font-semibold ${result.passed ? "text-green-600" : "text-red-500"}`}>
                   {result.passed ? t("player.passed") : t("player.failed")}
                 </div>
                 <div className="flex justify-center gap-6 text-sm text-muted-foreground">
                   <span>✅ {result.correctCount} {t("player.correct")}</span>
-                  <span>❌ {result.totalMC - result.correctCount} {t("player.incorrect")}</span>
+                  <span>❌ {result.gradableCount - result.correctCount} {t("player.incorrect")}</span>
                   <span>⏱️ {formatTime(result.timeTaken)}</span>
                 </div>
               </>
@@ -280,6 +315,11 @@ export function ExamPlayer({
                   {t("player.noAutoScore")}
                 </p>
               </>
+            )}
+            {result.ungradedOpenCount > 0 && (
+              <p className="text-xs text-amber-600">
+                {t("player.ungradedNote", { count: result.ungradedOpenCount })}
+              </p>
             )}
 
             <div className="flex gap-3 justify-center pt-2">
@@ -295,24 +335,24 @@ export function ExamPlayer({
           <h2 className="text-lg font-semibold">{t("player.reviewTitle")}</h2>
           {quiz.questions.map((q, idx) => {
             const a = answers[q.id];
-            const isMC =
-              q.questionType === "MULTIPLE_CHOICE" ||
-              q.questionType === "TRUE_FALSE";
-            const selectedOpt = isMC
-              ? q.options.find((o) => o.id === a?.selectedOptionId)
-              : null;
-            const isCorrect = selectedOpt?.isCorrect ?? null;
+            const server = result.answers[q.id];
+            const choice = isChoiceQuestion(q.questionType);
+            const qScore = server?.score ?? (choice ? 0 : null);
+            const isCorrect = server?.isCorrect ?? (choice ? false : null);
+            const partial = qScore !== null && qScore > 0 && qScore < 1;
 
             return (
               <Card
                 key={q.id}
                 variant="glass-sm"
                 className={
-                  isMC && isCorrect !== null
-                    ? isCorrect
+                  isCorrect === null
+                    ? ""
+                    : isCorrect
                       ? "ring-1 ring-green-400/60"
-                      : "ring-1 ring-red-400/60"
-                    : ""
+                      : partial
+                        ? "ring-1 ring-amber-400/60"
+                        : "ring-1 ring-red-400/60"
                 }
               >
                 <CardContent className="pt-4 space-y-3">
@@ -321,22 +361,26 @@ export function ExamPlayer({
                       {idx + 1}.
                     </span>
                     <p className="text-sm font-medium">{q.questionText}</p>
-                    {isMC && (
-                      <span className="ml-auto shrink-0">
-                        {isCorrect === true ? "✅" : isCorrect === false ? "❌" : "—"}
-                      </span>
-                    )}
+                    <span className="ml-auto shrink-0 text-xs">
+                      {isCorrect === true
+                        ? "✅"
+                        : partial
+                          ? `🟡 ${Math.round(qScore! * 100)}%`
+                          : isCorrect === false
+                            ? "❌"
+                            : "—"}
+                    </span>
                   </div>
 
-                  {isMC && (
+                  {choice && (
                     <div className="space-y-1 pl-4">
                       {q.options.map((opt) => {
-                        const selected = a?.selectedOptionId === opt.id;
+                        const selected = a?.selectedOptionIds.includes(opt.id);
                         let cls = "text-xs px-3 py-1.5 rounded-md ";
                         if (opt.isCorrect) {
-                          cls += "bg-green-100 text-green-800";
-                        } else if (selected && !opt.isCorrect) {
-                          cls += "bg-red-100 text-red-800";
+                          cls += "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+                        } else if (selected) {
+                          cls += "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
                         } else {
                           cls += "text-muted-foreground";
                         }
@@ -350,11 +394,25 @@ export function ExamPlayer({
                     </div>
                   )}
 
-                  {!isMC && a?.openResponse && (
-                    <div className="pl-4">
+                  {!choice && a?.openResponse && (
+                    <div className="pl-4 space-y-2">
                       <p className="text-xs text-muted-foreground italic">
                         {t("player.yourAnswer")}{a.openResponse}
                       </p>
+                      {qScore !== null && (
+                        <p className="text-xs font-medium">
+                          {t("player.aiScore", { percent: Math.round(qScore * 100) })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {server?.aiFeedback && (
+                    <div className="glass-sm rounded-xl border-l-2 border-l-violet-400/70 px-3 py-2 text-xs space-y-1">
+                      <p className="flex items-center gap-1.5 font-medium text-violet-600 dark:text-violet-400">
+                        <Sparkles size={12} /> {t("player.aiFeedback")}
+                      </p>
+                      <p className="text-foreground/80 whitespace-pre-line">{server.aiFeedback}</p>
                     </div>
                   )}
 
@@ -375,13 +433,9 @@ export function ExamPlayer({
 
   // ── Phase: running or confirming ───────────────────────────────────────────
 
-  const isMC =
-    question?.questionType === "MULTIPLE_CHOICE" ||
-    question?.questionType === "TRUE_FALSE";
-  const currentAnswer = answers[question?.id] ?? {
-    selectedOptionId: null,
-    openResponse: "",
-  };
+  const isChoice = isChoiceQuestion(question?.questionType ?? "");
+  const multi = isMultiSelect(question?.questionType ?? "");
+  const currentAnswer = answers[question?.id] ?? EMPTY_ANSWER;
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
@@ -402,10 +456,7 @@ export function ExamPlayer({
       {/* ── Question palette ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap gap-1.5">
         {quiz.questions.map((q, idx) => {
-          const a = answers[q.id];
-          const answered = isMCQuestion(q)
-            ? !!a?.selectedOptionId
-            : !!a?.openResponse?.trim();
+          const answered = isAnswered(q, answers[q.id]);
           const isCurrent = idx === currentIdx;
           return (
             <button
@@ -448,24 +499,38 @@ export function ExamPlayer({
           <CardTitle className="text-base font-medium leading-relaxed">
             {question.questionText}
           </CardTitle>
+          {multi && (
+            <p className="text-xs font-medium text-primary pt-1">{t("player.selectAllCorrect")}</p>
+          )}
         </CardHeader>
         <CardContent className="space-y-3">
-          {isMC ? (
-            <div className="space-y-2">
+          {isChoice ? (
+            <div className="space-y-2" role={multi ? "group" : "radiogroup"}>
               {question.options.map((opt) => {
-                const selected = currentAnswer.selectedOptionId === opt.id;
+                const selected = currentAnswer.selectedOptionIds.includes(opt.id);
                 return (
                   <button
                     key={opt.id}
                     type="button"
-                    className={`w-full text-left px-4 py-3 glass-sm rounded-xl text-sm transition-colors ${
+                    role={multi ? "checkbox" : "radio"}
+                    aria-checked={selected}
+                    className={`w-full text-left px-4 py-3 glass-sm rounded-xl text-sm transition-colors flex items-center gap-3 ${
                       selected
                         ? "border border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary/30"
                         : "border border-transparent hover:border-primary/40 hover:brightness-95 dark:hover:brightness-110"
                     }`}
-                    onClick={() => selectOption(question.id, opt.id)}
+                    onClick={() => toggleOption(question, opt.id)}
                   >
-                    {opt.text}
+                    <span
+                      aria-hidden
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center border ${
+                        multi ? "rounded" : "rounded-full"
+                      } ${selected ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40"}`}
+                    >
+                      {selected &&
+                        (multi ? <Check size={12} /> : <span className="h-1.5 w-1.5 rounded-full bg-current" />)}
+                    </span>
+                    <span className="flex-1">{opt.text}</span>
                   </button>
                 );
               })}
@@ -476,6 +541,7 @@ export function ExamPlayer({
               placeholder={t("player.typeOpenAnswer")}
               value={currentAnswer.openResponse}
               onChange={(e) => setOpenResponse(question.id, e.target.value)}
+              maxLength={10_000}
             />
           )}
         </CardContent>
@@ -546,10 +612,6 @@ export function ExamPlayer({
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function isMCQuestion(q: Question): boolean {
-  return q.questionType === "MULTIPLE_CHOICE" || q.questionType === "TRUE_FALSE";
-}
 
 function InfoRow({
   label,

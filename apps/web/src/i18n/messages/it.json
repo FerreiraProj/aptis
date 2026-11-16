@@ -326,7 +326,16 @@
     "saving": "Salvataggio...",
     "viewResult": "Vedi risultato",
     "openAnswerPlaceholder": "Scrivi la tua risposta...",
-    "explanation": "Spiegazione: "
+    "explanation": "Spiegazione: ",
+    "typeMultipleSelect": "Più risposte corrette",
+    "typeTrueFalse": "Vero/Falso",
+    "selectAllCorrect": "Seleziona tutte le opzioni corrette",
+    "partial": "Parzialmente corretta",
+    "grading": "Correzione con l'IA…",
+    "aiFeedback": "Correzione dell'IA",
+    "aiScore": "Voto: {percent}%",
+    "gradingFailed": "Impossibile correggere ora. La risposta verrà corretta alla fine del quiz.",
+    "ungradedNote": "{count} risposta/e aperta/e non sono state corrette e non contano per il voto."
   },
   "chat": {
     "title": "Tutor IA",
@@ -609,7 +618,17 @@
       "typeMultipleChoice": "Scelta multipla",
       "typeOpenAnswer": "Risposta aperta",
       "typeMixed": "Misto",
-      "typeExam": "Simulazione"
+      "typeExam": "Simulazione",
+      "typeMultipleSelect": "Più risposte corrette",
+      "typeTrueFalse": "Vero/Falso",
+      "selectAllCorrect": "Seleziona tutte le opzioni corrette",
+      "partial": "Parziale",
+      "grading": "Correzione dell'esame…",
+      "aiFeedback": "Correzione dell'IA",
+      "aiScore": "Voto: {percent}%",
+      "ungradedNote": "{count} risposta/e aperta/e non sono state corrette e non contano per il voto.",
+      "saveFailed": "Impossibile salvare e correggere l'esame. Controlla la connessione e riprova.",
+      "retry": "Riprova"
     }
   },
   "onboarding": {
@@ -765,5 +784,53 @@
     "limitDocuments": "Hai raggiunto il limite di {limit} documento/i al mese del tuo piano. Passa a un piano superiore per caricarne altri.",
     "limitChat": "Hai raggiunto il limite di {limit} messaggi al mese del tuo piano. Passa a un piano superiore per continuare a chattare.",
     "featureLocked": "Questa funzionalità non è inclusa nel tuo piano. Passa a un piano superiore per sbloccarla."
+  },
+  "generate": {
+    "quizTitle": "Genera quiz",
+    "quizDescription": "Scegli il tipo di domande, quante ne vuoi e la difficoltà.",
+    "flashcardsTitle": "Genera flashcard",
+    "flashcardsDescription": "Scegli quante flashcard generare da questo documento.",
+    "typeLabel": "Tipo di domande",
+    "types": {
+      "MULTIPLE_CHOICE": {
+        "name": "Scelta multipla",
+        "desc": "4 opzioni, una corretta"
+      },
+      "MULTIPLE_SELECT": {
+        "name": "Più risposte corrette",
+        "desc": "Seleziona tutte le corrette · credito parziale"
+      },
+      "TRUE_FALSE": {
+        "name": "Vero / Falso",
+        "desc": "Affermazioni da valutare"
+      },
+      "OPEN_ANSWER": {
+        "name": "Risposta aperta",
+        "desc": "Corretta dall'IA con feedback"
+      },
+      "MIXED": {
+        "name": "Misto",
+        "desc": "Un po' di ogni tipo"
+      }
+    },
+    "countLabel": "Numero di domande",
+    "flashcardCountLabel": "Numero di flashcard",
+    "difficultyLabel": "Difficoltà",
+    "difficulty": {
+      "MIXED": "Mista",
+      "EASY": "Facile",
+      "MEDIUM": "Media",
+      "HARD": "Difficile"
+    },
+    "planLimit": "Il tuo piano consente fino a {max} per generazione.",
+    "lockedHint": "Ti serve di più? I piani Pro e Premium consentono fino a 100.",
+    "seePlans": "Vedi i piani",
+    "generate": "Genera",
+    "generating": "Generazione…",
+    "generatingHint": "Con documenti lunghi può richiedere fino a un minuto.",
+    "cancel": "Annulla",
+    "successQuiz": "Quiz generato con {count} domande!",
+    "successFlashcards": "{count} flashcard generate!",
+    "error": "Errore durante la generazione. Riprova."
   }
 }

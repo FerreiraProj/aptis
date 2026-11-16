@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
 import { failStaleDocuments } from "@/lib/document-processing/pipeline";
+import { getUserPlan } from "@/lib/rate-limit";
+import { getGenerationLimits } from "@/lib/plans";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -27,7 +29,14 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ document });
+  // Lets the generate dialogs show what the user's plan allows
+  const plan = await getUserPlan(auth.user.id);
+
+  return NextResponse.json({
+    document,
+    plan,
+    generationLimits: getGenerationLimits(plan),
+  });
 }
 
 // PATCH /api/documents/[id] — toggle archive or update subjectId

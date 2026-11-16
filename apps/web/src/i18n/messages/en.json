@@ -326,7 +326,16 @@
     "saving": "Saving...",
     "viewResult": "View result",
     "openAnswerPlaceholder": "Write your answer...",
-    "explanation": "Explanation: "
+    "explanation": "Explanation: ",
+    "typeMultipleSelect": "Multiple answers",
+    "typeTrueFalse": "True/False",
+    "selectAllCorrect": "Select all correct options",
+    "partial": "Partially correct",
+    "grading": "Grading with AI…",
+    "aiFeedback": "AI feedback",
+    "aiScore": "Score: {percent}%",
+    "gradingFailed": "Couldn't grade right now. Your answer will be graded at the end of the quiz.",
+    "ungradedNote": "{count} open answer(s) couldn't be graded and don't count towards the score."
   },
   "chat": {
     "title": "AI Tutor",
@@ -609,7 +618,17 @@
       "typeMultipleChoice": "Multiple choice",
       "typeOpenAnswer": "Open answer",
       "typeMixed": "Mixed",
-      "typeExam": "Simulation"
+      "typeExam": "Simulation",
+      "typeMultipleSelect": "Multiple answers",
+      "typeTrueFalse": "True/False",
+      "selectAllCorrect": "Select all correct options",
+      "partial": "Partial",
+      "grading": "Grading your exam…",
+      "aiFeedback": "AI feedback",
+      "aiScore": "Score: {percent}%",
+      "ungradedNote": "{count} open answer(s) couldn't be graded and don't count towards the score.",
+      "saveFailed": "Couldn't save and grade the exam. Check your connection and try again.",
+      "retry": "Try again"
     }
   },
   "onboarding": {
@@ -765,5 +784,53 @@
     "limitDocuments": "You've reached your plan's limit of {limit} document(s) per month. Upgrade to upload more.",
     "limitChat": "You've reached your plan's limit of {limit} messages per month. Upgrade to keep chatting.",
     "featureLocked": "This feature isn't included in your plan. Upgrade to unlock it."
+  },
+  "generate": {
+    "quizTitle": "Generate quiz",
+    "quizDescription": "Choose the question type, how many you want and the difficulty.",
+    "flashcardsTitle": "Generate flashcards",
+    "flashcardsDescription": "Choose how many flashcards to generate from this document.",
+    "typeLabel": "Question type",
+    "types": {
+      "MULTIPLE_CHOICE": {
+        "name": "Multiple choice",
+        "desc": "4 options, one correct"
+      },
+      "MULTIPLE_SELECT": {
+        "name": "Multiple answers",
+        "desc": "Select all that apply · partial credit"
+      },
+      "TRUE_FALSE": {
+        "name": "True / False",
+        "desc": "Statements to validate"
+      },
+      "OPEN_ANSWER": {
+        "name": "Open answer",
+        "desc": "Graded by AI with feedback"
+      },
+      "MIXED": {
+        "name": "Mixed",
+        "desc": "A bit of every type"
+      }
+    },
+    "countLabel": "Number of questions",
+    "flashcardCountLabel": "Number of flashcards",
+    "difficultyLabel": "Difficulty",
+    "difficulty": {
+      "MIXED": "Mixed",
+      "EASY": "Easy",
+      "MEDIUM": "Medium",
+      "HARD": "Hard"
+    },
+    "planLimit": "Your plan allows up to {max} per generation.",
+    "lockedHint": "Need more? Pro and Premium plans allow up to 100.",
+    "seePlans": "See plans",
+    "generate": "Generate",
+    "generating": "Generating…",
+    "generatingHint": "Long documents can take up to a minute.",
+    "cancel": "Cancel",
+    "successQuiz": "Quiz generated with {count} questions!",
+    "successFlashcards": "{count} flashcards generated!",
+    "error": "Error generating content. Please try again."
   }
 }

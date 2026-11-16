@@ -2,7 +2,12 @@
  * Pure plan helpers (no DB access) — safe to import anywhere and easy to test.
  */
 
-import { PLAN_LIMITS, type PlanKey } from "./constants";
+import {
+  MAX_FLASHCARDS_PER_GENERATION,
+  MAX_QUESTIONS_PER_GENERATION,
+  PLAN_LIMITS,
+  type PlanKey,
+} from "./constants";
 
 /**
  * Subscription statuses that grant access to the paid plan.
@@ -46,6 +51,20 @@ export type MonthlyQuota = "documentsPerMonth" | "chatMessagesPerMonth";
 
 export function getMonthlyLimit(plan: PlanKey, quota: MonthlyQuota): number {
   return PLAN_LIMITS[plan][quota];
+}
+
+export type GenerationLimits = { maxQuestions: number; maxFlashcards: number };
+
+/**
+ * Max quiz questions / flashcards a plan may request in one generation.
+ * "Unlimited" plans are capped at the technical per-request ceilings.
+ */
+export function getGenerationLimits(plan: PlanKey): GenerationLimits {
+  const { quizzesPerDocument, flashcardsPerDocument } = PLAN_LIMITS[plan];
+  return {
+    maxQuestions: Math.min(quizzesPerDocument, MAX_QUESTIONS_PER_GENERATION),
+    maxFlashcards: Math.min(flashcardsPerDocument, MAX_FLASHCARDS_PER_GENERATION),
+  };
 }
 
 /** First instant of the current calendar month (UTC). */

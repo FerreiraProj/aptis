@@ -4,23 +4,33 @@ import { requireAuth, isAuthError } from "@/lib/auth/guards";
 import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { generateFlashcards } from "@/lib/ai/flashcard-generator";
 import { generateQuiz } from "@/lib/ai/quiz-generator";
-import { PLAN_LIMITS } from "@/lib/constants";
+import { AI_LOCALES, localeToLanguage } from "@/lib/ai/language";
+import { getGenerationLimits } from "@/lib/plans";
+import { GENERATABLE_QUIZ_TYPES, QUIZ_DIFFICULTIES } from "@/lib/quiz/question-types";
 import { z } from "zod";
 
 type Params = { params: Promise<{ id: string }> };
 
-// Long documents are generated in several parallel AI calls; allow time for the slowest.
+// Long documents / big requests are generated in several parallel AI calls.
 export const maxDuration = 300;
 
 const GenerateBodySchema = z.object({
   type: z.enum(["flashcards", "quiz", "both"]).default("both"),
-  count: z.coerce.number().int().min(1).max(100).optional(),
-  quizType: z.enum(["MULTIPLE_CHOICE", "OPEN_ANSWER", "MIXED"]).default("MULTIPLE_CHOICE"),
-  locale: z.enum(["pt", "en", "es", "fr", "de", "it"]).catch("pt").default("pt"),
+  /** Number of quiz questions (or flashcards when type = "flashcards") */
+  count: z.coerce.number().int().min(1).max(200).optional(),
+  /** Number of flashcards when type = "both" */
+  flashcardCount: z.coerce.number().int().min(1).max(200).optional(),
+  quizType: z.enum(GENERATABLE_QUIZ_TYPES).default("MULTIPLE_CHOICE"),
+  difficulty: z.enum(QUIZ_DIFFICULTIES).default("MIXED"),
+  locale: z.enum(AI_LOCALES).catch("pt").default("pt"),
 });
 
+const DEFAULT_QUESTIONS = 10;
+const DEFAULT_FLASHCARDS = 20;
+
 // POST /api/documents/[id]/generate
-// Body: { type: "flashcards" | "quiz" | "both", count?: number, quizType?: string }
+// Body: { type, count?, flashcardCount?, quizType?, difficulty?, locale? }
+// Requested counts are clamped to the user's plan (getGenerationLimits).
 export async function POST(request: NextRequest, { params }: Params) {
   const auth = await requireAuth();
   if (isAuthError(auth)) return auth.error;
@@ -43,17 +53,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       { status: 400 }
     );
   }
-  const { type, count, quizType, locale } = parsed.data;
-
-  const LOCALE_TO_LANGUAGE: Record<string, string> = {
-    pt: "Portuguese",
-    en: "English",
-    es: "Spanish",
-    fr: "French",
-    de: "German",
-    it: "Italian",
-  };
-  const language = LOCALE_TO_LANGUAGE[locale];
+  const { type, count, flashcardCount, quizType, difficulty, locale } = parsed.data;
+  const language = localeToLanguage(locale);
 
   // Fetch document
   const document = await prisma.document.findFirst({
@@ -78,19 +79,19 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
-  const limits = PLAN_LIMITS[plan];
-
-  const results: { flashcards?: number; quiz?: string } = {};
+  const limits = getGenerationLimits(plan);
+  const results: {
+    flashcards?: number;
+    quiz?: string;
+    questions?: number;
+  } = {};
 
   try {
     // Generate flashcards
     if (type === "flashcards" || type === "both") {
-      const flashcardCount = Math.min(
-        count || 20,
-        limits.flashcardsPerDocument === Infinity
-          ? 50
-          : limits.flashcardsPerDocument
-      );
+      const requested =
+        (type === "flashcards" ? count : flashcardCount) ?? DEFAULT_FLASHCARDS;
+      const flashcardTotal = Math.min(requested, limits.maxFlashcards);
 
       // Get user preferences
       const user = await prisma.user.findUnique({
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
       const flashcards = await generateFlashcards({
         text: document.extractedText,
-        count: flashcardCount,
+        count: flashcardTotal,
         userId: auth.user.id,
         subject: document.subject || "general",
         explanationStyle: user?.preferredExplanationStyle || "CONCISE",
@@ -127,16 +128,14 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     // Generate quiz
     if (type === "quiz" || type === "both") {
-      const quizCount = Math.min(
-        count || 10,
-        limits.quizzesPerDocument === Infinity ? 30 : limits.quizzesPerDocument
-      );
+      const questionTotal = Math.min(count ?? DEFAULT_QUESTIONS, limits.maxQuestions);
 
       const quiz = await generateQuiz({
         text: document.extractedText,
-        count: quizCount,
+        count: questionTotal,
         userId: auth.user.id,
         quizType,
+        difficulty,
         subject: document.subject || "general",
         language,
       });
@@ -171,6 +170,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       });
 
       results.quiz = savedQuiz.id;
+      results.questions = quiz.questions.length;
     }
   } catch (error) {
     // Log the details server-side; don't leak internal/provider errors to the client.

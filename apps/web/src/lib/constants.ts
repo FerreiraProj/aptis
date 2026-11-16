@@ -74,24 +74,28 @@ export const PLAN_RATE_LIMITS = {
     chat:      { requests: 20,  window: "1 h" }, // Chat messages
     upload:    { requests: 3,   window: "1 d" }, // Document uploads
     studyPlan: { requests: 1,   window: "1 d" }, // Study plan generation
+    grade:     { requests: 30,  window: "1 h" }, // AI grading of open answers
   },
   PRO: {
     generate:  { requests: 30,  window: "1 h" },
     chat:      { requests: 60,  window: "1 h" },
     upload:    { requests: 20,  window: "1 d" },
     studyPlan: { requests: 5,   window: "1 d" },
+    grade:     { requests: 200, window: "1 h" },
   },
   PREMIUM: {
     generate:  { requests: 100, window: "1 h" },
     chat:      { requests: 200, window: "1 h" },
     upload:    { requests: 50,  window: "1 d" },
     studyPlan: { requests: 10,  window: "1 d" },
+    grade:     { requests: 500, window: "1 h" },
   },
   INSTITUTIONAL: {
     generate:  null, // unlimited
     chat:      null,
     upload:    null,
     studyPlan: null,
+    grade:     null,
   },
 } as const satisfies Record<
   PlanKey,
@@ -115,3 +119,10 @@ export const SUPPORTED_FILE_TYPES = [
 ] as const;
 
 export const FLASHCARD_REVIEW_BATCH_SIZE = 20;
+
+/**
+ * Technical ceilings for a single AI generation request, applied when a plan
+ * allows "unlimited" (Infinity) items per document.
+ */
+export const MAX_QUESTIONS_PER_GENERATION = 100;
+export const MAX_FLASHCARDS_PER_GENERATION = 200;

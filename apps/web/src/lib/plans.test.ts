@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getGenerationLimits,
   getMonthlyLimit,
   hasFeature,
   resolveEffectivePlan,
@@ -54,6 +55,15 @@ describe("getMonthlyLimit", () => {
     expect(getMonthlyLimit("FREE", "chatMessagesPerMonth")).toBe(50);
     expect(getMonthlyLimit("PRO", "documentsPerMonth")).toBe(Infinity);
     expect(getMonthlyLimit("PRO", "chatMessagesPerMonth")).toBe(Infinity);
+  });
+});
+
+describe("getGenerationLimits", () => {
+  it("applies the per-plan limits (10/50/100 questions, 20/100/200 flashcards)", () => {
+    expect(getGenerationLimits("FREE")).toEqual({ maxQuestions: 10, maxFlashcards: 20 });
+    expect(getGenerationLimits("PRO")).toEqual({ maxQuestions: 50, maxFlashcards: 100 });
+    expect(getGenerationLimits("PREMIUM")).toEqual({ maxQuestions: 100, maxFlashcards: 200 });
+    expect(getGenerationLimits("INSTITUTIONAL")).toEqual({ maxQuestions: 100, maxFlashcards: 200 });
   });
 });
 

@@ -29,6 +29,7 @@ const ACTIONS = [
   { key: "chat", label: "Chat", desc: "Mensagens tutor IA" },
   { key: "upload", label: "Upload", desc: "Documentos" },
   { key: "studyPlan", label: "Plano", desc: "Plano de estudo" },
+  { key: "grade", label: "Correção IA", desc: "Respostas abertas" },
 ] as const;
 
 const WINDOWS = ["15 m", "30 m", "1 h", "6 h", "12 h", "1 d"] as const;

@@ -6,7 +6,7 @@ import { PLAN_RATE_LIMITS } from "@/lib/constants";
 import type { PlanTier } from "@aptis/database";
 
 const PLANS: PlanTier[] = ["FREE", "PRO", "PREMIUM", "INSTITUTIONAL"];
-const ACTIONS = ["generate", "chat", "upload", "studyPlan"] as const;
+const ACTIONS = ["generate", "chat", "upload", "studyPlan", "grade"] as const;
 
 // GET /api/admin/rate-limits — list all rate limit configs (seeds if empty)
 export async function GET() {

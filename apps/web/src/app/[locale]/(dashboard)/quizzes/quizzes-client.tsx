@@ -159,6 +159,8 @@ function QuizTypeBadge({ type }: { type: string }) {
   const t = useTranslations("quizzes");
   const labels: Record<string, string> = {
     MULTIPLE_CHOICE: t("typeMultipleChoice"),
+    MULTIPLE_SELECT: t("typeMultipleSelect"),
+    TRUE_FALSE: t("typeTrueFalse"),
     OPEN_ANSWER: t("typeOpenAnswer"),
     MIXED: t("typeMixed"),
   };

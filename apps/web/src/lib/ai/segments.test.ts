@@ -94,7 +94,23 @@ describe("planSegments", () => {
 
   it("uses a single call for short documents", () => {
     const plan = planSegments("short text about cells", 20);
-    expect(plan).toEqual([{ text: "short text about cells", count: 20, part: 1, totalParts: 1 }]);
+    expect(plan).toEqual([
+      { text: "short text about cells", count: 20, part: 1, totalParts: 1, batch: 1, batches: 1 },
+    ]);
+  });
+
+  it("splits a big request on a short text into several calls", () => {
+    const plan = planSegments("short text about cells", 100, { maxPerCall: 25 });
+    expect(plan).toHaveLength(4);
+    expect(plan.map((p) => p.count)).toEqual([25, 25, 25, 25]);
+    expect(plan.map((p) => p.batch)).toEqual([1, 2, 3, 4]);
+    expect(plan.every((p) => p.batches === 4)).toBe(true);
+  });
+
+  it("never asks a single call for more than maxPerCall", () => {
+    const plan = planSegments(makeDoc(100, 1000), 200, { maxPerCall: 40 });
+    expect(plan.reduce((s, p) => s + p.count, 0)).toBe(200);
+    expect(Math.max(...plan.map((p) => p.count))).toBeLessThanOrEqual(40);
   });
 
   it("returns nothing for empty input", () => {

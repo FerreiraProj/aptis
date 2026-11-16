@@ -93,6 +93,9 @@ export type SegmentPlan = {
   /** 1-based position of the segment within the chosen set */
   part: number;
   totalParts: number;
+  /** When one segment needs more items than fit in a call: 1-based batch index */
+  batch: number;
+  batches: number;
 };
 
 /**
@@ -107,7 +110,14 @@ export function planSegments(
     segmentChars = DEFAULT_SEGMENT_CHARS,
     maxSegments = DEFAULT_MAX_SEGMENTS,
     minPerSegment = DEFAULT_MIN_ITEMS_PER_SEGMENT,
-  }: { segmentChars?: number; maxSegments?: number; minPerSegment?: number } = {}
+    maxPerCall = Infinity,
+  }: {
+    segmentChars?: number;
+    maxSegments?: number;
+    minPerSegment?: number;
+    /** Split a segment into several calls when it needs more items than this. */
+    maxPerCall?: number;
+  } = {}
 ): SegmentPlan[] {
   if (totalCount <= 0) return [];
   const segments = splitIntoSegments(text, segmentChars);
@@ -123,9 +133,35 @@ export function planSegments(
     chosen.map((s) => s.length)
   );
 
-  return chosen
-    .map((segText, i) => ({ text: segText, count: counts[i], part: i + 1, totalParts: chosen.length }))
-    .filter((s) => s.count > 0);
+  const plans: SegmentPlan[] = [];
+  chosen.forEach((segText, i) => {
+    if (counts[i] <= 0) return;
+    const batches = Math.max(1, Math.ceil(counts[i] / maxPerCall));
+    const perBatch = distributeCount(counts[i], Array(batches).fill(1));
+    perBatch.forEach((count, b) =>
+      plans.push({
+        text: segText,
+        count,
+        part: i + 1,
+        totalParts: chosen.length,
+        batch: b + 1,
+        batches,
+      })
+    );
+  });
+  return plans;
+}
+
+/** Prompt hint so parallel batches over the same text don't repeat each other. */
+export function batchHint(seg: SegmentPlan): string {
+  if (seg.batches <= 1) return "";
+  return ` This is batch ${seg.batch} of ${seg.batches} for this same text: focus mainly on the ${ordinal(seg.batch)} of ${seg.batches} equal portions of the text, so batches cover different concepts.`;
+}
+
+function ordinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 }
 
 /**

@@ -326,7 +326,16 @@
     "saving": "Wird gespeichert...",
     "viewResult": "Ergebnis anzeigen",
     "openAnswerPlaceholder": "Schreibe deine Antwort...",
-    "explanation": "Erklärung: "
+    "explanation": "Erklärung: ",
+    "typeMultipleSelect": "Mehrere richtig",
+    "typeTrueFalse": "Richtig/Falsch",
+    "selectAllCorrect": "Wähle alle richtigen Optionen",
+    "partial": "Teilweise richtig",
+    "grading": "KI bewertet…",
+    "aiFeedback": "KI-Bewertung",
+    "aiScore": "Note: {percent} %",
+    "gradingFailed": "Bewertung gerade nicht möglich. Deine Antwort wird am Ende des Quiz bewertet.",
+    "ungradedNote": "{count} offene Antwort(en) konnten nicht bewertet werden und zählen nicht zur Note."
   },
   "chat": {
     "title": "KI-Tutor",
@@ -609,7 +618,17 @@
       "typeMultipleChoice": "Multiple Choice",
       "typeOpenAnswer": "Offene Antwort",
       "typeMixed": "Gemischt",
-      "typeExam": "Simulation"
+      "typeExam": "Simulation",
+      "typeMultipleSelect": "Mehrere richtig",
+      "typeTrueFalse": "Richtig/Falsch",
+      "selectAllCorrect": "Wähle alle richtigen Optionen",
+      "partial": "Teilweise",
+      "grading": "Prüfung wird bewertet…",
+      "aiFeedback": "KI-Bewertung",
+      "aiScore": "Note: {percent} %",
+      "ungradedNote": "{count} offene Antwort(en) konnten nicht bewertet werden und zählen nicht zur Note.",
+      "saveFailed": "Die Prüfung konnte nicht gespeichert und bewertet werden. Prüfe deine Verbindung und versuche es erneut.",
+      "retry": "Erneut versuchen"
     }
   },
   "onboarding": {
@@ -765,5 +784,53 @@
     "limitDocuments": "Du hast das Limit deines Tarifs von {limit} Dokument(en) pro Monat erreicht. Führe ein Upgrade durch, um mehr hochzuladen.",
     "limitChat": "Du hast das Limit deines Tarifs von {limit} Nachrichten pro Monat erreicht. Führe ein Upgrade durch, um weiterzuchatten.",
     "featureLocked": "Diese Funktion ist in deinem Tarif nicht enthalten. Führe ein Upgrade durch, um sie freizuschalten."
+  },
+  "generate": {
+    "quizTitle": "Quiz erstellen",
+    "quizDescription": "Wähle Fragetyp, Anzahl der Fragen und Schwierigkeit.",
+    "flashcardsTitle": "Karteikarten erstellen",
+    "flashcardsDescription": "Wähle, wie viele Karteikarten aus diesem Dokument erstellt werden sollen.",
+    "typeLabel": "Fragetyp",
+    "types": {
+      "MULTIPLE_CHOICE": {
+        "name": "Multiple Choice",
+        "desc": "4 Optionen, eine richtig"
+      },
+      "MULTIPLE_SELECT": {
+        "name": "Mehrere richtig",
+        "desc": "Alle richtigen wählen · Teilpunkte"
+      },
+      "TRUE_FALSE": {
+        "name": "Richtig / Falsch",
+        "desc": "Aussagen bewerten"
+      },
+      "OPEN_ANSWER": {
+        "name": "Offene Antwort",
+        "desc": "Von der KI mit Feedback bewertet"
+      },
+      "MIXED": {
+        "name": "Gemischt",
+        "desc": "Von jedem Typ etwas"
+      }
+    },
+    "countLabel": "Anzahl der Fragen",
+    "flashcardCountLabel": "Anzahl der Karteikarten",
+    "difficultyLabel": "Schwierigkeit",
+    "difficulty": {
+      "MIXED": "Gemischt",
+      "EASY": "Leicht",
+      "MEDIUM": "Mittel",
+      "HARD": "Schwer"
+    },
+    "planLimit": "Dein Tarif erlaubt bis zu {max} pro Erstellung.",
+    "lockedHint": "Mehr nötig? Die Tarife Pro und Premium erlauben bis zu 100.",
+    "seePlans": "Tarife ansehen",
+    "generate": "Erstellen",
+    "generating": "Wird erstellt…",
+    "generatingHint": "Bei langen Dokumenten kann es bis zu einer Minute dauern.",
+    "cancel": "Abbrechen",
+    "successQuiz": "Quiz mit {count} Fragen erstellt!",
+    "successFlashcards": "{count} Karteikarten erstellt!",
+    "error": "Fehler beim Erstellen. Bitte versuche es erneut."
   }
 }

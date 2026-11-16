@@ -2,7 +2,10 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { openai, MODELS } from "./client";
 import { logApiUsage } from "./usage-logger";
-import { planSegments, runForSegments, type SegmentPlan } from "./segments";
+import { batchHint, planSegments, runForSegments, type SegmentPlan } from "./segments";
+
+/** Max flashcards requested in a single model call. */
+const MAX_FLASHCARDS_PER_CALL = 40;
 
 const FlashcardSchema = z.object({
   flashcards: z
@@ -81,7 +84,9 @@ Rules:
       model: openai(MODELS.MINI),
       schema: FlashcardSchema,
       system,
-      prompt: `Create ${seg.count} high-quality study flashcards from this content (part ${seg.part} of ${seg.totalParts} of the document):\n\n${seg.text}`,
+      prompt: `Create ${seg.count} high-quality study flashcards from this content (part ${seg.part} of ${seg.totalParts} of the document).${batchHint(seg)}
+
+Content:\n\n${seg.text}`,
     });
 
     await logApiUsage({
@@ -97,7 +102,7 @@ Rules:
   };
 
   const batches = await runForSegments(
-    planSegments(text, count),
+    planSegments(text, count, { maxPerCall: MAX_FLASHCARDS_PER_CALL }),
     generateForSegment,
     "flashcards"
   );

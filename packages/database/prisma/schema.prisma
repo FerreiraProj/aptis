@@ -305,6 +305,8 @@ model Quiz {
 
 enum QuizType {
   MULTIPLE_CHOICE
+  MULTIPLE_SELECT
+  TRUE_FALSE
   OPEN_ANSWER
   MIXED
   EXAM_SIMULATION
@@ -331,6 +333,7 @@ model QuizQuestion {
 
 enum QuestionType {
   MULTIPLE_CHOICE
+  MULTIPLE_SELECT
   TRUE_FALSE
   OPEN_ANSWER
 }

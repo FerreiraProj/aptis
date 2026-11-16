@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,11 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import {
+  GenerateDialog,
+  type GenerateMode,
+  type GenerateOptions,
+} from "@/components/quizzes/generate-dialog";
 
 interface DocumentDetail {
   id: string;
@@ -29,11 +34,16 @@ interface DocumentDetail {
   _count: { flashcards: number; quizzes: number; chunks: number };
 }
 
+type GenerationLimits = { maxQuestions: number; maxFlashcards: number };
+
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const locale = useLocale();
+  const tGen = useTranslations("generate");
   const [doc, setDoc] = useState<DocumentDetail | null>(null);
+  const [limits, setLimits] = useState<GenerationLimits>({ maxQuestions: 10, maxFlashcards: 20 });
+  const [dialogMode, setDialogMode] = useState<GenerateMode | null>(null);
   const [generating, setGenerating] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -56,34 +66,48 @@ export default function DocumentDetailPage() {
     }
     const data = await res.json();
     setDoc(data.document);
+    if (data.generationLimits) setLimits(data.generationLimits);
     setLoading(false);
   }
 
-  async function handleGenerate(type: "flashcards" | "quiz") {
+  async function handleGenerate(options: GenerateOptions) {
     setGenerating(true);
     try {
+      const body =
+        options.mode === "quiz"
+          ? {
+              type: "quiz",
+              count: options.count,
+              quizType: options.quizType,
+              difficulty: options.difficulty,
+              locale,
+            }
+          : { type: "flashcards", count: options.count, locale };
+
       const res = await fetch(`/api/documents/${id}/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, locale }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Erro ao gerar");
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || tGen("error"));
       }
 
+      const { results } = await res.json();
       toast.success(
-        type === "flashcards"
-          ? "Flashcards gerados com sucesso!"
-          : "Quiz gerado com sucesso!"
+        options.mode === "flashcards"
+          ? tGen("successFlashcards", { count: results?.flashcards ?? options.count })
+          : tGen("successQuiz", { count: results?.questions ?? options.count })
       );
-      await fetchDocument();
+      setDialogMode(null);
 
-      if (type === "flashcards") router.push("/flashcards");
+      if (options.mode === "flashcards") router.push("/flashcards");
+      else if (results?.quiz) router.push(`/quizzes/${results.quiz}`);
       else router.push("/quizzes");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao gerar conteúdo");
+      toast.error(err instanceof Error ? err.message : tGen("error"));
     } finally {
       setGenerating(false);
     }
@@ -203,10 +227,10 @@ export default function DocumentDetailPage() {
               )}
               <Button
                 className="w-full"
-                onClick={() => handleGenerate("flashcards")}
+                onClick={() => setDialogMode("flashcards")}
                 disabled={generating}
               >
-                {generating ? "A gerar..." : "Gerar flashcards"}
+                {tGen("flashcardsTitle")}
               </Button>
             </CardContent>
           </Card>
@@ -217,8 +241,8 @@ export default function DocumentDetailPage() {
                 <Target size={18} className="text-primary" /> Quiz
               </CardTitle>
               <CardDescription>
-                Cria um quiz adaptativo com perguntas de escolha múltipla e
-                resposta aberta
+                Escolha múltipla, várias corretas, verdadeiro/falso ou resposta
+                aberta corrigida pela IA
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -230,14 +254,25 @@ export default function DocumentDetailPage() {
               <Button
                 className="w-full"
                 variant="outline"
-                onClick={() => handleGenerate("quiz")}
+                onClick={() => setDialogMode("quiz")}
                 disabled={generating}
               >
-                {generating ? "A gerar..." : "Gerar quiz"}
+                {tGen("quizTitle")}
               </Button>
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {dialogMode && (
+        <GenerateDialog
+          open
+          onOpenChange={(open) => !open && setDialogMode(null)}
+          mode={dialogMode}
+          max={dialogMode === "quiz" ? limits.maxQuestions : limits.maxFlashcards}
+          generating={generating}
+          onGenerate={handleGenerate}
+        />
       )}
 
       {/* Failed state */}
