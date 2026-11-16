@@ -2,6 +2,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { openai, MODELS } from "./client";
 import { logApiUsage } from "./usage-logger";
+import { planSegments, runForSegments, type SegmentPlan } from "./segments";
 
 const FlashcardSchema = z.object({
   flashcards: z
@@ -32,6 +33,10 @@ interface GenerateFlashcardsOptions {
   language?: string;
 }
 
+function normalizeKey(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
 export async function generateFlashcards(
   options: GenerateFlashcardsOptions
 ): Promise<GeneratedFlashcard[]> {
@@ -55,10 +60,7 @@ export async function generateFlashcards(
       "Explain using everyday analogies and comparisons to familiar concepts.",
   };
 
-  const { object, usage } = await generateObject({
-    model: openai(MODELS.MINI),
-    schema: FlashcardSchema,
-    system: `You are an expert educator creating flashcards for ${subject} students using spaced repetition.
+  const system = `You are an expert educator creating flashcards for ${subject} students using spaced repetition.
 
 Style: ${styleInstructions[explanationStyle]}
 
@@ -70,18 +72,48 @@ Rules:
 - Back: precise answer with real-world relevance when applicable
 - Vary difficulty (30% easy, 50% medium, 20% hard)
 - Use precise terminology appropriate to the subject area
-- Create practical, exam-relevant cards`,
-    prompt: `Create ${count} high-quality study flashcards from this content:\n\n${text.slice(0, 8000)}`,
+- Create practical, exam-relevant cards`;
+
+  // Cover the whole document: one call per segment, run in parallel.
+  const generateForSegment = async (seg: SegmentPlan) => {
+    const segStart = Date.now();
+    const { object, usage } = await generateObject({
+      model: openai(MODELS.MINI),
+      schema: FlashcardSchema,
+      system,
+      prompt: `Create ${seg.count} high-quality study flashcards from this content (part ${seg.part} of ${seg.totalParts} of the document):\n\n${seg.text}`,
+    });
+
+    await logApiUsage({
+      userId,
+      feature: "FLASHCARD_GENERATION",
+      model: MODELS.MINI,
+      inputTokens: usage.inputTokens ?? 0,
+      outputTokens: usage.outputTokens ?? 0,
+      durationMs: Date.now() - segStart,
+    });
+
+    return object.flashcards;
+  };
+
+  const batches = await runForSegments(
+    planSegments(text, count),
+    generateForSegment,
+    "flashcards"
+  );
+
+  // Merge, drop duplicate fronts, respect the requested count
+  const seen = new Set<string>();
+  const merged = batches.flat().filter((fc) => {
+    const key = normalizeKey(fc.front);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
 
-  await logApiUsage({
-    userId,
-    feature: "FLASHCARD_GENERATION",
-    model: MODELS.MINI,
-    inputTokens: usage.inputTokens ?? 0,
-    outputTokens: usage.outputTokens ?? 0,
-    durationMs: Date.now() - start,
-  });
+  console.info(
+    `[flashcards] ${merged.length}/${count} cards from ${batches.length} segment(s) in ${Date.now() - start}ms`
+  );
 
-  return object.flashcards;
+  return merged.slice(0, count);
 }

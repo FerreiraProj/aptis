@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanKey } from "@/lib/constants";
+import { resolveEffectivePlan } from "@/lib/plans";
 import { SubjectsClient } from "./subjects-client";
 
 export default async function SubjectsPage() {
@@ -21,11 +22,11 @@ export default async function SubjectsPage() {
     }),
     prisma.subscription.findUnique({
       where: { userId: user.id },
-      select: { plan: true },
+      select: { plan: true, status: true },
     }),
   ]);
 
-  const plan = (subscription?.plan as PlanKey | undefined) ?? "FREE";
+  const plan: PlanKey = resolveEffectivePlan(subscription);
   const limit = PLAN_LIMITS[plan].subjectsMax;
 
   return (

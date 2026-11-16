@@ -14,6 +14,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { PLAN_RATE_LIMITS, type PlanKey, type RateLimitAction } from "./constants";
+import { resolveEffectivePlan } from "./plans";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -146,16 +147,17 @@ async function getLimiter(
 // ─── Plan lookup helper ───────────────────────────────────────────────────────
 
 /**
- * Fetch the user's active plan tier from the DB.
- * Returns "FREE" if no active subscription exists.
+ * Fetch the plan the user is currently entitled to.
+ * Returns "FREE" when there is no subscription or it is no longer active
+ * (canceled, unpaid, incomplete, …) — see resolveEffectivePlan.
  */
 export async function getUserPlan(userId: string): Promise<PlanKey> {
   const { prisma } = await import("@aptis/database");
   const sub = await prisma.subscription.findUnique({
     where: { userId },
-    select: { plan: true },
+    select: { plan: true, status: true },
   });
-  return (sub?.plan as PlanKey | undefined) ?? "FREE";
+  return resolveEffectivePlan(sub);
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────

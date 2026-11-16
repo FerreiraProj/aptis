@@ -50,6 +50,7 @@ model User {
   progressRecords  ProgressRecord[]
   conversations    ChatConversation[]
   apiUsageLogs     ApiUsageLog[]
+  usageEvents      UsageEvent[]
   subjects         Subject[]
 
   // Affiliate / discount relations
@@ -572,6 +573,29 @@ model ApiUsageLog {
   @@map("api_usage_logs")
 }
 
+// ─────────────────────────────────────────────
+// PLAN QUOTA USAGE (monthly counters)
+// Kept separate from documents/messages so that deleting
+// a document or conversation does not reset the quota.
+// ─────────────────────────────────────────────
+
+model UsageEvent {
+  id        String         @id @default(uuid()) @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  kind      UsageEventKind
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind, createdAt])
+  @@map("usage_events")
+}
+
+enum UsageEventKind {
+  DOCUMENT_UPLOAD
+  CHAT_MESSAGE
+}
+
 enum ApiFeature {
   FLASHCARD_GENERATION
   QUIZ_GENERATION
@@ -768,7 +792,7 @@ model AffiliateCommission {
   referralId      String           @map("referral_id") @db.Uuid
   amountCents     Int              @map("amount_cents")
   status          CommissionStatus @default(PENDING)
-  stripeInvoiceId String?          @map("stripe_invoice_id")
+  stripeInvoiceId String?          @unique @map("stripe_invoice_id")
   paidAt          DateTime?        @map("paid_at")
   paidByAdminId   String?          @map("paid_by_admin_id") @db.Uuid
   notes           String?          @db.Text

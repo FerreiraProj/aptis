@@ -13,6 +13,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
+import { getUserPlan } from "@/lib/rate-limit";
+import { hasFeature } from "@/lib/plans";
+import { PlanGate } from "@/components/plan-gate";
 
 export const metadata = { title: "Exam Simulator" };
 
@@ -23,6 +26,11 @@ export default async function ExamSimulatorPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  const plan = await getUserPlan(user.id);
+  if (!hasFeature(plan, "examSimulator")) {
+    return <PlanGate feature="examSimulator" />;
+  }
 
   const t = await getTranslations("examSimulator");
 

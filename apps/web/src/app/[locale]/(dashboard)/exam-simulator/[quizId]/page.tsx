@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@aptis/database";
 import { redirect, notFound } from "next/navigation";
 import { ExamPlayer } from "./exam-player";
+import { getUserPlan } from "@/lib/rate-limit";
+import { hasFeature } from "@/lib/plans";
+import { PlanGate } from "@/components/plan-gate";
 
 type Params = { params: Promise<{ quizId: string }> };
 
@@ -14,6 +17,11 @@ export default async function ExamSessionPage({ params }: Params) {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  const plan = await getUserPlan(user.id);
+  if (!hasFeature(plan, "examSimulator")) {
+    return <PlanGate feature="examSimulator" />;
+  }
 
   const quiz = await prisma.quiz.findFirst({
     where: { id: quizId, document: { userId: user.id } },

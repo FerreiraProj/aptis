@@ -3,6 +3,7 @@ import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
 import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { generateStudyPlan } from "@/lib/ai/study-plan-generator";
+import { requireFeature } from "@/lib/usage";
 
 // POST /api/study-plans — generate + save a new study plan
 export async function POST(request: NextRequest) {
@@ -11,6 +12,9 @@ export async function POST(request: NextRequest) {
 
   // Rate limit: plan-aware study plan generation
   const plan = await getUserPlan(auth.user.id);
+  const locked = requireFeature(plan, "studyPlan");
+  if (locked) return locked;
+
   const rateLimit = await checkRateLimit("studyPlan", auth.user.id, plan);
   if (!rateLimit.success) {
     return NextResponse.json(

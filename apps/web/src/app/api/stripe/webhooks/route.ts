@@ -136,7 +136,16 @@ export async function POST(req: NextRequest) {
         const affiliateRef = await prisma.affiliateReferral.findFirst({
           where: { referredUserId: userId, canceledAt: null },
         });
-        if (affiliateRef) {
+        // Stripe retries webhooks — skip invoices that already produced a commission.
+        // (stripe_invoice_id is also UNIQUE in the DB as a second line of defence.)
+        const alreadyCredited = affiliateRef
+          ? await prisma.affiliateCommission.findUnique({
+              where: { stripeInvoiceId: invoice.id },
+              select: { id: true },
+            })
+          : null;
+
+        if (affiliateRef && !alreadyCredited) {
           const isFirstPayment = affiliateRef.paymentsTracked === 0;
           const shouldCredit =
             affiliateRef.recurringMonths === 0
@@ -157,22 +166,28 @@ export async function POST(req: NextRequest) {
               commType,
               commValue
             );
-            await prisma.$transaction([
-              prisma.affiliateCommission.create({
-                data: {
-                  referralId: affiliateRef.id,
-                  amountCents: amount,
-                  stripeInvoiceId: invoice.id,
-                },
-              }),
-              prisma.affiliateReferral.update({
-                where: { id: affiliateRef.id },
-                data: {
-                  paymentsTracked: { increment: 1 },
-                  convertedAt: affiliateRef.convertedAt ?? new Date(),
-                },
-              }),
-            ]);
+            try {
+              await prisma.$transaction([
+                prisma.affiliateCommission.create({
+                  data: {
+                    referralId: affiliateRef.id,
+                    amountCents: amount,
+                    stripeInvoiceId: invoice.id,
+                  },
+                }),
+                prisma.affiliateReferral.update({
+                  where: { id: affiliateRef.id },
+                  data: {
+                    paymentsTracked: { increment: 1 },
+                    convertedAt: affiliateRef.convertedAt ?? new Date(),
+                  },
+                }),
+              ]);
+            } catch (err) {
+              // P2002 = unique violation: a concurrent retry already credited this invoice.
+              if ((err as { code?: string }).code !== "P2002") throw err;
+              console.info("[webhook] commission already recorded for invoice", invoice.id);
+            }
           }
         }
         break;

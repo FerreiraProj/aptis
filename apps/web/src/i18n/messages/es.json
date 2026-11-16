@@ -750,5 +750,20 @@
         ]
       }
     }
+  },
+  "planGate": {
+    "lockedTitle": "Disponible en los planes Pro y Premium",
+    "upgradeButton": "Ver planes",
+    "examSimulator": {
+      "title": "Simulador de Examen",
+      "description": "Practica en condiciones reales de examen, con cronómetro e informe final. Mejora tu plan para desbloquear el simulador."
+    },
+    "studyPlan": {
+      "title": "Plan de Estudio",
+      "description": "Genera un plan de estudio personalizado hasta la fecha de tu examen. Mejora tu plan para desbloquear los planes de estudio."
+    },
+    "limitDocuments": "Has alcanzado el límite de {limit} documento(s) al mes de tu plan. Mejora tu plan para subir más.",
+    "limitChat": "Has alcanzado el límite de {limit} mensajes al mes de tu plan. Mejora tu plan para seguir conversando.",
+    "featureLocked": "Esta función no está incluida en tu plan. Mejora tu plan para desbloquearla."
   }
 }

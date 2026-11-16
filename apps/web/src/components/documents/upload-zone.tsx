@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { usePlanErrorMessage } from "@/components/use-plan-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ interface Subject {
 
 export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
   const router = useRouter();
+  const planErrorMessage = usePlanErrorMessage();
   const [mode, setMode] = useState<UploadMode>("file");
   const [isDragOver, setIsDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -94,8 +96,8 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
       setUploadProgress(70);
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Upload failed");
+        const error = await response.json().catch(() => ({}));
+        throw new Error(planErrorMessage(error) ?? error.error ?? "Upload failed");
       }
 
       const { document } = await response.json();

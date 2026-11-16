@@ -5,8 +5,19 @@ import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { generateFlashcards } from "@/lib/ai/flashcard-generator";
 import { generateQuiz } from "@/lib/ai/quiz-generator";
 import { PLAN_LIMITS } from "@/lib/constants";
+import { z } from "zod";
 
 type Params = { params: Promise<{ id: string }> };
+
+// Long documents are generated in several parallel AI calls; allow time for the slowest.
+export const maxDuration = 300;
+
+const GenerateBodySchema = z.object({
+  type: z.enum(["flashcards", "quiz", "both"]).default("both"),
+  count: z.coerce.number().int().min(1).max(100).optional(),
+  quizType: z.enum(["MULTIPLE_CHOICE", "OPEN_ANSWER", "MIXED"]).default("MULTIPLE_CHOICE"),
+  locale: z.enum(["pt", "en", "es", "fr", "de", "it"]).catch("pt").default("pt"),
+});
 
 // POST /api/documents/[id]/generate
 // Body: { type: "flashcards" | "quiz" | "both", count?: number, quizType?: string }
@@ -25,8 +36,14 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const { id } = await params;
-  const body = await request.json();
-  const { type = "both", count, quizType = "MULTIPLE_CHOICE", locale = "pt" } = body;
+  const parsed = GenerateBodySchema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid request", issues: parsed.error.issues.map((i) => i.message) },
+      { status: 400 }
+    );
+  }
+  const { type, count, quizType, locale } = parsed.data;
 
   const LOCALE_TO_LANGUAGE: Record<string, string> = {
     pt: "Portuguese",
@@ -36,7 +53,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     de: "German",
     it: "Italian",
   };
-  const language = LOCALE_TO_LANGUAGE[locale] ?? "Portuguese";
+  const language = LOCALE_TO_LANGUAGE[locale];
 
   // Fetch document
   const document = await prisma.document.findFirst({
@@ -119,7 +136,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         text: document.extractedText,
         count: quizCount,
         userId: auth.user.id,
-        quizType: quizType as "MULTIPLE_CHOICE" | "OPEN_ANSWER" | "MIXED",
+        quizType,
         subject: document.subject || "general",
         language,
       });
@@ -129,7 +146,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         data: {
           documentId: document.id,
           title: quiz.title,
-          quizType: quizType as never,
+          quizType,
           questions: {
             create: quiz.questions.map((q, idx) => ({
               questionIndex: idx,
@@ -156,10 +173,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       results.quiz = savedQuiz.id;
     }
   } catch (error) {
+    // Log the details server-side; don't leak internal/provider errors to the client.
     console.error("[generate] AI generation failed:", error);
-    const message =
-      error instanceof Error ? error.message : "AI generation failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "AI generation failed. Please try again." },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ results });

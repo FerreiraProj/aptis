@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { usePlanErrorMessage } from "@/components/use-plan-error";
 import { formatDistanceToNow } from "date-fns";
 import type { Locale } from "date-fns";
 import { pt, enUS, es, fr, de, it } from "date-fns/locale";
@@ -39,6 +40,7 @@ export function ChatInterface({
 }) {
   const t = useTranslations("chat");
   const tCommon = useTranslations("common");
+  const planErrorMessage = usePlanErrorMessage();
   const locale = useLocale();
   const dateFnsLocale = DATE_FNS_LOCALES[locale] ?? enUS;
 
@@ -139,7 +141,9 @@ export function ChatInterface({
           ...prev.slice(0, -1),
           {
             role: "assistant",
-            content: `Erro: ${(err as { error?: string }).error ?? "Falha na resposta"}`,
+            content:
+              planErrorMessage(err as { code?: string; limit?: number }) ??
+              `Erro: ${(err as { error?: string }).error ?? "Falha na resposta"}`,
           },
         ]);
         return;

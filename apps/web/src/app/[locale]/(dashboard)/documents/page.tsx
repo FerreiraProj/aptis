@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@aptis/database";
 import { redirect } from "next/navigation";
 import { DocumentsClient } from "./documents-client";
+import { failStaleDocuments } from "@/lib/document-processing/pipeline";
 
 export const metadata = { title: "Documentos" };
 
@@ -12,6 +13,8 @@ export default async function DocumentsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  await failStaleDocuments(user.id);
 
   const docSelect = {
     id: true,

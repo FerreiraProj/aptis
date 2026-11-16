@@ -2,6 +2,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { openai, MODELS } from "./client";
 import { logApiUsage } from "./usage-logger";
+import { planSegments, runForSegments, type SegmentPlan } from "./segments";
 
 const QuizSchema = z.object({
   title: z.string(),
@@ -25,7 +26,9 @@ const QuizSchema = z.object({
         points: z.number(),
       })
     )
-    .min(5)
+    // Per-call bounds: long documents are split across several calls,
+    // so one segment may legitimately ask for only a few questions.
+    .min(1)
     .max(30),
 });
 
@@ -38,6 +41,10 @@ interface GenerateQuizOptions {
   quizType?: "MULTIPLE_CHOICE" | "OPEN_ANSWER" | "MIXED";
   subject?: string;
   language?: string;
+}
+
+function normalizeKey(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 export async function generateQuiz(
@@ -63,10 +70,7 @@ export async function generateQuiz(
         ? "Create open-ended questions that require explanation, requiring synthesis of knowledge."
         : "Mix multiple choice (60%) and open-answer (40%) questions.";
 
-  const { object, usage } = await generateObject({
-    model: openai(model),
-    schema: QuizSchema,
-    system: `You are creating a ${subject} exam for students.
+  const system = `You are creating a ${subject} exam for students.
 
 ${typeInstructions}
 
@@ -77,18 +81,50 @@ Quality rules:
 - Include plausible distractors for MC (common mistakes, similar-sounding terms)
 - Explanations must explain WHY the answer is correct (not just restate it)
 - Vary difficulty appropriately
-- Test application, not just recall`,
-    prompt: `Generate ${count} exam questions based on this content:\n\n${text.slice(0, 10000)}`,
-  });
+- Test application, not just recall`;
 
-  await logApiUsage({
-    userId,
-    feature: "QUIZ_GENERATION",
-    model,
-    inputTokens: usage.inputTokens ?? 0,
-    outputTokens: usage.outputTokens ?? 0,
-    durationMs: Date.now() - start,
-  });
+  // Cover the whole document: one call per segment, run in parallel.
+  const generateForSegment = async (seg: SegmentPlan) => {
+    const segStart = Date.now();
+    const { object, usage } = await generateObject({
+      model: openai(model),
+      schema: QuizSchema,
+      system,
+      prompt: `Generate ${seg.count} exam questions based on this content (part ${seg.part} of ${seg.totalParts} of the document). The title should describe the document as a whole:\n\n${seg.text}`,
+    });
 
-  return object;
+    await logApiUsage({
+      userId,
+      feature: "QUIZ_GENERATION",
+      model,
+      inputTokens: usage.inputTokens ?? 0,
+      outputTokens: usage.outputTokens ?? 0,
+      durationMs: Date.now() - segStart,
+    });
+
+    return object;
+  };
+
+  const results = await runForSegments(
+    planSegments(text, count),
+    generateForSegment,
+    "quiz"
+  );
+
+  const seen = new Set<string>();
+  const questions = results
+    .flatMap((r) => r.questions)
+    .filter((q) => {
+      const key = normalizeKey(q.questionText);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, count);
+
+  console.info(
+    `[quiz] ${questions.length}/${count} questions from ${results.length} segment(s) in ${Date.now() - start}ms`
+  );
+
+  return { title: results[0].title, questions };
 }

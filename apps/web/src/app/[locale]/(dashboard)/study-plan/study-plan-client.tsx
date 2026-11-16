@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { usePlanErrorMessage } from "@/components/use-plan-error";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,7 @@ export function StudyPlanClient({
 }) {
   const t = useTranslations("studyPlan");
   const tCommon = useTranslations("common");
+  const planErrorMessage = usePlanErrorMessage();
 
   const taskTypeLabels: Record<string, string> = {
     READING: t("taskReading"),
@@ -178,8 +180,8 @@ export function StudyPlanClient({
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error ?? t("generatingError"));
+        const err = await res.json().catch(() => ({}));
+        throw new Error(planErrorMessage(err) ?? err.error ?? t("generatingError"));
       }
 
       const { plan: newPlan } = await res.json();

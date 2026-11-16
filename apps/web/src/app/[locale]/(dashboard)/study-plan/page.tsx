@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@aptis/database";
 import { redirect } from "next/navigation";
 import { StudyPlanClient } from "./study-plan-client";
+import { getUserPlan } from "@/lib/rate-limit";
+import { hasFeature } from "@/lib/plans";
+import { PlanGate } from "@/components/plan-gate";
 
 export const metadata = { title: "Plano de Estudo" };
 
@@ -12,6 +15,11 @@ export default async function StudyPlanPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  const plan = await getUserPlan(user.id);
+  if (!hasFeature(plan, "studyPlan")) {
+    return <PlanGate feature="studyPlan" />;
+  }
 
   const [dbUser, activePlan, documents, subjects] = await Promise.all([
     prisma.user.findUnique({

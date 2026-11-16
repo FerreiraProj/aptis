@@ -750,5 +750,20 @@
         ]
       }
     }
+  },
+  "planGate": {
+    "lockedTitle": "Verfügbar in den Tarifen Pro und Premium",
+    "upgradeButton": "Tarife ansehen",
+    "examSimulator": {
+      "title": "Prüfungssimulator",
+      "description": "Übe unter echten Prüfungsbedingungen, mit Timer und Abschlussbericht. Führe ein Upgrade durch, um den Simulator freizuschalten."
+    },
+    "studyPlan": {
+      "title": "Lernplan",
+      "description": "Erstelle einen persönlichen Lernplan bis zu deinem Prüfungstermin. Führe ein Upgrade durch, um Lernpläne freizuschalten."
+    },
+    "limitDocuments": "Du hast das Limit deines Tarifs von {limit} Dokument(en) pro Monat erreicht. Führe ein Upgrade durch, um mehr hochzuladen.",
+    "limitChat": "Du hast das Limit deines Tarifs von {limit} Nachrichten pro Monat erreicht. Führe ein Upgrade durch, um weiterzuchatten.",
+    "featureLocked": "Diese Funktion ist in deinem Tarif nicht enthalten. Führe ein Upgrade durch, um sie freizuschalten."
   }
 }

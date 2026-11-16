@@ -108,7 +108,13 @@ Instruções:
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
 
-  // 3. Stream response
+  // 3. Persist the user's message BEFORE streaming, so it is not lost if the
+  //    stream fails or the client disconnects mid-answer.
+  await prisma.chatMessage.create({
+    data: { conversationId, role: "USER", content: userMessage },
+  });
+
+  // 4. Stream response
   const result = streamText({
     model: openai(MODELS.STANDARD),
     system: systemPrompt,
@@ -121,23 +127,16 @@ Instruções:
       totalInputTokens = usage.inputTokens ?? 0;
       totalOutputTokens = usage.outputTokens ?? 0;
 
-      // Persist both messages
-      await prisma.chatMessage.createMany({
-        data: [
-          {
-            conversationId,
-            role: "USER",
-            content: userMessage,
-          },
-          {
-            conversationId,
-            role: "ASSISTANT",
-            content: text,
-            tokensUsed: (usage.inputTokens ?? 0) + (usage.outputTokens ?? 0),
-            modelUsed: MODELS.STANDARD,
-            sourceChunkIds: relevantChunks.map((c) => c.id),
-          },
-        ],
+      // Persist the assistant's answer (the user message was saved up front)
+      await prisma.chatMessage.create({
+        data: {
+          conversationId,
+          role: "ASSISTANT",
+          content: text,
+          tokensUsed: (usage.inputTokens ?? 0) + (usage.outputTokens ?? 0),
+          modelUsed: MODELS.STANDARD,
+          sourceChunkIds: relevantChunks.map((c) => c.id),
+        },
       });
 
       // Auto-generate title on first message

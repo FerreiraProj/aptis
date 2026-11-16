@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
+import { failStaleDocuments } from "@/lib/document-processing/pipeline";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -10,6 +11,8 @@ export async function GET(_request: NextRequest, { params }: Params) {
   if (isAuthError(auth)) return auth.error;
 
   const { id } = await params;
+
+  await failStaleDocuments(auth.user.id);
 
   const document = await prisma.document.findFirst({
     where: { id, userId: auth.user.id },
@@ -45,6 +48,17 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   if (!document) {
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  }
+
+  // The subject must belong to the same user
+  if (subjectId) {
+    const subject = await prisma.subject.findFirst({
+      where: { id: subjectId, userId: auth.user.id },
+      select: { id: true },
+    });
+    if (!subject) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    }
   }
 
   const updated = await prisma.document.update({

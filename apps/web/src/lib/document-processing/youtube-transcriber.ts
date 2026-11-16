@@ -281,7 +281,7 @@ function parseXml(body: string): TranscriptSegment[] {
   return segments;
 }
 
-function extractVideoId(url: string): string | null {
+export function extractVideoId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/,
     /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,

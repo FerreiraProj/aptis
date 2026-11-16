@@ -1,15 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@aptis/database";
 import { requireAuth, isAuthError } from "@/lib/auth/guards";
 import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
-import { processDocument } from "@/lib/document-processing/pipeline";
+import {
+  processDocument,
+  failStaleDocuments,
+} from "@/lib/document-processing/pipeline";
+import { extractVideoId } from "@/lib/document-processing/youtube-transcriber";
 import { MAX_FILE_SIZE_BYTES, SUPPORTED_FILE_TYPES } from "@/lib/constants";
+import {
+  checkMonthlyQuota,
+  quotaExceededResponse,
+  recordUsage,
+} from "@/lib/usage";
 import type { SourceType } from "@aptis/database";
+
+// Text extraction + OCR + embeddings run after the response is sent (via `after`),
+// but still inside this function invocation — so it needs a generous time budget.
+export const maxDuration = 300;
 
 // GET /api/documents — List user's documents
 export async function GET(request: NextRequest) {
   const auth = await requireAuth();
   if (isAuthError(auth)) return auth.error;
+
+  await failStaleDocuments(auth.user.id);
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
@@ -47,10 +62,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth();
   if (isAuthError(auth)) return auth.error;
+  const userId = auth.user.id;
 
   // Rate limit: plan-aware upload limits
-  const plan = await getUserPlan(auth.user.id);
-  const rateLimit = await checkRateLimit("upload", auth.user.id, plan);
+  const plan = await getUserPlan(userId);
+  const rateLimit = await checkRateLimit("upload", userId, plan);
   if (!rateLimit.success) {
     return NextResponse.json(
       { error: "Rate limit exceeded. Try again later." },
@@ -61,37 +77,47 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Monthly document quota (PLAN_LIMITS.documentsPerMonth)
+  const quota = await checkMonthlyQuota(userId, plan, "documentsPerMonth");
+  if (!quota.allowed) return quotaExceededResponse("documentsPerMonth", quota);
+
   const contentType = request.headers.get("content-type") || "";
 
   // Handle YouTube URL (JSON body)
   if (contentType.includes("application/json")) {
-    const body = await request.json();
-    const { youtubeUrl, title } = body;
+    const body = await request.json().catch(() => null);
+    const youtubeUrl: unknown = body?.youtubeUrl;
+    const title: unknown = body?.title;
 
-    if (!youtubeUrl || typeof youtubeUrl !== "string") {
+    if (typeof youtubeUrl !== "string" || !extractVideoId(youtubeUrl)) {
       return NextResponse.json(
-        { error: "youtubeUrl is required" },
+        { error: "A valid YouTube URL is required" },
         { status: 400 }
       );
     }
 
     const document = await prisma.document.create({
       data: {
-        userId: auth.user.id,
-        title: title || "YouTube Video",
+        userId,
+        title:
+          typeof title === "string" && title.trim()
+            ? title.trim().slice(0, 300)
+            : "YouTube Video",
         sourceType: "YOUTUBE",
         youtubeUrl,
         status: "PENDING",
       },
     });
+    await recordUsage(userId, "documentsPerMonth");
 
-    // Process asynchronously (don't await)
-    processDocument({
-      documentId: document.id,
-      userId: auth.user.id,
-      youtubeUrl,
-      sourceType: "YOUTUBE",
-    }).catch((err) => console.error("YouTube processing failed:", err));
+    after(() =>
+      processDocument({
+        documentId: document.id,
+        userId,
+        youtubeUrl,
+        sourceType: "YOUTUBE",
+      }).catch((err) => console.error("YouTube processing failed:", err))
+    );
 
     return NextResponse.json({ document }, { status: 201 });
   }
@@ -127,6 +153,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // The subject must belong to the uploading user
+  if (subjectId) {
+    const subject = await prisma.subject.findFirst({
+      where: { id: subjectId, userId },
+      select: { id: true },
+    });
+    if (!subject) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    }
+  }
+
   // Determine source type
   let sourceType: SourceType = "PDF";
   if (file.type === "text/plain") sourceType = "TEXT";
@@ -139,7 +176,7 @@ export async function POST(request: NextRequest) {
   // Upload to Supabase Storage temporarily
   const { createAdminClient } = await import("@/lib/supabase/server");
   const supabase = await createAdminClient();
-  const storagePath = `${auth.user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const storagePath = `${userId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
 
   const arrayBuffer = await file.arrayBuffer();
   const { error: uploadError } = await supabase.storage
@@ -149,7 +186,7 @@ export async function POST(request: NextRequest) {
   if (uploadError) {
     console.error("[documents/upload] Supabase Storage error:", uploadError);
     return NextResponse.json(
-      { error: "Failed to upload file", detail: uploadError.message },
+      { error: "Failed to upload file" },
       { status: 500 }
     );
   }
@@ -157,7 +194,7 @@ export async function POST(request: NextRequest) {
   // Create document record
   const document = await prisma.document.create({
     data: {
-      userId: auth.user.id,
+      userId,
       title: title || file.name,
       sourceType,
       originalName: file.name,
@@ -167,15 +204,19 @@ export async function POST(request: NextRequest) {
       ...(subjectId ? { subjectId } : {}),
     },
   });
+  await recordUsage(userId, "documentsPerMonth");
 
-  // Process asynchronously
-  processDocument({
-    documentId: document.id,
-    userId: auth.user.id,
-    storagePath,
-    sourceType,
-    mimeType: file.type,
-  }).catch((err) => console.error("Document processing failed:", err));
+  // Process after the response is sent. `after` keeps the serverless
+  // function alive until processing finishes (bounded by maxDuration).
+  after(() =>
+    processDocument({
+      documentId: document.id,
+      userId,
+      storagePath,
+      sourceType,
+      mimeType: file.type,
+    }).catch((err) => console.error("Document processing failed:", err))
+  );
 
   return NextResponse.json({ document }, { status: 201 });
 }

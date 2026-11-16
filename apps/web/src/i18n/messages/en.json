@@ -750,5 +750,20 @@
         ]
       }
     }
+  },
+  "planGate": {
+    "lockedTitle": "Available on Pro and Premium plans",
+    "upgradeButton": "See plans",
+    "examSimulator": {
+      "title": "Exam Simulator",
+      "description": "Practise under real exam conditions, with a timer and a final report. Upgrade to unlock the simulator."
+    },
+    "studyPlan": {
+      "title": "Study Plan",
+      "description": "Generate a personalised study plan up to your exam date. Upgrade to unlock study plans."
+    },
+    "limitDocuments": "You've reached your plan's limit of {limit} document(s) per month. Upgrade to upload more.",
+    "limitChat": "You've reached your plan's limit of {limit} messages per month. Upgrade to keep chatting.",
+    "featureLocked": "This feature isn't included in your plan. Upgrade to unlock it."
   }
 }

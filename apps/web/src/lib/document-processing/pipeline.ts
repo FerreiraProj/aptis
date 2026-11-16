@@ -21,6 +21,32 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "uploads";
 
+/**
+ * Processing runs inside the upload request (max 300 s). If a document has been
+ * PENDING/PROCESSING for much longer than that, the function was killed or
+ * crashed — mark it FAILED so the user sees an error and can re-upload,
+ * instead of a spinner that never ends.
+ */
+const STALE_PROCESSING_MS = 15 * 60 * 1000;
+
+export async function failStaleDocuments(userId: string): Promise<void> {
+  try {
+    await prisma.document.updateMany({
+      where: {
+        userId,
+        status: { in: ["PENDING", "PROCESSING"] },
+        updatedAt: { lt: new Date(Date.now() - STALE_PROCESSING_MS) },
+      },
+      data: {
+        status: "FAILED",
+        errorMessage: "Processing timed out. Please upload the document again.",
+      },
+    });
+  } catch (err) {
+    console.error("[pipeline] failStaleDocuments failed:", err);
+  }
+}
+
 interface ProcessDocumentOptions {
   documentId: string;
   userId: string;

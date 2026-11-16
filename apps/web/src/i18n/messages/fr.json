@@ -750,5 +750,20 @@
         ]
       }
     }
+  },
+  "planGate": {
+    "lockedTitle": "Disponible avec les offres Pro et Premium",
+    "upgradeButton": "Voir les offres",
+    "examSimulator": {
+      "title": "Simulateur d'examen",
+      "description": "Entraîne-toi en conditions réelles d'examen, avec chronomètre et rapport final. Passe à une offre supérieure pour débloquer le simulateur."
+    },
+    "studyPlan": {
+      "title": "Plan d'étude",
+      "description": "Génère un plan d'étude personnalisé jusqu'à la date de ton examen. Passe à une offre supérieure pour débloquer les plans d'étude."
+    },
+    "limitDocuments": "Tu as atteint la limite de {limit} document(s) par mois de ton offre. Passe à une offre supérieure pour en importer davantage.",
+    "limitChat": "Tu as atteint la limite de {limit} messages par mois de ton offre. Passe à une offre supérieure pour continuer à discuter.",
+    "featureLocked": "Cette fonctionnalité n'est pas incluse dans ton offre. Passe à une offre supérieure pour la débloquer."
   }
 }

@@ -4,7 +4,14 @@ import { requireAuth, isAuthError } from "@/lib/auth/guards";
 import { checkRateLimit, getUserPlan } from "@/lib/rate-limit";
 import { handleChatMessage } from "@/lib/ai/chat-handler";
 import type { ModelMessage } from "ai";
-import type { MessageRole } from "@aptis/database";
+import {
+  checkMonthlyQuota,
+  quotaExceededResponse,
+  recordUsage,
+} from "@/lib/usage";
+
+/** Hard cap on a single user message (keeps prompt cost predictable). */
+const MAX_MESSAGE_CHARS = 4000;
 
 type Params = { params: Promise<{ conversationId: string }> };
 
@@ -50,14 +57,19 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
+  // Monthly message quota (PLAN_LIMITS.chatMessagesPerMonth)
+  const quota = await checkMonthlyQuota(auth.user.id, plan, "chatMessagesPerMonth");
+  if (!quota.allowed) return quotaExceededResponse("chatMessagesPerMonth", quota);
+
   const { conversationId } = await params;
 
   const conversation = await prisma.chatConversation.findFirst({
     where: { id: conversationId, userId: auth.user.id },
     include: {
       messages: {
-        orderBy: { createdAt: "asc" },
-        take: 20, // last 20 messages for context
+        // Newest first so `take` keeps the LAST 20 messages; reversed below.
+        orderBy: { createdAt: "desc" },
+        take: 20,
       },
     },
   });
@@ -69,12 +81,21 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
-  const body = await request.json();
-  const { message: userMessage, subjectName } = body as { message: string; subjectName?: string };
+  const body = await request.json().catch(() => null);
+  const userMessage: unknown = body?.message;
+  const subjectName: unknown = body?.subjectName;
 
-  if (!userMessage || typeof userMessage !== "string") {
+  if (typeof userMessage !== "string" || !userMessage.trim()) {
     return NextResponse.json({ error: "message is required" }, { status: 400 });
   }
+  if (userMessage.length > MAX_MESSAGE_CHARS) {
+    return NextResponse.json(
+      { error: `Message too long (max ${MAX_MESSAGE_CHARS} characters)` },
+      { status: 400 }
+    );
+  }
+
+  await recordUsage(auth.user.id, "chatMessagesPerMonth");
 
   // Get user preferences
   const user = await prisma.user.findUnique({
@@ -83,7 +104,8 @@ export async function POST(request: NextRequest, { params }: Params) {
   });
 
   // Build message history for the AI
-  const history: ModelMessage[] = conversation.messages
+  const history: ModelMessage[] = [...conversation.messages]
+    .reverse() // back to chronological order
     .filter((m) => m.role !== "SYSTEM")
     .map((m) => ({
       role: (m.role === "USER" ? "user" : "assistant") as "user" | "assistant",
@@ -97,7 +119,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     documentIds: conversation.documentIds,
     history,
     explanationStyle: user?.preferredExplanationStyle || "CONCISE",
-    subjectName: subjectName || undefined,
+    subjectName:
+      typeof subjectName === "string" && subjectName.trim()
+        ? subjectName.trim().slice(0, 100)
+        : undefined,
   });
 }
 

@@ -750,5 +750,20 @@
         ]
       }
     }
+  },
+  "planGate": {
+    "lockedTitle": "Disponível nos planos Pro e Premium",
+    "upgradeButton": "Ver planos",
+    "examSimulator": {
+      "title": "Simulador de Exame",
+      "description": "Pratica em condições reais de exame, com cronómetro e relatório final. Faz upgrade para desbloquear o simulador."
+    },
+    "studyPlan": {
+      "title": "Plano de Estudo",
+      "description": "Gera um plano de estudo personalizado até à data do teu exame. Faz upgrade para desbloquear os planos de estudo."
+    },
+    "limitDocuments": "Atingiste o limite de {limit} documento(s) por mês do teu plano. Faz upgrade para carregar mais.",
+    "limitChat": "Atingiste o limite de {limit} mensagens por mês do teu plano. Faz upgrade para continuar a conversar.",
+    "featureLocked": "Esta funcionalidade não está incluída no teu plano. Faz upgrade para a desbloquear."
   }
 }

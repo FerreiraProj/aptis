@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { syncSubscriptionFromStripe } from "@/lib/stripe/sync-subscription";
+import { resolveEffectivePlan } from "@/lib/plans";
 import { Upload, Zap, Target, MessageCircle, Flame, Brain, BookOpen, Trophy } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { DashboardCharts, type ActivityDay, type DifficultyItem, type AccuracyPoint, type QuizResult } from "./dashboard-charts";
@@ -89,7 +90,7 @@ export default async function DashboardPage({
   ] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.id },
-      include: { subscription: { select: { plan: true } } },
+      include: { subscription: { select: { plan: true, status: true } } },
     }),
     prisma.flashcard.count({
       where: { userId: user.id, smDueDate: { lte: now } },
@@ -240,7 +241,7 @@ export default async function DashboardPage({
   const retention =
     totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
 
-  const planLabel = dbUser?.subscription?.plan || "FREE";
+  const planLabel = resolveEffectivePlan(dbUser?.subscription);
 
   const statusLabels: Record<string, string> = {
     PENDING: t("statusPending"),
