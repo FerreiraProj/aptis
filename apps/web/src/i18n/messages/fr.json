@@ -171,7 +171,7 @@
   },
   "upload": {
     "title": "Téléverser un document",
-    "description": "PDF, PowerPoint, texte, lien YouTube ou photo de vos notes",
+    "description": "PDF, Word, PowerPoint, texte, lien YouTube ou photo de vos notes",
     "dropzone": "Glissez-déposez ici ou cliquez pour sélectionner",
     "supportedFormats": "PDF, PPT, TXT, JPG, PNG (max. 50 Mo)",
     "youtubeUrl": "URL YouTube",

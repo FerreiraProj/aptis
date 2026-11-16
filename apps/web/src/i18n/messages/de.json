@@ -171,7 +171,7 @@
   },
   "upload": {
     "title": "Dokument hochladen",
-    "description": "PDF, PowerPoint, Text, YouTube-Link oder Foto deiner Notizen",
+    "description": "PDF, Word, PowerPoint, Text, YouTube-Link oder Foto deiner Notizen",
     "dropzone": "Hierher ziehen oder klicken zum Auswählen",
     "supportedFormats": "PDF, PPT, TXT, JPG, PNG (max. 50 MB)",
     "youtubeUrl": "YouTube-URL",

@@ -7,13 +7,16 @@ import {
   failStaleDocuments,
 } from "@/lib/document-processing/pipeline";
 import { extractVideoId } from "@/lib/document-processing/youtube-transcriber";
-import { MAX_FILE_SIZE_BYTES, SUPPORTED_FILE_TYPES } from "@/lib/constants";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/constants";
+import {
+  detectUploadType,
+  legacyOfficeFormat,
+} from "@/lib/document-processing/file-types";
 import {
   checkMonthlyQuota,
   quotaExceededResponse,
   recordUsage,
 } from "@/lib/usage";
-import type { SourceType } from "@aptis/database";
 
 // Text extraction + OCR + embeddings run after the response is sent (via `after`),
 // but still inside this function invocation — so it needs a generous time budget.
@@ -146,12 +149,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!SUPPORTED_FILE_TYPES.includes(file.type as never)) {
+  const detected = detectUploadType(file.name, file.type);
+  if (!detected) {
+    const legacy = legacyOfficeFormat(file.name, file.type);
     return NextResponse.json(
-      { error: "Unsupported file type" },
+      {
+        error: legacy
+          ? `Old .${legacy} files are not supported. Save the file as .${legacy}x and upload it again.`
+          : "Unsupported file type",
+        ...(legacy ? { code: "LEGACY_OFFICE_FORMAT", format: legacy } : {}),
+      },
       { status: 415 }
     );
   }
+  const { sourceType, mimeType } = detected;
 
   // The subject must belong to the uploading user
   if (subjectId) {
@@ -164,15 +175,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Determine source type
-  let sourceType: SourceType = "PDF";
-  if (file.type === "text/plain") sourceType = "TEXT";
-  else if (file.type.startsWith("image/")) sourceType = "IMAGE";
-  else if (
-    file.type.includes("presentation") ||
-    /\.pptx$/i.test(file.name)
-  ) sourceType = "POWERPOINT";
-
   // Upload to Supabase Storage temporarily
   const { createAdminClient } = await import("@/lib/supabase/server");
   const supabase = await createAdminClient();
@@ -181,7 +183,7 @@ export async function POST(request: NextRequest) {
   const arrayBuffer = await file.arrayBuffer();
   const { error: uploadError } = await supabase.storage
     .from(process.env.SUPABASE_STORAGE_BUCKET || "uploads")
-    .upload(storagePath, arrayBuffer, { contentType: file.type });
+    .upload(storagePath, arrayBuffer, { contentType: mimeType });
 
   if (uploadError) {
     console.error("[documents/upload] Supabase Storage error:", uploadError);
@@ -198,7 +200,7 @@ export async function POST(request: NextRequest) {
       title: title || file.name,
       sourceType,
       originalName: file.name,
-      mimeType: file.type,
+      mimeType,
       sizeBytes: file.size,
       status: "PENDING",
       ...(subjectId ? { subjectId } : {}),
@@ -214,7 +216,7 @@ export async function POST(request: NextRequest) {
       userId,
       storagePath,
       sourceType,
-      mimeType: file.type,
+      mimeType,
     }).catch((err) => console.error("Document processing failed:", err))
   );
 

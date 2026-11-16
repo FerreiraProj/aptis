@@ -265,6 +265,7 @@ function DocumentCard({
   const sourceTypes: Record<string, string> = {
     PDF: "PDF",
     POWERPOINT: "PowerPoint",
+    WORD: "Word",
     TEXT: t("sourceText"),
     YOUTUBE: "YouTube",
     SCREENSHOT: t("sourceImage"),

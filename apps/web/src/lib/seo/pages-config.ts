@@ -757,7 +757,7 @@ export const SEO_PAGES: SeoPageConfig[] = [
       { icon: "🔁", title: "Revisão espaçada integrada", description: "Algoritmo de repetição espaçada que maximiza a retenção automaticamente." },
     ],
     faq: [
-      { question: "Que tipos de documentos o Aptis aceita?", answer: "PDFs (incluindo slides exportados e apontamentos), texto copiado diretamente, e ficheiros de texto. Documentos Word e PowerPoint podem ser exportados para PDF e depois carregados." },
+      { question: "Que tipos de documentos o Aptis aceita?", answer: "PDFs (incluindo slides exportados e apontamentos), documentos Word (.docx), apresentações PowerPoint (.pptx), ficheiros de texto, fotografias de apontamentos e vídeos do YouTube com legendas." },
       { question: "Os flashcards gerados são de boa qualidade?", answer: "A qualidade depende da clareza do documento original. Para documentos bem estruturados com texto claro, os flashcards são geralmente muito bons. Podes sempre editar os que precisam de ajuste." },
       { question: "Posso misturar flashcards de vários documentos numa revisão?", answer: "Sim. Podes selecionar flashcards de múltiplos documentos e revisá-los em conjunto, por exemplo todos os flashcards de uma disciplina." },
       { question: "Os flashcards ficam guardados permanentemente?", answer: "Sim. Os teus flashcards ficam guardados na tua conta sem limite de tempo, enquanto a conta estiver ativa." },

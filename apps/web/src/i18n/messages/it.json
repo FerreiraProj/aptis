@@ -171,7 +171,7 @@
   },
   "upload": {
     "title": "Carica documento",
-    "description": "PDF, PowerPoint, testo, link YouTube o foto dei tuoi appunti",
+    "description": "PDF, Word, PowerPoint, testo, link YouTube o foto dei tuoi appunti",
     "dropzone": "Trascina qui o clicca per selezionare",
     "supportedFormats": "PDF, PPT, TXT, JPG, PNG (max. 50 MB)",
     "youtubeUrl": "URL YouTube",

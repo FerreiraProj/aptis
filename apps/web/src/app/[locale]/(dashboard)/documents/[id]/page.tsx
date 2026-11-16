@@ -326,6 +326,7 @@ function sourceTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     PDF: "PDF",
     POWERPOINT: "PowerPoint",
+    WORD: "Word",
     TEXT: "Texto",
     YOUTUBE: "YouTube",
     SCREENSHOT: "Imagem",

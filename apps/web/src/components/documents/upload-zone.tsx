@@ -15,7 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SUPPORTED_FILE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/constants";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/constants";
+import {
+  UPLOAD_ACCEPT,
+  detectUploadType,
+  legacyOfficeFormat,
+} from "@/lib/document-processing/file-types";
 import { FileText, Youtube, Upload, CheckCircle2, Lock, BookMarked } from "lucide-react";
 
 type UploadMode = "file" | "youtube";
@@ -48,8 +53,13 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
   }, []);
 
   function validateAndSetFile(f: File) {
-    if (!SUPPORTED_FILE_TYPES.includes(f.type as never)) {
-      toast.error(`Formato não suportado: ${f.type}`);
+    if (!detectUploadType(f.name, f.type)) {
+      const legacy = legacyOfficeFormat(f.name, f.type);
+      toast.error(
+        legacy
+          ? `Ficheiros .${legacy} antigos não são suportados. Abre-o e guarda como .${legacy}x.`
+          : `Formato não suportado: ${f.type || f.name}`
+      );
       return;
     }
     if (f.size > MAX_FILE_SIZE_BYTES) {
@@ -149,7 +159,7 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
           <CardHeader>
             <CardTitle>Carregar Documento</CardTitle>
             <CardDescription>
-              PDF, PowerPoint (.pptx), texto ou imagem dos teus apontamentos
+              PDF, Word (.docx), PowerPoint (.pptx), texto ou imagem dos teus apontamentos
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -189,10 +199,10 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
                       Arrasta e larga ou clica para selecionar
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      PDF, PPTX, TXT, JPG, PNG — máximo 50MB
+                      PDF, DOCX, PPTX, TXT, JPG, PNG — máximo 50MB
                     </p>
                     <p className="text-xs text-muted-foreground/70 mt-1">
-                      Ficheiros .ppt antigos não são suportados — converte para .pptx
+                      Ficheiros .doc e .ppt antigos não são suportados — guarda como .docx ou .pptx
                     </p>
                   </div>
                 </>
@@ -201,7 +211,7 @@ export function UploadZone({ subjects = [] }: { subjects?: Subject[] }) {
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
-                accept={SUPPORTED_FILE_TYPES.join(",")}
+                accept={UPLOAD_ACCEPT}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) validateAndSetFile(f);

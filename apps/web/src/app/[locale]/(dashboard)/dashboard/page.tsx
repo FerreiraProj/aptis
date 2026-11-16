@@ -253,6 +253,7 @@ export default async function DashboardPage({
   const sourceTypeLabels: Record<string, string> = {
     PDF: "PDF",
     POWERPOINT: "PowerPoint",
+    WORD: "Word",
     TEXT: t("sourceText"),
     YOUTUBE: "YouTube",
     SCREENSHOT: t("sourceImage"),

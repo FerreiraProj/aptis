@@ -171,7 +171,7 @@
   },
   "upload": {
     "title": "Subir documento",
-    "description": "PDF, PowerPoint, texto, enlace de YouTube o foto de tus apuntes",
+    "description": "PDF, Word, PowerPoint, texto, enlace de YouTube o foto de tus apuntes",
     "dropzone": "Arrastra y suelta aquí o haz clic para seleccionar",
     "supportedFormats": "PDF, PPT, TXT, JPG, PNG (máx. 50 MB)",
     "youtubeUrl": "URL de YouTube",

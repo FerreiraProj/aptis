@@ -1,6 +1,7 @@
 /**
- * PowerPoint text extraction using officeparser v6.
- * Only handles .pptx (OOXML) — old .ppt (CFB binary) is NOT supported by officeparser.
+ * Office (OOXML) text extraction using officeparser v6.
+ * Handles .pptx (PowerPoint) and .docx (Word). The old binary formats
+ * (.ppt / .doc) are NOT supported by officeparser — they are rejected at upload.
  *
  * officeparser reliably detects file format from the extension, so we write the buffer
  * to a temp file, parse it, then clean up immediately.
@@ -11,7 +12,9 @@ import { join } from "path";
 import { tmpdir } from "os";
 import { randomUUID } from "crypto";
 
-export async function parsePptx(buffer: Buffer): Promise<string> {
+type OfficeExtension = "pptx" | "docx";
+
+async function parseOfficeFile(buffer: Buffer, ext: OfficeExtension): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mod = await import("officeparser") as any;
 
@@ -24,8 +27,8 @@ export async function parsePptx(buffer: Buffer): Promise<string> {
     );
   }
 
-  // Write buffer to a temp .pptx file so officeparser can detect format from extension
-  const tmpPath = join(tmpdir(), `${randomUUID()}.pptx`);
+  // Write buffer to a temp file so officeparser can detect format from extension
+  const tmpPath = join(tmpdir(), `${randomUUID()}.${ext}`);
   try {
     writeFileSync(tmpPath, buffer);
     const result = await parseOffice(tmpPath);
@@ -46,6 +49,14 @@ export async function parsePptx(buffer: Buffer): Promise<string> {
   } finally {
     try { unlinkSync(tmpPath); } catch { /* ignore cleanup errors */ }
   }
+}
+
+export function parsePptx(buffer: Buffer): Promise<string> {
+  return parseOfficeFile(buffer, "pptx");
+}
+
+export function parseDocx(buffer: Buffer): Promise<string> {
+  return parseOfficeFile(buffer, "docx");
 }
 
 function cleanText(text: string): string {

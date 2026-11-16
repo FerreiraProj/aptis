@@ -107,16 +107,7 @@ export type RateLimitAction = keyof (typeof PLAN_RATE_LIMITS)["FREE"];
 export const MAX_FILE_SIZE_MB = 50;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-export const SUPPORTED_FILE_TYPES = [
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  // Note: "application/vnd.ms-powerpoint" (.ppt old binary format) is NOT supported —
-  // officeparser only handles .pptx (OOXML). Users must convert .ppt → .pptx first.
-  "text/plain",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
+// Supported upload formats live in lib/document-processing/file-types.ts
 
 export const FLASHCARD_REVIEW_BATCH_SIZE = 20;
 

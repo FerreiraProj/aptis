@@ -171,7 +171,7 @@
   },
   "upload": {
     "title": "Upload Document",
-    "description": "PDF, PowerPoint, text, YouTube link or photo of your notes",
+    "description": "PDF, Word, PowerPoint, text, YouTube link or photo of your notes",
     "dropzone": "Drag and drop here or click to select",
     "supportedFormats": "PDF, PPT, TXT, JPG, PNG (max 50MB)",
     "youtubeUrl": "YouTube URL",

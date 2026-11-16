@@ -199,6 +199,7 @@ model Document {
 enum SourceType {
   PDF
   POWERPOINT
+  WORD
   TEXT
   YOUTUBE
   SCREENSHOT
