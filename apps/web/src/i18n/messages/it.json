@@ -421,6 +421,8 @@
     "billingTitle": "Piano e fatturazione",
     "planLabel": "Piano {plan}",
     "renewsOn": "Rinnovo il",
+    "grantedUntil": "Concesso dal team fino al",
+    "grantedIndefinite": "Concesso dal team, senza scadenza",
     "upgrade": "Aggiorna piano",
     "syncSubscription": "Ho già aggiornato ma non si è aggiornato →",
     "syncing": "Sincronizzazione...",

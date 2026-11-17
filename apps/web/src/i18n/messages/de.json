@@ -421,6 +421,8 @@
     "billingTitle": "Abo & Abrechnung",
     "planLabel": "Abo {plan}",
     "renewsOn": "Verlängerung am",
+    "grantedUntil": "Vom Team gewährt bis",
+    "grantedIndefinite": "Vom Team unbefristet gewährt",
     "upgrade": "Upgrade",
     "syncSubscription": "Ich habe bereits ein Upgrade gemacht, aber es hat sich nicht aktualisiert →",
     "syncing": "Synchronisierung...",

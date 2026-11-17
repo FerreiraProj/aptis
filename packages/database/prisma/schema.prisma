@@ -34,6 +34,12 @@ model User {
   // Stripe
   stripeCustomerId String? @unique @map("stripe_customer_id")
 
+  // Admin-granted plan (independent of Stripe; takes precedence while active).
+  // planOverrideExpiresAt = null means the grant is indefinite.
+  planOverride          PlanTier? @map("plan_override")
+  planOverrideExpiresAt DateTime? @map("plan_override_expires_at")
+  planOverrideGrantedAt DateTime? @map("plan_override_granted_at")
+
   // Preferences
   preferredExplanationStyle ExplanationStyle @default(CONCISE) @map("preferred_explanation_style")
   preferredLocale           String           @default("pt") @map("preferred_locale")

@@ -421,6 +421,8 @@
     "billingTitle": "Abonnement et facturation",
     "planLabel": "Abonnement {plan}",
     "renewsOn": "Renouvellement le",
+    "grantedUntil": "Offert par l'équipe jusqu'au",
+    "grantedIndefinite": "Offert par l'équipe, sans date de fin",
     "upgrade": "Mettre à niveau",
     "syncSubscription": "J'ai déjà mis à niveau mais ça ne s'est pas mis à jour →",
     "syncing": "Synchronisation...",

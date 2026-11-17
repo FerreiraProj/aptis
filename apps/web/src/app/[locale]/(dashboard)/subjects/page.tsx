@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PLAN_LIMITS } from "@/lib/constants";
 import type { PlanKey } from "@/lib/constants";
-import { resolveEffectivePlan } from "@/lib/plans";
+import { resolveUserPlan, userPlanSelect } from "@/lib/plans";
 import { SubjectsClient } from "./subjects-client";
 
 export default async function SubjectsPage() {
@@ -14,19 +14,19 @@ export default async function SubjectsPage() {
 
   if (!user) redirect("/login");
 
-  const [subjects, subscription] = await Promise.all([
+  const [subjects, planUser] = await Promise.all([
     prisma.subject.findMany({
       where: { userId: user.id },
       include: { _count: { select: { documents: true } } },
       orderBy: { createdAt: "asc" },
     }),
-    prisma.subscription.findUnique({
-      where: { userId: user.id },
-      select: { plan: true, status: true },
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: userPlanSelect,
     }),
   ]);
 
-  const plan: PlanKey = resolveEffectivePlan(subscription);
+  const plan: PlanKey = resolveUserPlan(planUser);
   const limit = PLAN_LIMITS[plan].subjectsMax;
 
   return (

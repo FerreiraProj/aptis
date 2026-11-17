@@ -31,6 +31,9 @@ interface UserProfile {
     status: string;
     currentPeriodEnd: string;
   } | null;
+  effectivePlan?: string;
+  planOverrideActive?: boolean;
+  planOverrideExpiresAt?: string | null;
 }
 
 type TabId = "geral" | "estudo" | "ia";
@@ -234,9 +237,19 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">
-                    {t("planLabel", { plan: profile.subscription?.plan ?? "FREE" })}
+                    {t("planLabel", {
+                      plan: profile.effectivePlan ?? profile.subscription?.plan ?? "FREE",
+                    })}
                   </p>
-                  {profile.subscription?.currentPeriodEnd && (
+                  {profile.planOverrideActive ? (
+                    <p className="text-sm text-muted-foreground">
+                      {profile.planOverrideExpiresAt
+                        ? `${t("grantedUntil")} ${new Date(
+                            profile.planOverrideExpiresAt
+                          ).toLocaleDateString()}`
+                        : t("grantedIndefinite")}
+                    </p>
+                  ) : profile.subscription?.currentPeriodEnd && (
                     <p className="text-sm text-muted-foreground">
                       {t("renewsOn")}{" "}
                       {new Date(
@@ -247,10 +260,14 @@ export default function SettingsPage() {
                 </div>
                 <Badge
                   variant={
-                    profile.subscription?.status === "ACTIVE" ? "default" : "outline"
+                    profile.planOverrideActive || profile.subscription?.status === "ACTIVE"
+                      ? "default"
+                      : "outline"
                   }
                 >
-                  {profile.subscription?.status ?? "FREE"}
+                  {profile.planOverrideActive
+                    ? "ACTIVE"
+                    : profile.subscription?.status ?? "FREE"}
                 </Badge>
               </div>
               {!profile.subscription ? (

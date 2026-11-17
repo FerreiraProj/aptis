@@ -1,5 +1,6 @@
 import { prisma } from "@aptis/database";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { resolveUserPlan } from "@/lib/plans";
 
 export const metadata = { title: "Admin" };
 
@@ -18,6 +19,8 @@ export default async function AdminPage() {
           fullName: true,
           role: true,
           createdAt: true,
+          planOverride: true,
+          planOverrideExpiresAt: true,
           subscription: { select: { plan: true, status: true } },
         },
       }),
@@ -66,7 +69,7 @@ export default async function AdminPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {u.subscription?.plan || "FREE"}
+                    {resolveUserPlan(u)}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(u.createdAt).toLocaleDateString("pt-PT")}

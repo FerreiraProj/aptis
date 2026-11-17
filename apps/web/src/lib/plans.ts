@@ -35,6 +35,39 @@ export function resolveEffectivePlan(sub: SubscriptionLike): PlanKey {
   return sub.plan in PLAN_LIMITS ? (sub.plan as PlanKey) : "FREE";
 }
 
+/**
+ * A user row with the optional admin-granted plan (independent of Stripe).
+ * planOverrideExpiresAt = null means the grant is indefinite.
+ */
+export type UserPlanLike = {
+  planOverride?: string | null;
+  planOverrideExpiresAt?: Date | string | null;
+  subscription?: SubscriptionLike;
+} | null | undefined;
+
+/** True when an admin grant exists and has not expired. */
+export function isPlanOverrideActive(user: UserPlanLike, now: Date = new Date()): boolean {
+  if (!user?.planOverride || !(user.planOverride in PLAN_LIMITS)) return false;
+  if (!user.planOverrideExpiresAt) return true;
+  return new Date(user.planOverrideExpiresAt).getTime() > now.getTime();
+}
+
+/**
+ * Resolve a user's plan: an active admin grant wins; otherwise the Stripe
+ * subscription (see resolveEffectivePlan).
+ */
+export function resolveUserPlan(user: UserPlanLike, now: Date = new Date()): PlanKey {
+  if (isPlanOverrideActive(user, now)) return user!.planOverride as PlanKey;
+  return resolveEffectivePlan(user?.subscription);
+}
+
+/** Prisma `select` fragment with everything resolveUserPlan needs. */
+export const userPlanSelect = {
+  planOverride: true,
+  planOverrideExpiresAt: true,
+  subscription: { select: { plan: true, status: true } },
+} as const;
+
 /** Boolean feature flags defined in PLAN_LIMITS. */
 export type PlanFeature = {
   [K in keyof (typeof PLAN_LIMITS)["FREE"]]: (typeof PLAN_LIMITS)["FREE"][K] extends boolean

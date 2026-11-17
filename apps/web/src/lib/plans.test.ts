@@ -3,7 +3,9 @@ import {
   getGenerationLimits,
   getMonthlyLimit,
   hasFeature,
+  isPlanOverrideActive,
   resolveEffectivePlan,
+  resolveUserPlan,
   startOfMonthUtc,
 } from "./plans";
 
@@ -76,5 +78,40 @@ describe("startOfMonthUtc", () => {
   it("handles the last moment of a month", () => {
     const d = startOfMonthUtc(new Date("2026-12-31T23:59:59.999Z"));
     expect(d.toISOString()).toBe("2026-12-01T00:00:00.000Z");
+  });
+});
+
+describe("resolveUserPlan (admin grants)", () => {
+  const now = new Date("2026-06-15T12:00:00Z");
+  const paidPro = { plan: "PRO", status: "ACTIVE" };
+
+  it("falls back to the subscription when there is no grant", () => {
+    expect(resolveUserPlan({ subscription: paidPro }, now)).toBe("PRO");
+    expect(resolveUserPlan(null, now)).toBe("FREE");
+  });
+
+  it("uses an indefinite grant even without paying", () => {
+    const user = { planOverride: "PREMIUM", planOverrideExpiresAt: null, subscription: null };
+    expect(isPlanOverrideActive(user, now)).toBe(true);
+    expect(resolveUserPlan(user, now)).toBe("PREMIUM");
+  });
+
+  it("uses a time-limited grant until it expires", () => {
+    const user = {
+      planOverride: "PREMIUM",
+      planOverrideExpiresAt: new Date("2026-07-15T12:00:00Z"),
+      subscription: paidPro,
+    };
+    expect(resolveUserPlan(user, now)).toBe("PREMIUM");
+    expect(resolveUserPlan(user, new Date("2026-08-01T00:00:00Z"))).toBe("PRO");
+  });
+
+  it("ignores an expired grant on a canceled subscription", () => {
+    const user = {
+      planOverride: "PRO",
+      planOverrideExpiresAt: "2026-01-01T00:00:00Z",
+      subscription: { plan: "PRO", status: "CANCELED" },
+    };
+    expect(resolveUserPlan(user, now)).toBe("FREE");
   });
 });

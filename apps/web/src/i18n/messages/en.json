@@ -421,6 +421,8 @@
     "billingTitle": "Plan & billing",
     "planLabel": "Plan {plan}",
     "renewsOn": "Renews on",
+    "grantedUntil": "Granted by the team until",
+    "grantedIndefinite": "Granted by the team, no end date",
     "upgrade": "Upgrade",
     "syncSubscription": "I upgraded but it didn't update →",
     "syncing": "Syncing...",

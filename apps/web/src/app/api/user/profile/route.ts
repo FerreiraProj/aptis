@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@aptis/database";
 import { z } from "zod";
+import { resolveUserPlan, isPlanOverrideActive } from "@/lib/plans";
 
 export async function GET() {
   const supabase = await createClient();
@@ -30,7 +31,13 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ user: dbUser });
+  return NextResponse.json({
+    user: {
+      ...dbUser,
+      effectivePlan: resolveUserPlan(dbUser),
+      planOverrideActive: isPlanOverrideActive(dbUser),
+    },
+  });
 }
 
 const UpdateProfileSchema = z.object({
