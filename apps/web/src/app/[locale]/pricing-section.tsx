@@ -1,21 +1,8 @@
 import { Link } from "@/i18n/navigation";
-import { headers } from "next/headers";
+import { connection } from "next/server";
+import { getPublicPlans, type PublicPlan } from "@/lib/pricing";
 import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
-
-type PlanRow = {
-  id: string;
-  plan: string;
-  name: string;
-  description: string | null;
-  priceMonthly: number;
-  priceYearly: number;
-  promoPriceMonthly: number | null;
-  promoPriceYearly: number | null;
-  currency: string;
-  features: string[];
-  trialDays: number;
-};
 
 const HIGHLIGHTED: Record<string, boolean> = {
   PRO: true,
@@ -23,22 +10,16 @@ const HIGHLIGHTED: Record<string, boolean> = {
 
 export async function PricingSection() {
   const t = await getTranslations("pricing");
-  const hdrs = await headers();
-  const host = hdrs.get("host") ?? "localhost:3000";
-  const proto = hdrs.get("x-forwarded-proto") ?? "http";
-  const baseUrl = `${proto}://${host}`;
+  // Render per request so plan changes in /admin/plans show up immediately
+  await connection();
 
-  let plans: PlanRow[] = [];
+  // Read the DB directly — fetching our own /api/pricing over the public
+  // domain from a server component is fragile (proxy/redirects return HTML).
+  let plans: PublicPlan[] = [];
   try {
-    const res = await fetch(`${baseUrl}/api/pricing`, { cache: "no-store" });
-    if (res.ok) {
-      const data = await res.json();
-      plans = data.plans ?? [];
-    } else {
-      console.error("[PricingSection] /api/pricing returned", res.status);
-    }
+    plans = await getPublicPlans();
   } catch (err) {
-    console.error("[PricingSection] fetch failed:", err);
+    console.error("[PricingSection] failed to load plans:", err);
   }
 
   if (plans.length === 0) return null;
